@@ -1,0 +1,384 @@
+\documentclass[%draft,
+    10pt,
+    headinclude, footexclude,
+    % twoside, % this produces strange margins!
+    openright, % for new chapters
+    notitlepage,
+    cleardoubleempty,
+    headsepline,
+    pointlessnumbers,
+    bibtotoc, idxtotoc,
+    ]{scrbook}
+
+% iPad Air 2 resolution: 1536 x 2048
+% 1.3333 ratio (4:3)
+% LeeSeshia is 15,73 ? 20,96 cm, ratio 1.332
+%\setlength{\paperwidth}{15.73cm} \setlength{\paperheight}{20.96cm}
+\setlength{\paperwidth}{15.72cm} \setlength{\paperheight}{20.95cm}
+%\typearea{calc} % without BCOR results to a DIV of 8 for 11pt
+\typearea[1.1cm]{15} % used 18, but 15 gives more space for the binding, TODO: check if 1.1 cm is the correct number
+
+\usepackage{scrlayer-scrpage}
+\setkomafont{pagehead}{\scshape\small}
+\setkomafont{pagenumber}{\scshape\small}
+
+
+\newif\ifbook
+%\booktrue % comment out for the print book version
+
+\ifbook
+\else
+\ifoot{\hyperlink{contents}{{\textnormal{Contents}}}}
+\cfoot{\hyperlink{index}{{\textnormal{Index}}}}
+\fi
+
+
+
+\usepackage{pslatex} % -- times instead of computer modern, especially for the plain article class
+\usepackage[pdftex,
+            pdfauthor={Martin et al.},
+            pdftitle={Introduction to Chip Design\\Using Open-Source Tools},
+            colorlinks=true,bookmarks=true]{hyperref}
+
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{multirow}
+\usepackage{cite}
+\usepackage{dirtree}
+\usepackage{pdfpages}
+\usepackage{makeidx}
+%\usepackage{showidx} % for index debugging
+% For alignment on tables
+\usepackage{dcolumn}
+\newcommand{\cc}[1]{\multicolumn{1}{c}{#1}}
+\usepackage{tikz}
+\usetikzlibrary{arrows,bending}
+\usetikzlibrary{positioning}
+
+
+% fatter TT font
+\renewcommand*\ttdefault{txtt}
+% another TT, suggested by Alex
+% \usepackage{inconsolata}
+% \usepackage[T1]{fontenc} % needed as well?
+
+% Smaller verbatim text
+\usepackage{etoolbox}
+\makeatletter
+\patchcmd{\@verbatim}
+  {\verbatim@font}
+  {\verbatim@font\small}
+  {}{}
+\makeatother
+
+\usepackage[procnames]{listings}
+
+
+\ifbook
+\hypersetup{
+  linkcolor  = black,
+  citecolor  = black,
+  urlcolor   = black,
+  colorlinks = black,
+  bookmarks=false,
+}
+\else
+\hypersetup{
+  linkcolor  = blue,
+  citecolor  = blue,
+  urlcolor   = blue,
+  colorlinks = true,
+  bookmarks=true,
+  pdfpagemode=UseOutlines,
+}
+\fi
+
+
+\makeindex
+
+% not really used
+\newenvironment{comment}
+{ \vspace{-0.1in}
+  \begin{quotation}
+  \noindent
+  \small \em
+  \rule{\linewidth}{0.5pt}\\
+}
+{
+  \\
+  \rule{\linewidth}{0.5pt}
+  \end{quotation}
+}
+
+\newcommand{\scale}{0.7}
+
+%\input{shared/chisel.tex}
+
+\newcommand{\code}[1]{{\lstinline[basicstyle=\small\ttfamily]{#1}}}
+\newcommand{\codefoot}[1]{{\lstinline[basicstyle=\footnotesize\ttfamily]{#1}}}
+
+\newcommand{\todo}[1]{{\emph{TODO: #1}}}
+\newcommand{\martin}[1]{{\color{blue} Martin: #1}}
+\newcommand{\myref}[2]{\href{#1}{#2}}
+
+\ifbook
+\renewcommand{\myref}[2]{{#2}{\footnote{\url{#1}}}}
+\fi
+
+% uncomment following for final submission
+%\renewcommand{\todo}[1]{}
+%\renewcommand{\martin}[1]{}
+
+\makeindex
+
+\begin{document}
+
+
+\ifbook
+\else
+%\includepdf{chisel-cover.pdf}
+\newpage
+\thispagestyle{empty}
+~
+\newpage
+\fi
+
+
+
+\begin{flushleft}
+\pagestyle{empty}
+\ \\
+\vspace{1cm}
+{\usekomafont{title}\mdseries\huge Introduction to Chip Design\\ \large Using Open-Source Tools}
+\ \\
+\vspace{1cm}
+{\usekomafont{title}\mdseries\Large First Edition}
+\cleardoublepage
+\end{flushleft}
+\newpage
+
+
+\begin{flushleft}
+\pagestyle{empty}
+\ \\
+\vspace{1cm}
+{\usekomafont{title}\Huge Introduction to Chip Design\\ \large Using Open-Source Tools\\
+\bigskip
+{\usekomafont{title}\huge First Edition}\\
+\bigskip
+\bigskip
+\bigskip
+\bigskip
+%{\large\itshape Beta Edition}\\
+\bigskip
+{\usekomafont{title}\huge Martin et al.}
+\medskip\\
+%{\large\itshape martin@jopdesign.com}
+
+}
+
+%\vspace{10cm} \emph{Version: \today}
+\newpage
+\end{flushleft}
+
+\thispagestyle{empty}
+\begin{flushleft}
+{\small
+
+%\lowertitleback{
+Copyright \copyright{} 2024-2025 Martin...
+  \medskip\\
+  \begin{tabular}{lp{.8\textwidth}}
+    \raisebox{-12pt}{\includegraphics[height=18pt]{figures/cc_by_sa}} &
+     This work is licensed under a Creative Commons Attribution-ShareAlike
+     4.0 International License.
+     \url{http://creativecommons.org/licenses/by-sa/4.0/}\\
+  \end{tabular}
+%}
+
+\medskip
+
+Email: \url{martin@jopdesign.com}\\
+Visit the source at \url{https://github.com/os-chip-design/chip-design-book}
+\medskip
+
+First edition published 2025 by Kindle Direct Publishing,\\
+\url{https://kdp.amazon.com/}
+\medskip
+\medskip
+
+
+\textbf{Library of Congress Cataloging-in-Publication Data}
+\medskip
+
+TBD... Schoeberl, Martin
+\begin{quote}
+xxxl\\
+Martin ...\\
+Includes bibliographical references and an index.\\
+ISBN xxx
+\end{quote}
+
+\bigskip
+
+
+Manufactured in the United States of America.
+
+Typeset by Martin Schoeberl.}
+\end{flushleft}
+
+\frontmatter
+
+\phantomsection
+\hypertarget{contents}{}
+\tableofcontents
+
+
+\begingroup
+\let\cleardoublepage\clearpage
+\listoffigures
+\listoftables
+\lstlistoflistings
+\endgroup
+
+\chapter{Foreword}
+
+\medskip
+\medskip
+
+It is an exciting time to be in the world of digital design....
+
+\chapter{Preface}
+
+% This text goes on the backside of the book, and in Amazon description
+This book is an introduction to chip design with a focus on using...
+
+
+
+
+
+\section*{Acknowledgements}
+
+\todo{Maybe? Probably not yet ;-)}
+
+
+\mainmatter
+
+\chapter{Introduction}
+\label{sec:intro}
+
+This book is an introduction to chip design using open-source tools.
+
+
+\chapter{The MOSFET and CMOS}
+
+\chapter{Building Standard Cells}
+
+\section{FABs}
+
+\section{PDK}
+
+\chapter{The Design Flow}
+
+\chapter{Hardware Description Languages}
+
+\section{Verilog}
+\section{VHDL}
+\section{SystemVerilog}
+\section{Chisel}
+
+\cite{chisel:dac2012} \cite{chisel:book}
+\section{Other Languages}
+\subsection{Amaranth}
+\subsection{SpinalHDL}
+\subsection{MyHDL}
+\subsection{Clash}
+\section{Generator Scripting Languages}
+
+\chapter{Open-Source Tools}
+
+
+\chapter{Open-Source Production Frameoworks}
+
+\section{Caravel and efabless}
+
+\section{Tiny Tapeout}
+
+\section{Maybe something from Edu4Chip?}
+
+\chapter{xxx}
+
+
+\chapter{Acronyms}
+
+Hardware designers and computer engineers like to use acronyms.
+However, it takes time to get used to them. Here is a list of common terms
+related to digital design and computer architecture.
+
+\todo{Fix for the very many acronyms we use in chip design...}
+
+
+\begin{description}
+\item [ADC] analog-to-digital converter
+\item [ALU] arithmetic and logic unit
+\item [ASIC] application-specific integrated circuit
+\item [CFG] control flow graph
+\item [Chisel] constructing hardware in a Scala embedded language
+\item [CISC] complex instruction set computer
+\item [CPI] clock cycles per instruction
+\item [CPU] central processing unit
+\item [CRC] cyclic redundancy check
+\item [DAC] digital-to-analog converter
+\item [DFF] D flip-flop, data flip-flop
+\item [DMA] direct memory access
+\item [DRAM] dynamic random access memory
+\item [EMC] electromagnetic compatibility
+\item [ESD] electrostatic discharge
+\item [FF] flip-flop
+\item [FIFO] first-in, first-out
+\item [FPGA] field-programmable gate array
+% \item [GC] garbage collect(ion/or)
+\item [HDL] hardware description language
+\item [HLS] high-level synthesis
+\item [IC] instruction count
+\item [IDE] integrated development environment
+\item [ILP] instruction level parallelism
+\item [IC] integrated circuit
+\item [IO] input/output
+\item [ISA] instruction set architecture
+\item [JDK] Java development kit
+\item [JIT] just-in-time
+\item [JVM] Java virtual machine
+\item [LC] logic cell
+\item [LRU] least-recently used
+\item [LSB] least significant bit
+\item [MMIO] memory-mapped IO
+\item [MSB] most significant bit
+\item [MUX] multiplexer
+\item [OO] object oriented
+\item [OOO] out-of-order
+\item [OS] operating system
+\item [RAM] random access memory
+\item [RISC] reduced instruction set computer
+%\item [RT] Real-Time
+%\item [RTOS] Real-Time Operating System
+\item [SDRAM] synchronous DRAM
+\item [SRAM] static random access memory
+\item [TOS] top of stack
+\item [UART] universal asynchronous receiver/transmitter
+\item [VHDL] VHSIC hardware description language
+\item [VHSIC] very high speed integrated circuit
+%\item [WCET] Worst-Case Execution Time
+\end{description}
+
+
+
+\bibliographystyle{plain}
+\bibliography{msbib, chip-design}
+
+\phantomsection
+\hypertarget{index}{}
+\printindex
+
+\end{document}
