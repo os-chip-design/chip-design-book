@@ -247,12 +247,14 @@ Typeset by Martin Schoeberl.}
 \medskip
 \medskip
 
-It is an exciting time to be in the world of digital design....
+It is an exciting time to be in the world of chip design....
+
+\todo{Could this be written by someone else?}
 
 \chapter{Preface}
 
 % This text goes on the backside of the book, and in Amazon description
-This book is an introduction to chip design with a focus on using...
+This book is an introduction to chip design with a focus on using open-source tools. 
 
 
 
@@ -268,46 +270,60 @@ This book is an introduction to chip design with a focus on using...
 \chapter{Introduction}
 \label{sec:intro}
 
-This book is an introduction to chip design using open-source tools.
+This book is an introduction to chip design using open-source tools. The topic of the book are the steps that are needed to produce a chip for a design described in a hardware description language (HDL) down to the files that are sent to the fab. Those steps are often called the backend design.
+
+\todo{Explain the term fab.}
+
+This book does not cover digital design, such as basic Boolean equations and sequential circuits. For this topic, we refer to other textbooks, such as \cite{dally:vhdl:2016} and \cite{chisel:book}. When we need to describe some circuits, we will describe them in \myref{https://www.chisel-lang.org/}{Chisel}~\cite{chisel:dac2012} and in Verilog.
+
+This book is optimized for reading on a tablet (e.g., an iPad) or a laptop.
+We include links to further reading in the running text, primarily to
+\myref{https://en.wikipedia.org/}{Wikipedia} articles.
 
 
-\chapter{The MOSFET and CMOS}
+\section{History of Design Tools}
 
-\chapter{Building Standard Cells}
+Very early chips have been designed by hand, and the photo masks have been produced by \emph{drawing} them with tapes. \todo{What was the last chip done this way?} As this process does not scale, the development of computer aided design (CAD) tools have been developed. Another term used is: electroinc design automation (EDA).
 
-\section{FABs}
 
-\section{PDK}
+\chapter{List of Chapters}
 
-\chapter{The Design Flow}
+Elevate them when there is some text
 
-\chapter{Hardware Description Languages}
+\section{The MOSFET and CMOS Technology}
 
-\section{Verilog}
-\section{VHDL}
-\section{SystemVerilog}
-\section{Chisel}
+\section{Building Standard Cells}
+
+\subsection{FABs}
+
+\subsection{PDK}
+
+\section{The Design Flow}
+
+\section{Hardware Description Languages}
+
+\subsection{Verilog}
+\subsection{VHDL}
+\subsection{SystemVerilog}
+\subsection{Chisel}
 
 \cite{chisel:dac2012} \cite{chisel:book}
-\section{Other Languages}
+\subsection{Other Languages}
 \subsection{Amaranth}
 \subsection{SpinalHDL}
 \subsection{MyHDL}
 \subsection{Clash}
-\section{Generator Scripting Languages}
+\subsection{Generator Scripting Languages}
 
-\chapter{Open-Source Tools}
+\section{Open-Source Tools}
 
-
-\chapter{Open-Source Production Frameoworks}
+\section{Open-Source Production Frameoworks}
 
 \section{Caravel and efabless}
 
 \section{Tiny Tapeout}
 
 \section{Maybe something from Edu4Chip?}
-
-\chapter{xxx}
 
 
 \chapter{Acronyms}
@@ -316,14 +332,14 @@ Hardware designers and computer engineers like to use acronyms.
 However, it takes time to get used to them. Here is a list of common terms
 related to digital design and computer architecture.
 
-\todo{Fix for the very many acronyms we use in chip design...}
+\todo{Add the very many acronyms we use in chip design...}
 
 
 \begin{description}
 \item [ADC] analog-to-digital converter
 \item [ALU] arithmetic and logic unit
 \item [ASIC] application-specific integrated circuit
-\item [CFG] control flow graph
+\item [CAD] computer aided design
 \item [Chisel] constructing hardware in a Scala embedded language
 \item [CISC] complex instruction set computer
 \item [CPI] clock cycles per instruction
@@ -333,18 +349,17 @@ related to digital design and computer architecture.
 \item [DFF] D flip-flop, data flip-flop
 \item [DMA] direct memory access
 \item [DRAM] dynamic random access memory
+\item [EDA] electroinc design automation
 \item [EMC] electromagnetic compatibility
 \item [ESD] electrostatic discharge
 \item [FF] flip-flop
 \item [FIFO] first-in, first-out
 \item [FPGA] field-programmable gate array
-% \item [GC] garbage collect(ion/or)
 \item [HDL] hardware description language
 \item [HLS] high-level synthesis
-\item [IC] instruction count
+\item [IC] integrated circuit (also instruction count in computer architecture)
 \item [IDE] integrated development environment
 \item [ILP] instruction level parallelism
-\item [IC] integrated circuit
 \item [IO] input/output
 \item [ISA] instruction set architecture
 \item [JDK] Java development kit
@@ -361,15 +376,11 @@ related to digital design and computer architecture.
 \item [OS] operating system
 \item [RAM] random access memory
 \item [RISC] reduced instruction set computer
-%\item [RT] Real-Time
-%\item [RTOS] Real-Time Operating System
 \item [SDRAM] synchronous DRAM
 \item [SRAM] static random access memory
-\item [TOS] top of stack
 \item [UART] universal asynchronous receiver/transmitter
 \item [VHDL] VHSIC hardware description language
 \item [VHSIC] very high speed integrated circuit
-%\item [WCET] Worst-Case Execution Time
 \end{description}
 
 
