@@ -270,7 +270,7 @@ This book is an introduction to chip design with a focus on using open-source to
 \chapter{Introduction}
 \label{sec:intro}
 
-This book is an introduction to chip design using open-source tools. The topic of the book are the steps that are needed to produce a chip for a design described in a hardware description language (HDL) down to the files that are sent to the fab. Those steps are often called the backend design.
+This book is an introduction to chip design using open-source tools. The topic of the book is the steps that are needed to produce a chip for a design described in a hardware description language (HDL) down to the files that are sent to the fab. Those steps are often called the backend design.
 
 \todo{Explain the term fab.}
 
@@ -283,8 +283,24 @@ We include links to further reading in the running text, primarily to
 
 \section{History of Design Tools}
 
-Very early chips have been designed by hand, and the photo masks have been produced by \emph{drawing} them with tapes. \todo{What was the last chip done this way?} As this process does not scale, the development of computer aided design (CAD) tools have been developed. Another term used is: electroinc design automation (EDA).
+Very early chips have been designed by hand, and the photo masks have been produced by \emph{drawing} them with tapes. \todo{What was the last chip done this way?} As this process does not scale, computer-aided design (CAD) tools have been developed. Another term used is: electronic design automation (EDA).
 
+Albertos keynote: \cite{tides:eda}
+
+
+\section{Tool Installation}
+
+The magic of open-srouce tools is that we can install them on a personal computer without any concerns of licensing and license servers. The downside of open-source tools is the veriaety of installation options. There is no single best way for the installation. Furthermore, open-source tools are best supported on a Unix operating system, and preferable Linux. Support under MacOS comes second. MS Windows is best served by using the Window subsystme for Linux.
+
+\subsection{Nix Based}
+
+\subsection{Docker Images}
+
+\subsection{Compileing from Source}
+
+\section{Hello World}
+
+After installing the tools, we want to see them in action. Synthesize a minimal circuit from the description in an HDL to the generation of a GDSII file and visualize it in an editor.
 
 \chapter{List of Chapters}
 
@@ -386,7 +402,7 @@ related to digital design and computer architecture.
 
 
 \bibliographystyle{plain}
-\bibliography{msbib, chip-design}
+\bibliography{msbib}
 
 \phantomsection
 \hypertarget{index}{}
