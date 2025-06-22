@@ -187,7 +187,7 @@
 {\small
 
 %\lowertitleback{
-Copyright \copyright{} 2024-2025 Martin...
+Copyright \copyright{} 2025 Martin...
   \medskip\\
   \begin{tabular}{lp{.8\textwidth}}
     \raisebox{-12pt}{\includegraphics[height=18pt]{figures/cc_by_sa}} &
@@ -270,7 +270,7 @@ This book is an introduction to chip design with a focus on using open-source to
 \chapter{Introduction}
 \label{sec:intro}
 
-This book is an introduction to chip design using open-source tools. The topic of the book is the steps that are needed to produce a chip for a design described in a hardware description language (HDL) down to the files that are sent to the fab. Those steps are often called the backend design.
+This book is an introduction to chip design using open-source tools. It covers the steps needed to produce a chip for a design described in a hardware description language (HDL), down to the files that are sent to the fab. Those steps are often called the backend design.
 
 \todo{Explain the term fab.}
 
@@ -285,26 +285,43 @@ We include links to further reading in the running text, primarily to
 
 Very early chips have been designed by hand, and the photo masks have been produced by \emph{drawing} them with tapes. \todo{What was the last chip done this way?} As this process does not scale, computer-aided design (CAD) tools have been developed. Another term used is: electronic design automation (EDA).
 
-Albertos keynote: \cite{tides:eda}
 
+Alberto was invited to give a keynote speech at the 40th Design Automation Conference (DAC). That speech resulted in a paper on the history (and future) of EDA~\cite{tides:eda}, mostly work as presented at DAC.
 
+Alberto co-founded Cadence Design Systems and Synopsys, the two major EDA tool vendors.
+
+\subsection{Simulation} 
+IBM's Astap (advanced statistical
+analysis program) and UC Berkeley's
+Spice (simulation program for integrated
+circuits emphasis)
+
+Early tools, still in use today: Spice, Espresso, Magic, 
 \section{Tool Installation}
 
-The magic of open-srouce tools is that we can install them on a personal computer without any concerns of licensing and license servers. The downside of open-source tools is the veriaety of installation options. There is no single best way for the installation. Furthermore, open-source tools are best supported on a Unix operating system, and preferable Linux. Support under MacOS comes second. MS Windows is best served by using the Window subsystme for Linux.
+The magic of open-source tools is that we can install them on a personal computer without any concerns of licensing and license servers. The downside of open-source tools is the variety of installation options. There is no single best way for the installation. Furthermore, open-source tools are best supported on a Unix operating system, and preferably Linux. Support under MacOS comes second. MS Windows is best served by using the Windows Subsystem for Linux.
+
+\url{https://github.com/YosysHQ/oss-cad-suite-build}
 
 \subsection{Nix Based}
 
 \subsection{Docker Images}
 
-\subsection{Compileing from Source}
+\subsection{Compiling from Source}
+
+As the tools are open-source, it is always a (theoretical) option to compile them from source. However, often there are library dependencies that are not easy to resolve. Therefore, we recommend installing the tools with some packaging software that ensures compatibility between the various tools.
 
 \section{Hello World}
 
-After installing the tools, we want to see them in action. Synthesize a minimal circuit from the description in an HDL to the generation of a GDSII file and visualize it in an editor.
+After installing the tools, we want to see them in action. The \emph{Hello World} version for the backend chip design is to synthesize a minimal circuit from the HDL description to generate a GDSII file and visualize it in an editor.
 
 \chapter{List of Chapters}
 
 Elevate them when there is some text
+
+\section{Just notes and pointers}
+
+\url{https://vlsi.ethz.ch/wiki/VLSI_Lectures} ETHZ notes
 
 \section{The MOSFET and CMOS Technology}
 
@@ -333,7 +350,16 @@ Elevate them when there is some text
 
 \section{Open-Source Tools}
 
-\section{Open-Source Production Frameoworks}
+\section{Open-Source Production Frameworks}
+
+\subsection{OpenROAD}
+
+\myref{https://github.com/The-OpenROAD-Project}{OpenROAD}~\cite{OpenROAD} started as a DARPA-sponsored project to enable an end-to-end design flow of chips from RTL to the final chips without human intervention, within a maximum of 24 hours.
+
+\subsection{OpenLane}
+
+OpenLane~\cite{OpenLANE, openlane:woset:2020} is a collection of EDA tools, such as Yosys, Magic, Netgen, and KLayout. It also includes OpenROAD. OpenLane consists of scripts to automate the flow from RTL, described in Verilog, to the chip production data as a GDSII file.
+
 
 \section{Caravel and efabless}
 
