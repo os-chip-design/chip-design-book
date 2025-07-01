@@ -323,6 +323,12 @@ Elevate them when there is some text
 
 \url{https://vlsi.ethz.ch/wiki/VLSI_Lectures} ETHZ notes
 
+\url{https://github.com/open-source-eda-birds-of-a-feather/open-source-eda-birds-of-a-feather.github.io/blob/main/doc/slides_2025/BOF25_PULP_mbertuletti.pdf} ETH presenation
+
+\url{https://github.com/open-source-eda-birds-of-a-feather/open-source-eda-birds-of-a-feather.github.io/blob/main/doc/slides_2025/DAC25%20Recent%20Experiences%20Markarian-v3a.pdf} UCSD course
+
+
+
 \section{The MOSFET and CMOS Technology}
 
 \section{Building Standard Cells}
@@ -350,18 +356,68 @@ Elevate them when there is some text
 
 \section{Open-Source Tools}
 
+John Ousterhout wrote Magic at UCB. Now he is at Stanford and wrote a book on agile SW development.
+\url{https://web.stanford.edu/~ouster/cgi-bin/home.php}
+
 \section{Open-Source Production Frameworks}
+
+Chip design consists of several steps from synthesis down to GDSII files. Scripts usually orchestrate those steps. In the following, we describe different frameworks that contain the needed open-source tool, but also the scripts to run the flow.
 
 \subsection{OpenROAD}
 
-\myref{https://github.com/The-OpenROAD-Project}{OpenROAD}~\cite{OpenROAD} started as a DARPA-sponsored project to enable an end-to-end design flow of chips from RTL to the final chips without human intervention, within a maximum of 24 hours.
+\myref{https://github.com/The-OpenROAD-Project}{OpenROAD}~\cite{OpenROAD} started as a DARPA-sponsored project to enable an end-to-end design flow of chips from RTL to the final chips without human intervention, within a maximum of 24 hours. The documentation is published on \myref{https://openroad.readthedocs.io/en/latest/}{Read the Docs}.
+OpenROAD includes the following open-source \myref{https://openlane.readthedocs.io/en/latest/flow_overview.html}{tools}:
 
+\begin{itemize}
+\item \myref{https://github.com/the-openroad-project/openroad/tree/master/src/ifp}{ifp} defines the core are, the rows, and the tracks.
+\item \myref{https://github.com/the-openroad-project/openroad/tree/master/src/pdn}{pdn} is a power distribution network (PDN) generator.
+\item \myref{https://github.com/the-openroad-project/openroad/tree/master/src/tap}{Tapcell} inserts tapcells or endcaps.
+\item \myref{https://github.com/the-openroad-project/openroad/tree/master/src/gpl}{gpl} performs global placement. The tool is an extension of the \myref{https://github.com/The-OpenROAD-Project/RePlAce}{RePlAce} tool.
+\item \myref{https://github.com/the-openroad-project/openroad/tree/master/src/rsz}{Gate Resizer} to optimize the design until the maximum utilization is reached.
+\item \myref{https://github.com/the-openroad-project/openroad/tree/master/src/dpl}{OpenDP} performs detailed placements.
+\item \myref{https://github.com/the-openroad-project/openroad/tree/master/src/cts}{TritonCTS 2.0} is performs clock tree synthesis.
+\item \myref{https://github.com/the-openroad-project/openroad/tree/master/src/grt}{FastRoute} performs global routing.
+\item \myref{https://github.com/the-openroad-project/openroad/tree/master/src/drt}{TritonRoute} performs detailed routing.
+\item \myref{https://github.com/the-openroad-project/openroad/tree/master/src/rcx}{OpenRCX} performs parasitics extraction.
+\item And some more.
+\end{itemize}
+
+Use the links for documentation of the individual tools.
+
+\todo{what else is part of OpenROAD?}
+
+ 
 \subsection{OpenLane}
 
-OpenLane~\cite{OpenLANE, openlane:woset:2020} is a collection of EDA tools, such as Yosys, Magic, Netgen, and KLayout. It also includes OpenROAD. OpenLane consists of scripts to automate the flow from RTL, described in Verilog, to the chip production data as a GDSII file.
+\myref{https://github.com/The-OpenROAD-Project/OpenLane}{OpenLane}~\cite{OpenLANE, openlane:woset:2020} is a collection of EDA tools, such as Yosys, Magic, Netgen, and KLayout. It also includes OpenROAD. OpenLane consists of TCL scripts to automate the flow from RTL, described in Verilog, to the chip production data as a GDSII file.
+
+OpenLane was developed by eFabless, and the documentation is published on \myref{https://openlane.readthedocs.io/en/latest/}{Read the Docs}.
+
+\subsubsection{The Design Flow}
+
+\begin{figure}
+  \centering
+  \includegraphics[width=\textwidth]{figures/flow}
+  \caption{OpenLane design flow, including the OpenROAD flow in blue.}
+  \label{fig:flow}
+\end{figure}
+
+Figure~\ref{fig:flow}\footnote{Copyright 2020-2022 Efabless Corporation and contributors, License: Apache 2.0.} shows the design flow of OpenLane.
 
 
-\section{Caravel and efabless}
+
+
+
+\subsubsection{OpenLane2 and LibreLane}
+
+\myref{https://github.com/efabless/openlane2}{OpenLane2} is a new, partly rewritten,\footnote{OpenLane2 started out of OpenLane and OpenROAD scripts} framework for chip design with a focus on substituting TCL scripts with Python scripts. The documentation is published on \myref{https://openlane2.readthedocs.io/}{Read the Docs}.
+However, the original OpenLane \myref{https://openlane.readthedocs.io/en/latest/}{documentation} is richer than the OpenLane2 documentation. Therefore, consider reading that one as a basis.
+
+Efabless, the original developer of OpenLane and OpenLane2, exited the business in spring 2024. To continue the development of OpenLane, the repository was cloned/forked in April 2025, and the project was renamed to \myref{https://github.com/librelane/librelane}{LibreLane}.
+
+\section{Caravel and Efabless}
+
+\myref{https://caravel-harness.readthedocs.io/}{Caravel}
 
 \section{Tiny Tapeout}
 
