@@ -301,23 +301,100 @@ Early tools, still in use today: Spice, Espresso, Magic,
 
 The magic of open-source tools is that we can install them on a personal computer without any concerns of licensing and license servers. The downside of open-source tools is the variety of installation options. There is no single best way for the installation. Furthermore, open-source tools are best supported on a Unix operating system, and preferably Linux. Support under MacOS comes second. MS Windows is best served by using the Windows Subsystem for Linux.
 
-\url{https://github.com/YosysHQ/oss-cad-suite-build}
 
 \subsection{Nix Based}
 
+Install \code{nix} from \url{https://docs.determinate.systems/}.
+\todo{Back to original documentation, maybe this was an issue.}
+
 \subsection{Docker Images}
+
+See: \url{https://github.com/iic-jku/IIC-OSIC-TOOLS/issues/147}
 
 \subsection{Compiling from Source}
 
 As the tools are open-source, it is always a (theoretical) option to compile them from source. However, often there are library dependencies that are not easy to resolve. Therefore, we recommend installing the tools with some packaging software that ensures compatibility between the various tools.
 
+\subsection{Further Packages}
+
+\url{https://github.com/YosysHQ/oss-cad-suite-build}
+
+\todo{There was a web assembly-based version that runs in VSC}
+
 \section{Hello World}
 
 After installing the tools, we want to see them in action. The \emph{Hello World} version for the backend chip design is to synthesize a minimal circuit from the HDL description to generate a GDSII file and visualize it in an editor.
 
+The following example is inspired by running \myref{https://colab.research.google.com/github/librelane/librelane/blob/main/notebook.ipynb}{LibreLane on Google Colab}.
+
+Execute `nix-shell` in your LibreLane installation. Try to check your LibreLane version by invoking Python
+on:
+\begin{verbatim}
+import librelane
+print(librelane.__version__)
+\end{verbatim}
+
+Then, switch to a working directory and create the following small Verilog design (\code{adder.v}):
+
+\begin{verbatim}
+module adder (
+    input  [7:0] a,
+    input  [7:0] b,
+    output [7:0] sum
+);
+
+    assign sum = a + b;
+
+endmodule
+\end{verbatim}
+
+Furthermore, you need an \code{adder.json} file:
+\begin{verbatim}
+{
+  "DESIGN_NAME": "adder",
+  "VERILOG_FILES": ["dir::adder.v"],
+  "CLOCK_PERIOD": 20,
+  "CLOCK_PORT": "clock"
+}
+\end{verbatim}
+
+For a fully automatic run of the full flow and visualizing it with KLayout, you can execute:
+
+\begin{verbatim}
+librelane adder.json
+librelane --last-run --flow openinklayout adder.json
+\end{verbatim}
+
+This single command runs the complete synthesis flow from RTL to GDSII.
+A flow that takes 75 steps. Figure~\ref{fig:adder} shows the final GDSII file for the
+adder in KLayout.
+
+\begin{figure}
+  \centering
+  \includegraphics[width=0.5\textwidth]{figures/adder}
+  \caption{The synthesized adder.}
+  \label{fig:adder}
+\end{figure}
+
+However, we can also run individual steps from Python.
+Let us start with Yosys synthesis. The design is split into so-called \emph{steps}.
+Therefore, we need to import the steps.
+
+\begin{verbatim}
+import librelane
+from librelane.steps import Step
+\end{verbatim}
+
+Now let us get a step and display the help:
+
+\begin{verbatim}
+Synthesis = Step.factory.get("Yosys.Synthesis")
+Synthesis.display_help()
+\end{verbatim}
+
 \chapter{List of Chapters}
 
-Elevate them when there is some text
+\todo{Elevate them when there is some text.}
 
 \section{Just notes and pointers}
 
@@ -352,6 +429,7 @@ Elevate them when there is some text
 \subsection{SpinalHDL}
 \subsection{MyHDL}
 \subsection{Clash}
+\subsection{Spade}
 \subsection{Generator Scripting Languages}
 
 \section{Open-Source Tools}
@@ -414,6 +492,10 @@ Figure~\ref{fig:flow}\footnote{Copyright 2020-2022 Efabless Corporation and cont
 However, the original OpenLane \myref{https://openlane.readthedocs.io/en/latest/}{documentation} is richer than the OpenLane2 documentation. Therefore, consider reading that one as a basis.
 
 Efabless, the original developer of OpenLane and OpenLane2, exited the business in spring 2024. To continue the development of OpenLane, the repository was cloned/forked in April 2025, and the project was renamed to \myref{https://github.com/librelane/librelane}{LibreLane}.
+
+\subsubsection{Running the Flow \emph{Manually}}
+
+
 
 \section{Caravel and Efabless}
 
