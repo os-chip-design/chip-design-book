@@ -6,5 +6,6 @@ ciel.enable(
     ciel.get_ciel_home(),
     "sky130",
     get_opdks_rev(),
-    data_source=StaticWebDataSource("https://fossi-foundation.github.io/ciel-releases"),
+    data_source =
+        StaticWebDataSource("https://fossi-foundation.github.io/ciel-releases"),
 )

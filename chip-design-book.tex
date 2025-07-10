@@ -425,13 +425,21 @@ When you expand the adder in Cells, you can see which cells have been used.
 By double-clicking on a cell type, it is removed from the display. This is an indirect way to show the cells in the GDS.
 
 \subsection{Manual Flow -- A Very Rough Start}
-However, we can also run individual steps from Python.
 
+However, we can also run individual steps from Python.
 The following example is inspired by running \myref{https://colab.research.google.com/github/librelane/librelane/blob/main/notebook.ipynb}{LibreLane on Google Colab}.
 
-Start Python and runn follwoing commands:\footnote{All code from this book can be found in the GitHub repo of the book: 
+Start Python and run the following commands:\footnote{All code from this book can be found in the GitHub repo of the book: \url{https://github.com/os-chip-design/chip-design-book/tree/main/code}}
 
 \lstinputlisting[float, caption={Python code to setup the PDK.}, label={lst:pdk}, frame=tb, captionpos=b]{code/pdk.py}
+
+\lstinputlisting[float, caption={Python code to configure the project.}, label={lst:config}, frame=tb, captionpos=b]{code/config.py}
+
+\begin{itemize}
+\item Execute Listing~\ref{lst:pdk} to setup the PDK.
+\item  Execute Listing~\ref{lst:config} to configure your project.
+\end{itemize}
+
 
 A Flow needs to be configured. This is done.... \todo{The following does not work.}
 
@@ -440,18 +448,6 @@ A Flow needs to be configured. This is done.... \todo{The following does not wor
 \todo{Maybe read up in \url{https://openlane2.readthedocs.io/en/latest/usage/writing_custom_flows.html}}
 
 
-\begin{verbatim}
-from librelane.config import Config
-
-Config.interactive(
-    "adder",
-    PDK="sky130A",
-    CLOCK_PORT="clk",
-    CLOCK_NET="clk",
-    CLOCK_PERIOD=10,
-    PRIMARY_GDSII_STREAMOUT_TOOL="klayout",
-)
-\end{verbatim}
 
 Let us start with Yosys synthesis. The design is split into so-called \emph{steps}.
 Therefore, we need to import the steps.
