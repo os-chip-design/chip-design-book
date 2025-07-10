@@ -1,0 +1,7 @@
+
+{
+  "DESIGN_NAME": "adder",
+  "VERILOG_FILES": ["dir::adder.v"],
+  "CLOCK_PERIOD": 20,
+  "CLOCK_PORT": "clock"
+}

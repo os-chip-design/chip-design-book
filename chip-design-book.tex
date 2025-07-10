@@ -114,6 +114,22 @@
 \newcommand{\scale}{0.7}
 
 %\input{shared/chisel.tex}
+\lstset{%frame=lines,
+  aboveskip=3mm,
+  belowskip=3mm,
+  showstringspaces=false,
+  columns=fixed, % basewidth=\mybasewidth,
+  basicstyle={\small\ttfamily},
+  numbers=none,
+  numberstyle=\footnotesize,
+  % identifierstyle=\color{red},
+  breaklines=true,
+  breakatwhitespace=true,
+  procnamekeys={def, val, var, class, trait, object, extends},
+  % procnamestyle=\ttfamily,
+  tabsize=4,
+  float
+}
 
 \newcommand{\code}[1]{{\lstinline[basicstyle=\small\ttfamily]{#1}}}
 \newcommand{\codefoot}[1]{{\lstinline[basicstyle=\footnotesize\ttfamily]{#1}}}
@@ -304,85 +320,84 @@ The magic of open-source tools is that we can install them on a personal compute
 
 \subsection{Nix Based}
 
-Install \code{nix} from \url{https://docs.determinate.systems/}.
+From OpenLane-2 on, the preferred installation is \myref{https://en.wikipedia.org/wiki/Nix_(package_manager)}{Nix}-based. Nix is a cross-platform package manager, also enabling native binaries for ARM-based systems (e.g., Mac laptops). The OpenLane 
+\myref{https://openlane2.readthedocs.io/en/latest/getting_started/common/nix_installation/index.html}{getting started} documentation explains how to install Nix, and also how to set up the Nix cache for the OpenLane tools.
 
-\todo{Back to original documentation, maybe this was an issue.}
-
-\todo{LibreLane installation}.
+Another option to install Nix is via \myref{https://docs.determinate.systems/}{Determinate}. Note that you need to install the OpenLane cache to avoid building all the tools yourself.
 
 \subsection{Docker Images}
 
-See: \url{https://github.com/iic-jku/IIC-OSIC-TOOLS/issues/147}
+Another option is to use Docker containers with ready-installed tools.
+Harald Prettl, from the Johannes Kepler University of Linz, provides 
+\myref{https://github.com/iic-jku/IIC-OSIC-TOOLS}{IIC-OSIC-TOOLS} (Integrated Infrastructure for Collaborative Open Source IC Tools), a Docker container based on Ubuntu 24.04 LTS for the following
+CPU architectures: x86\_64/amd64 and aarch64/arm64.
+
+Note that, as the time of writing, the default PDK is the IHP PDK, which is not yet supported in the OpenLane flow from within the container.\footnote{See: \url{https://github.com/iic-jku/IIC-OSIC-TOOLS/issues/147}} Switch to the Sky130 PDK with the following command:
+
+\begin{verbatim}
+sak-pdk sky130A
+\end{verbatim}
+
 
 \subsection{Compiling from Source}
 
 As the tools are open-source, it is always a (theoretical) option to compile them from source. However, often there are library dependencies that are not easy to resolve. Therefore, we recommend installing the tools with some packaging software that ensures compatibility between the various tools.
 
-\subsection{Further Packages}
-
-\url{https://github.com/YosysHQ/oss-cad-suite-build}
-
-\todo{There was a web assembly-based version that runs in VSC}
 
 \subsection{Installing LibreLane}
 
-Install LibreLane by cloning from \url{https://github.com/librelane/librelane}.
+When you use the \code{nix}-based setup, you need to install \myref{https://github.com/librelane/librelane}{LibreLane}. Install LibreLane by cloning it:
+
+\begin{verbatim}
+git clone git@github.com:librelane/librelane.git
+\end{verbatim}
+
+\noindent You set up your environment by entering \code{nix} as follows:
+
+\begin{verbatim}
+cd librelane
+nix-shell
+\end{verbatim}
+
+\noindent The frontend command is \code{librelane}. Check the version you have installed with:
+
+\begin{verbatim}
+librelane --version
+\end{verbatim}
+
+\subsection{Further Packages}
+
+There are several other distributions of the open-source chip design tools available:
+
+\begin{description}
+\item[\myref{https://github.com/YosysHQ/oss-cad-suite-build}{OSS CAD Suite}] is a collection of tools with a focus on open-source design flow for \myref{https://en.wikipedia.org/wiki/Field-programmable_gate_array}{FPGA}s.
+\item[\myref{https://yowasp.org/}{YoWASP}] (Yosys WebAssembly Synthesis \& PnR) is a collection of tools targeting FPGA design flow compiled to WebAssembly. Therefore, they can be run easily on different platforms, even as a VSC plugin. 
+\end{description}
 
 \section{Hello World}
 
-After installing the tools, we want to see them in action. The \emph{Hello World} version for the backend chip design is to synthesize a minimal circuit from the HDL description to generate a GDSII file and visualize it in an editor.
-
-The following example is inspired by running \myref{https://colab.research.google.com/github/librelane/librelane/blob/main/notebook.ipynb}{LibreLane on Google Colab}.
+After installing the tools, we want to see them in action. The \emph{Hello World} version for the backend chip design is to synthesize a minimal circuit from the HDL description to generate a \myref{https://en.wikipedia.org/wiki/GDSII}{GDSII} file and visualize it in an editor.
 
 Execute `nix-shell` in your LibreLane installation. Try to check your LibreLane version by invoking Python
-on:
-\begin{verbatim}
-import librelane
-print(librelane.__version__)
-\end{verbatim}
+on the code shown in Listing~\ref{lst:version}.
 
-Then, switch to a working directory and create the following small Verilog design (\code{adder.v}):
+\lstinputlisting[float, caption={Python script to show the version of the installed LibreLane.}, label={lst:version}, frame=tb, captionpos=b]{code/version.py}
 
-\begin{verbatim}
-module adder (
-    input clock,
-    input  [7:0] a,
-    input  [7:0] b,
-    output [7:0] sum
-);
 
-    reg [7:0] reg_a, reg_b, reg_sum;
+Then, switch to a working directory and create the following small Verilog design (\code{adder.v}), as shwon in Listing~\ref{lst:adder}.
 
-    always @(posedge clock) begin
-        reg_a <= a;
-        reg_b <= b;
-        reg_sum <= reg_a + reg_b;
-    end;
+\lstinputlisting[float, caption={A pipelined adder as a Hello World example for LibreLane.}, label={lst:adder}, frame=tb, captionpos=b]{code/adder.v}
 
-    assign sum = reg_sum;
+This example is an adder, including registers at the input and the output ports, so we explore the maximum clocking frequency.
 
-endmodule
-\end{verbatim}
+\lstinputlisting[float, caption={The JSON configuration file.}, label={lst:config}, frame=tb, captionpos=b]{code/adder.json}
 
-This is an adder, including registers at the input and the output ports, so we explore the maximum clocking frequency.
+Furthermore, you need an \code{adder.json} file, as shown in Listing~\ref{lst:config}.
 
-\todo{Maybe have the example in the source folder to be able to run it. CI?}
-
-Furthermore, you need an \code{adder.json} file:
-\begin{verbatim}
-{
-  "DESIGN_NAME": "adder",
-  "VERILOG_FILES": ["dir::adder.v"],
-  "CLOCK_PERIOD": 20,
-  "CLOCK_PORT": "clock"
-}
-\end{verbatim}
-
-For a fully automatic run of the full flow and visualizing it with KLayout, you can execute:
+For a fully automatic run of the full flow you can execute:
 
 \begin{verbatim}
 librelane adder.json
-librelane --last-run --flow openinklayout adder.json
 \end{verbatim}
 
 This single command runs the complete synthesis flow from RTL to GDSII.
@@ -392,18 +407,35 @@ adder in KLayout.
 \begin{figure}
   \centering
   \includegraphics[width=0.5\textwidth]{figures/adder}
-  \caption{The synthesized adder.}
+  \caption{The synthesized adder as visualized in KLayout.}
   \label{fig:adder}
 \end{figure}
 
+\subsection{Exploring the Design}
 
+A first step to explore the design is to view the GDS in KLayout with:
 
-\subsection{Manual Flow -- Very Rough Start}
+\begin{verbatim}
+librelane --last-run --flow openinklayout adder.json
+\end{verbatim}
+
+In Klayout, you can explore the design. Use the rules to measure your design. How large is it?
+Would it fit into a Tiny Tapeout Tile? How large is a Tiny Tapeout tile?
+When you expand the adder in Cells, you can see which cells have been used.
+By double-clicking on a cell type, it is removed from the display. This is an indirect way to show the cells in the GDS.
+
+\subsection{Manual Flow -- A Very Rough Start}
 However, we can also run individual steps from Python.
+
+The following example is inspired by running \myref{https://colab.research.google.com/github/librelane/librelane/blob/main/notebook.ipynb}{LibreLane on Google Colab}.
+
+Start Python and runn follwoing commands:\footnote{All code from this book can be found in the GitHub repo of the book: 
+
+\lstinputlisting[float, caption={Python code to setup the PDK.}, label={lst:pdk}, frame=tb, captionpos=b]{code/pdk.py}
 
 A Flow needs to be configured. This is done.... \todo{The following does not work.}
 
-\todo{Donn has updated stuff: see \url{https://element.fossi-chat.org/#/room/#librelane:fossi-chat.org}, 
+\todo{Donn has updated stuff: see \url{https://gist.github.com/donn/ae9571b14432097241fdfcfeea53719e}} %\url{https://element.fossi-chat.org/#/room/#librelane:fossi-chat.org}}
 
 \todo{Maybe read up in \url{https://openlane2.readthedocs.io/en/latest/usage/writing_custom_flows.html}}
 
@@ -462,6 +494,7 @@ display(synthesis)
 
 \url{https://github.com/open-source-eda-birds-of-a-feather/open-source-eda-birds-of-a-feather.github.io/blob/main/doc/slides_2025/DAC25%20Recent%20Experiences%20Markarian-v3a.pdf} UCSD course
 
+On STA: \url{https://www.zerotoasiccourse.com/terminology/sta/}
 
 
 \section{The MOSFET and CMOS Technology}
@@ -577,7 +610,7 @@ related to digital design and computer architecture.
 \item [ADC] analog-to-digital converter
 \item [ALU] arithmetic and logic unit
 \item [ASIC] application-specific integrated circuit
-\item [CAD] computer aided design
+\item [CAD] computer-aided design
 \item [Chisel] constructing hardware in a Scala embedded language
 \item [CISC] complex instruction set computer
 \item [CPI] clock cycles per instruction
@@ -587,17 +620,18 @@ related to digital design and computer architecture.
 \item [DFF] D flip-flop, data flip-flop
 \item [DMA] direct memory access
 \item [DRAM] dynamic random access memory
-\item [EDA] electroinc design automation
+\item [EDA] electronic design automation
 \item [EMC] electromagnetic compatibility
 \item [ESD] electrostatic discharge
 \item [FF] flip-flop
 \item [FIFO] first-in, first-out
 \item [FPGA] field-programmable gate array
+\item [GDS]  graphic design system
 \item [HDL] hardware description language
 \item [HLS] high-level synthesis
 \item [IC] integrated circuit (also instruction count in computer architecture)
 \item [IDE] integrated development environment
-\item [ILP] instruction level parallelism
+\item [ILP] instruction-level parallelism
 \item [IO] input/output
 \item [ISA] instruction set architecture
 \item [JDK] Java development kit
