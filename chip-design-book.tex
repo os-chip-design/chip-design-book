@@ -305,7 +305,10 @@ The magic of open-source tools is that we can install them on a personal compute
 \subsection{Nix Based}
 
 Install \code{nix} from \url{https://docs.determinate.systems/}.
+
 \todo{Back to original documentation, maybe this was an issue.}
+
+\todo{LibreLane installation}.
 
 \subsection{Docker Images}
 
@@ -320,6 +323,10 @@ As the tools are open-source, it is always a (theoretical) option to compile the
 \url{https://github.com/YosysHQ/oss-cad-suite-build}
 
 \todo{There was a web assembly-based version that runs in VSC}
+
+\subsection{Installing LibreLane}
+
+Install LibreLane by cloning from \url{https://github.com/librelane/librelane}.
 
 \section{Hello World}
 
@@ -338,15 +345,28 @@ Then, switch to a working directory and create the following small Verilog desig
 
 \begin{verbatim}
 module adder (
+    input clock,
     input  [7:0] a,
     input  [7:0] b,
     output [7:0] sum
 );
 
-    assign sum = a + b;
+    reg [7:0] reg_a, reg_b, reg_sum;
+
+    always @(posedge clock) begin
+        reg_a <= a;
+        reg_b <= b;
+        reg_sum <= reg_a + reg_b;
+    end;
+
+    assign sum = reg_sum;
 
 endmodule
 \end{verbatim}
+
+This is an adder, including registers at the input and the output ports, so we explore the maximum clocking frequency.
+
+\todo{Maybe have the example in the source folder to be able to run it. CI?}
 
 Furthermore, you need an \code{adder.json} file:
 \begin{verbatim}
@@ -376,7 +396,31 @@ adder in KLayout.
   \label{fig:adder}
 \end{figure}
 
+
+
+\subsection{Manual Flow -- Very Rough Start}
 However, we can also run individual steps from Python.
+
+A Flow needs to be configured. This is done.... \todo{The following does not work.}
+
+\todo{Donn has updated stuff: see \url{https://element.fossi-chat.org/#/room/#librelane:fossi-chat.org}, 
+
+\todo{Maybe read up in \url{https://openlane2.readthedocs.io/en/latest/usage/writing_custom_flows.html}}
+
+
+\begin{verbatim}
+from librelane.config import Config
+
+Config.interactive(
+    "adder",
+    PDK="sky130A",
+    CLOCK_PORT="clk",
+    CLOCK_NET="clk",
+    CLOCK_PERIOD=10,
+    PRIMARY_GDSII_STREAMOUT_TOOL="klayout",
+)
+\end{verbatim}
+
 Let us start with Yosys synthesis. The design is split into so-called \emph{steps}.
 Therefore, we need to import the steps.
 
@@ -389,7 +433,21 @@ Now let us get a step and display the help:
 
 \begin{verbatim}
 Synthesis = Step.factory.get("Yosys.Synthesis")
-Synthesis.display_help()
+print(Synthesis.get_help_md())
+\end{verbatim}
+
+
+Next step:
+
+\begin{verbatim}
+from librelane.state import State
+
+synthesis = Synthesis(
+    VERILOG_FILES=["./adder.v"],
+    state_in=State(),
+)
+synthesis.start()
+display(synthesis)
 \end{verbatim}
 
 \chapter{List of Chapters}
