@@ -381,16 +381,16 @@ After installing the tools, we want to see them in action. The \emph{Hello World
 Execute `nix-shell` in your LibreLane installation. Try to check your LibreLane version by invoking Python
 on the code shown in Listing~\ref{lst:version}.
 
-\lstinputlisting[float, caption={Python script to show the version of the installed LibreLane.}, label={lst:version}, frame=tb, captionpos=b]{code/version.py}
+\lstinputlisting[float, caption={Python script to show the version of the installed LibreLane (\code{version.py}).}, label={lst:version}, frame=tb, captionpos=b]{code/version.py}
 
 
 Then, switch to a working directory and create the following small Verilog design (\code{adder.v}), as shwon in Listing~\ref{lst:adder}.
 
-\lstinputlisting[float, caption={A pipelined adder as a Hello World example for LibreLane.}, label={lst:adder}, frame=tb, captionpos=b]{code/adder.v}
+\lstinputlisting[float, caption={A pipelined adder as a Hello World example for LibreLane (\code{adder.v}).}, label={lst:adder}, frame=tb, captionpos=b]{code/adder.v}
 
 This example is an adder, including registers at the input and the output ports, so we explore the maximum clocking frequency.
 
-\lstinputlisting[float, caption={The JSON configuration file.}, label={lst:config}, frame=tb, captionpos=b]{code/adder.json}
+\lstinputlisting[float, caption={The JSON configuration file (\code{adder.json}).}, label={lst:config}, frame=tb, captionpos=b]{code/adder.json}
 
 Furthermore, you need an \code{adder.json} file, as shown in Listing~\ref{lst:config}.
 
@@ -419,64 +419,41 @@ A first step to explore the design is to view the GDS in KLayout with:
 librelane --last-run --flow openinklayout adder.json
 \end{verbatim}
 
-In Klayout, you can explore the design. Use the rules to measure your design. How large is it?
+In Klayout, you can explore the design. Use the rulers to measure your design. How large is it?
 Would it fit into a Tiny Tapeout Tile? How large is a Tiny Tapeout tile?
 When you expand the adder in Cells, you can see which cells have been used.
 By double-clicking on a cell type, it is removed from the display. This is an indirect way to show the cells in the GDS.
 
 \subsection{Manual Flow -- A Very Rough Start}
 
-However, we can also run individual steps from Python.
-The following example is inspired by running \myref{https://colab.research.google.com/github/librelane/librelane/blob/main/notebook.ipynb}{LibreLane on Google Colab}.
+However, we can also run the individual steps from Python.
+The following example is inspired by running \myref{https://colab.research.google.com/github/librelane/librelane/blob/main/notebook.ipynb}{LibreLane on Google Colab}, a nice way to explore LibreLane just from your browser
 
-Start Python and run the following commands:\footnote{All code from this book can be found in the GitHub repo of the book: \url{https://github.com/os-chip-design/chip-design-book/tree/main/code}}
+Start Python and run the following commands:\footnote{All code from this book can be found in the GitHub repo of the book: \url{https://github.com/os-chip-design/chip-design-book/tree/main/code}. You can execute those scripts from within Python with the following command: \code{exec(open('script.py').read())}}
 
-\lstinputlisting[float, caption={Python code to setup the PDK.}, label={lst:pdk}, frame=tb, captionpos=b]{code/pdk.py}
+\lstinputlisting[float, caption={Setting up the PDK.}, label={lst:pdk}, frame=tb, captionpos=b]{code/pdk.py}
 
-\lstinputlisting[float, caption={Python code to configure the project.}, label={lst:config}, frame=tb, captionpos=b]{code/config.py}
+\lstinputlisting[float, caption={Configure the project (\code{config.py}).}, label={lst:config}, frame=tb, captionpos=b]{code/config.py}
 
 \begin{itemize}
 \item Execute Listing~\ref{lst:pdk} to setup the PDK.
-\item  Execute Listing~\ref{lst:config} to configure your project.
+\item A \code{Flow} needs to be configured. Execute Listing~\ref{lst:config} to configure your project.
 \end{itemize}
-
-
-A Flow needs to be configured. This is done.... \todo{The following does not work.}
 
 \todo{Donn has updated stuff: see \url{https://gist.github.com/donn/ae9571b14432097241fdfcfeea53719e}} %\url{https://element.fossi-chat.org/#/room/#librelane:fossi-chat.org}}
 
 \todo{Maybe read up in \url{https://openlane2.readthedocs.io/en/latest/usage/writing_custom_flows.html}}
 
 
+\lstinputlisting[float, caption={Get started with the steps (\code{steps.py}).}, label={lst:steps}, frame=tb, captionpos=b]{code/steps.py}
 
-Let us start with Yosys synthesis. The design is split into so-called \emph{steps}.
-Therefore, we need to import the steps.
+Let us start with the Yosys synthesis. The design is split into so-called \emph{steps}.
+Therefore, we need to import \code{Step} and \code{State}, as shown in Listing~\ref{lst:steps}).
+The last command shows us help with the steps.
 
-\begin{verbatim}
-import librelane
-from librelane.steps import Step
-\end{verbatim}
+\lstinputlisting[float, caption={Python code to run the synthesis (\code{synth.py}).}, label={lst:synth}, frame=tb, captionpos=b]{code/synth.py}
 
-Now let us get a step and display the help:
-
-\begin{verbatim}
-Synthesis = Step.factory.get("Yosys.Synthesis")
-print(Synthesis.get_help_md())
-\end{verbatim}
-
-
-Next step:
-
-\begin{verbatim}
-from librelane.state import State
-
-synthesis = Synthesis(
-    VERILOG_FILES=["./adder.v"],
-    state_in=State(),
-)
-synthesis.start()
-display(synthesis)
-\end{verbatim}
+We can run the synthesis with the code from Listing~\ref{lst:synth}.
 
 \chapter{List of Chapters}
 
