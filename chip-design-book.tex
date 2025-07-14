@@ -384,17 +384,22 @@ on the code shown in Listing~\ref{lst:version}.
 \lstinputlisting[float, caption={Python script to show the version of the installed LibreLane (\myref{https://github.com/os-chip-design/chip-design-book/blob/main/code/version.py}{\code{version.py}}).}, label={lst:version}, frame=tb, captionpos=b]{code/version.py}
 
 
-Then, switch to a working directory and create the following small Verilog design ({\code{adder.v}), as shown in Listing~\ref{lst:adder}.
-
 \lstinputlisting[float, caption={A pipelined adder as a Hello World example for LibreLane (\myref{https://github.com/os-chip-design/chip-design-book/blob/main/code/adder.v}{\code{adder.v}}).}, label={lst:adder}, frame=tb, captionpos=b]{code/adder.v}
 
-This example is an adder, including registers at the input and output ports, so we can use static timing analysis (STA) to explore the maximum clocking frequency.
 
 \lstinputlisting[float, caption={The JSON configuration file (\myref{https://github.com/os-chip-design/chip-design-book/blob/main/code/adder.json}{\code{adder.json}}).}, label={lst:config}, frame=tb, captionpos=b]{code/adder.json}
 
-Furthermore, you need an \code{adder.json} file, as shown in Listing~\ref{lst:config}.
+Then, switch to a working directory and create the following small Verilog design ({\code{adder.v}), as shown in Listing~\ref{lst:adder}.
+This example is an adder, including registers at the input and output ports, so we can use static timing analysis (STA) to explore the maximum clocking frequency.
 
-For a fully automatic run of the full flow you can execute:
+
+Furthermore, you need a configuration for your flow. You can find all possible configuration parameters at the
+\myref{https://librelane.readthedocs.io/en/latest/reference/common_flow_vars.html}{Universal Flow Configuration Variables} section of the LibreLane documentation. However, most variables can be left at their default values.
+
+Config files can support more than one PDK, see the \myref{https://github.com/librelane/librelane/blob/main/librelane/examples/spm/config.yaml}{LibreLane example}. Configuration can be in YAML or JSON format.
+We will use the \code{adder.json} file with a minimal configuration, as shown in Listing~\ref{lst:config}.
+
+For a fully automatic run of the full flow, you can execute:
 
 \begin{verbatim}
 librelane adder.json
@@ -423,6 +428,8 @@ In Klayout, you can explore the design. Use the rulers to measure your design. H
 Would it fit into a Tiny Tapeout Tile? How large is a Tiny Tapeout tile?
 When you expand the adder in Cells, you can see which cells have been used.
 By double-clicking on a cell type, it is removed from the display. This is an indirect way to show the cells in the GDS.
+
+At the time of this writing, the flow generates 75 folders containing the results and reports of the individual steps. You can find those folders in folder \code{runs/RUN\_DATE\_TIME}. The first four steps perform linting of the design, and any Verilog syntax errors are found there. An initial estimate of the used cells can be found in the report \code{06-yosys-synthesis/stat.rpt}. The file \code{adder.nl.v} contains the design synthesized to standard cells from the used PDK. As our example is very simple, we can manually inspect the generated Verilog.
 
 \subsection{Manual Flow -- A Very Rough Start}
 
@@ -459,7 +466,9 @@ We can run the synthesis with the code from Listing~\ref{lst:synth}.
 
 \todo{Elevate them when there is some text.}
 
-\section{Just notes and pointers}
+\section{Notes and Pointers (Reading List)}
+
+Into in OpenLane: \url{https://openlane2.readthedocs.io/en/latest/getting_started/newcomers/index.html}
 
 \url{https://vlsi.ethz.ch/wiki/VLSI_Lectures} ETHZ notes
 
