@@ -406,8 +406,15 @@ librelane adder.json
 \end{verbatim}
 
 This single command runs the complete synthesis flow from RTL to GDSII.
-A flow that takes 75 steps. Figure~\ref{fig:adder} shows the final GDSII file for the
-adder in KLayout.
+As the design is very simple, the flow will run in about a minute.
+Figure~\ref{fig:adder} shows the final GDSII file for the adder in KLayout.
+
+
+A flow takes 75 steps, each reporting in its folder.
+During the flow, a lot of information is printed out.
+Scrolling back in the terminal, you can see reports of design checks and resource usage.
+Every time you run the flow, it will create a new folder under folder \code{runs}.
+The name of the folder will be \code{RUN\_year\_month\_day\_hh-mm-ss}.
 
 \begin{figure}
   \centering
@@ -429,7 +436,38 @@ Would it fit into a Tiny Tapeout Tile? How large is a Tiny Tapeout tile?
 When you expand the adder in Cells, you can see which cells have been used.
 By double-clicking on a cell type, it is removed from the display. This is an indirect way to show the cells in the GDS.
 
-At the time of this writing, the flow generates 75 folders containing the results and reports of the individual steps. You can find those folders in folder \code{runs/RUN\_DATE\_TIME}. The first four steps perform linting of the design, and any Verilog syntax errors are found there. An initial estimate of the used cells can be found in the report \code{06-yosys-synthesis/stat.rpt}. The file \code{adder.nl.v} contains the design synthesized to standard cells from the used PDK. As our example is very simple, we can manually inspect the generated Verilog.
+At the time of this writing, the flow generates 75 folders containing the results and reports for each individual step. You can find those subfolders in the folder \code{runs/RUN\_DATE\_TIME}. Not all reports are equally important. We will explore some of them.
+
+\subsubsection{Linting and a First Area Estimate}
+
+The first four steps perform linting of the design, and any Verilog syntax errors are identified during this process. An initial estimate of the used cells can be found in the report \code{06-yosys-synthesis/reports/stat.rpt}. For our pipelined adder, we can identify the 24 flip-flops as \code{dfxtp_2} cells in that report:
+
+\begin{verbatim}
+...
+   Number of cells:                 60
+     sky130_fd_sc_hd__a31oi_2        1
+     sky130_fd_sc_hd__and2_2         4
+     sky130_fd_sc_hd__dfxtp_2       24
+...
+\end{verbatim}
+
+\noindent We use the Sky130 PDK and can find the documentation of each cell \myref{https://skywater-pdk.readthedocs.io/en/main/}{online}.
+E.g., the DFF is described at \myref{https://skywater-pdk.readthedocs.io/en/main/contents/libraries/sky130_fd_sc_hd/cells/dfxtp/README.html}{dfxtp\_2}.
+The file \code{adder.nl.v} contains the design synthesized to standard cells from the used PDK. As our example is very simple, we can manually inspect the generated Verilog.
+
+\subsubsection{xxx}
+
+\subsubsection{Static Timing Analysis}
+
+In folder \code{nn-openroad-stapostpnr}, the static timing analysis (STA) reports are found.
+\todo{continue here***************}
+
+\subsubsection{Design Rule Checks}
+
+\subsubsection{Summary}
+
+The subfolder \code{final} contains a summary of the project in files \code{metrics.csv} and \code{metrics.json}.
+It includes timing information, size of the design, number of standard cells used, and other detailed metrics.
 
 \subsection{Manual Flow -- A Very Rough Start}
 
@@ -478,6 +516,13 @@ Into in OpenLane: \url{https://openlane2.readthedocs.io/en/latest/getting_starte
 
 On STA: \url{https://www.zerotoasiccourse.com/terminology/sta/}
 
+OpenRAM playground: \url{https://gist.github.com/proppy/1054e1618f5f90ce3af529ab5e56ad3f}
+
+Chip design book: \url{https://link.springer.com/book/10.1007/978-90-481-9591-6}
+
+Local TT hardening: \url{https://tinytapeout.com/guides/local-hardening/}
+
+\url{https://github.com/iic-jku/SKY130-RTL-with-Custom-Standardcell-to-GDSII/blob/main/README.md}
 
 \section{The MOSFET and CMOS Technology}
 
