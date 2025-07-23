@@ -1,0 +1,4 @@
+DESIGN_NAME: memory
+VERILOG_FILES: dir::memory.v
+CLOCK_PERIOD: 25
+CLOCK_PORT: clock

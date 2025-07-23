@@ -56,7 +56,6 @@
 \usetikzlibrary{arrows,bending}
 \usetikzlibrary{positioning}
 
-
 % fatter TT font
 \renewcommand*\ttdefault{txtt}
 % another TT, suggested by Alex
@@ -436,6 +435,8 @@ Would it fit into a Tiny Tapeout Tile? How large is a Tiny Tapeout tile?
 When you expand the adder in Cells, you can see which cells have been used.
 By double-clicking on a cell type, it is removed from the display. This is an indirect way to show the cells in the GDS.
 
+\todo{Matt has a better selection of layers to see the design with this summary.pl tool.}
+
 At the time of this writing, the flow generates 75 folders containing the results and reports for each individual step. You can find those subfolders in the folder \code{runs/RUN\_DATE\_TIME}. Not all reports are equally important. We will explore some of them.
 
 \subsubsection{Linting and a First Area Estimate}
@@ -500,6 +501,36 @@ The last command shows us help with the steps.
 
 We can run the synthesis with the code from Listing~\ref{lst:synth}.
 
+\chapter{Memories}
+
+When describing memories in an HDL, the synthesis tool will not generate on-chip memories, as we are used to in an FPGA. It will use generated storage out of DFF and multiplexers, which is very expensive. As an example, a 1024-bit memory is needed to implement the register file for an RISC-V processor. Implementing an RV-32I version in a 3-stage pipeline, the register file needs about 55\% of the processor area~\cite{wildcat:2024}.
+
+An efficient memory cell is built out of six-transistor (6T) SRAM cells, as shown in Figure~\ref{fig:sram:cell}. The middle four transistors implement two cross-coupled inverters. The other two transistors are used for reading and writing the bit.
+
+\todo{explain: WL: word line. BL: bit line.}
+
+\begin{figure}
+  \centering
+  \includegraphics[width=0.5\textwidth]{figures/sram_cell}
+  \caption{A six-transistor (6T) \myref{https://en.wikipedia.org/wiki/Static_random-access_memory}{CMOS SRAM cell}.}
+  \label{fig:sram:cell}
+\end{figure}
+
+However, standard synthesis tools do not generate memories based on 6T SRAM cells. The tools to generate on-chip memories are called memory compilers. \myref{https://openram.org/}{OpenRAM} is an open-source memory compiler~\cite{opeRAM:2016}. Furthermore, the Sky130 PDK includes a few memories generated with OpenRAM.
+
+\subsection{SRAM links}
+
+Matt design: \url{https://github.com/mattvenn/zero_to_asic_mpw7/tree/mpw7/openlane/user\_project\_wrapper}
+
+OpenRAM playground: \url{https://gist.github.com/proppy/1054e1618f5f90ce3af529ab5e56ad3f}
+
+DFFRAM: \url{https://github.com/AUCOHL/DFFRAM}
+
+\url{https://tinytapeout.com/specs/memory/}
+
+Tutorial: \url{https://armleo-openlane.readthedocs.io/en/merge-window-4/tutorials/openram.html}
+
+and at \url{https://openlane.readthedocs.io/en/latest/tutorials/openram.html}
 
 \chapter{List of Chapters}
 
@@ -524,23 +555,13 @@ Local TT hardening: \url{https://tinytapeout.com/guides/local-hardening/}
 
 \url{https://github.com/iic-jku/SKY130-RTL-with-Custom-Standardcell-to-GDSII/blob/main/README.md}
 
+\subsection{Matt Venn Links}
+
 List of efabless projects: \url{https://github.com/mattvenn/efabless\_project\_tool} clone and efabless\_tool.py
 
 \code{./efabless\_tool.py --fields id,sumary,giturl --list | grep -i sram}
 
-\subsection{SRAM links}
-
-Matt design: \url{https://github.com/mattvenn/zero_to_asic_mpw7/tree/mpw7/openlane/user\_project\_wrapper}
-
-OpenRAM playground: \url{https://gist.github.com/proppy/1054e1618f5f90ce3af529ab5e56ad3f}
-
-DFFRAM: \url{https://github.com/AUCOHL/DFFRAM}
-
-\url{https://tinytapeout.com/specs/memory/}
-
-Tutorial: \url{https://armleo-openlane.readthedocs.io/en/merge-window-4/tutorials/openram.html}
-
-and at \url{https://openlane.readthedocs.io/en/latest/tutorials/openram.html}
+New summary tool form Matt: \url{https://github.com/mattvenn/openlane_summary/tree/librelane}
 
 \section{The MOSFET and CMOS Technology}
 
