@@ -320,7 +320,7 @@ The magic of open-source tools is that we can install them on a personal compute
 
 \subsection{Nix Based}
 
-From OpenLane-2 on, the preferred installation is \myref{https://en.wikipedia.org/wiki/Nix_(package_manager)}{Nix}-based. Nix is a cross-platform package manager, also enabling native binaries for ARM-based systems (e.g., Mac laptops). The OpenLane 
+From OpenLane-2 (now LibreLane) on, the preferred installation is \myref{https://en.wikipedia.org/wiki/Nix_(package_manager)}{Nix}-based. Nix is a cross-platform package manager, also enabling native binaries for ARM-based systems (e.g., Mac laptops). The OpenLane 
 \myref{https://openlane2.readthedocs.io/en/latest/getting_started/common/nix_installation/index.html}{getting started} documentation explains how to install Nix, and also how to set up the Nix cache for the OpenLane tools.
 
 Another option to install Nix is via \myref{https://docs.determinate.systems/}{Determinate}. Note that you need to install the OpenLane cache to avoid building all the tools yourself.
@@ -500,6 +500,7 @@ The last command shows us help with the steps.
 
 We can run the synthesis with the code from Listing~\ref{lst:synth}.
 
+
 \chapter{List of Chapters}
 
 \todo{Elevate them when there is some text.}
@@ -516,13 +517,30 @@ Into in OpenLane: \url{https://openlane2.readthedocs.io/en/latest/getting_starte
 
 On STA: \url{https://www.zerotoasiccourse.com/terminology/sta/}
 
-OpenRAM playground: \url{https://gist.github.com/proppy/1054e1618f5f90ce3af529ab5e56ad3f}
 
 Chip design book: \url{https://link.springer.com/book/10.1007/978-90-481-9591-6}
 
 Local TT hardening: \url{https://tinytapeout.com/guides/local-hardening/}
 
 \url{https://github.com/iic-jku/SKY130-RTL-with-Custom-Standardcell-to-GDSII/blob/main/README.md}
+
+List of efabless projects: \url{https://github.com/mattvenn/efabless\_project\_tool} clone and efabless\_tool.py
+
+\code{./efabless\_tool.py --fields id,sumary,giturl --list | grep -i sram}
+
+\subsection{SRAM links}
+
+Matt design: \url{https://github.com/mattvenn/zero_to_asic_mpw7/tree/mpw7/openlane/user\_project\_wrapper}
+
+OpenRAM playground: \url{https://gist.github.com/proppy/1054e1618f5f90ce3af529ab5e56ad3f}
+
+DFFRAM: \url{https://github.com/AUCOHL/DFFRAM}
+
+\url{https://tinytapeout.com/specs/memory/}
+
+Tutorial: \url{https://armleo-openlane.readthedocs.io/en/merge-window-4/tutorials/openram.html}
+
+and at \url{https://openlane.readthedocs.io/en/latest/tutorials/openram.html}
 
 \section{The MOSFET and CMOS Technology}
 
