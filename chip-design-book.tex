@@ -518,7 +518,20 @@ An efficient memory cell is built out of six-transistor (6T) SRAM cells, as show
 
 However, standard synthesis tools do not generate memories based on 6T SRAM cells. The tools to generate on-chip memories are called memory compilers. \myref{https://openram.org/}{OpenRAM} is an open-source memory compiler~\cite{opeRAM:2016}. Furthermore, the Sky130 PDK includes a few memories generated with OpenRAM.
 
+The process of including those macros is not straightforward. First errors occur in nn-magic-writelef. To ignore those errors, we can add following line into our .yaml file:
+
+\begin{verbatim}
+MAGIC_CAPTURE_ERRORS: false
+\end{verbatim}
+
+
 \subsection{SRAM links}
+
+SRAM on TT09: \url{https://github.com/FriedrichWu/tt09-sram/tree/main}
+
+Uri's IHP SRAM test on TT:m\url{https://tinytapeout.com/chips/ttihp0p2/tt_um_urish_sram_test}
+
+Another SRAM compiler: \url{https://github.com/rahulk29/sram22} including precompiled memories: \url{https://github.com/rahulk29/sram22_sky130_macros}
 
 Matt design: \url{https://github.com/mattvenn/zero_to_asic_mpw7/tree/mpw7/openlane/user\_project\_wrapper}
 
@@ -538,9 +551,11 @@ and at \url{https://openlane.readthedocs.io/en/latest/tutorials/openram.html}
 
 \section{Notes and Pointers (Reading List)}
 
-Into in OpenLane: \url{https://openlane2.readthedocs.io/en/latest/getting_started/newcomers/index.html}
+Intro to OpenLane: \url{https://openlane2.readthedocs.io/en/latest/getting_started/newcomers/index.html}
 
 \url{https://vlsi.ethz.ch/wiki/VLSI_Lectures} ETHZ notes
+
+\url{https://github.com/OS-EDA/Course} IHP course
 
 \url{https://github.com/open-source-eda-birds-of-a-feather/open-source-eda-birds-of-a-feather.github.io/blob/main/doc/slides_2025/BOF25_PULP_mbertuletti.pdf} ETH presenation
 

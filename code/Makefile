@@ -5,6 +5,12 @@ doit:
 view:
 	librelane --last-run --flow openinklayout adder.json
 
+mem:
+	librelane memory.yaml
+
+mem-view:
+	librelane --last-run --flow openinklayout memory.yaml
+
 version:
 	python version.py
 
