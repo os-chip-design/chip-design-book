@@ -386,7 +386,7 @@ on the code shown in Listing~\ref{lst:version}.
 \lstinputlisting[float, caption={A pipelined adder as a Hello World example for LibreLane (\myref{https://github.com/os-chip-design/chip-design-book/blob/main/code/adder.v}{\code{adder.v}}).}, label={lst:adder}, frame=tb, captionpos=b]{code/adder.v}
 
 
-\lstinputlisting[float, caption={The JSON configuration file (\myref{https://github.com/os-chip-design/chip-design-book/blob/main/code/adder.json}{\code{adder.json}}).}, label={lst:config}, frame=tb, captionpos=b]{code/adder.json}
+\lstinputlisting[float, caption={The JSON configuration file (\myref{https://github.com/os-chip-design/chip-design-book/blob/main/code/adder.json}{\code{adder.json}}).}, label={lst:adder}, frame=tb, captionpos=b]{code/adder.json}
 
 Then, switch to a working directory and create the following small Verilog design ({\code{adder.v}), as shown in Listing~\ref{lst:adder}.
 This example is an adder, including registers at the input and output ports, so we can use static timing analysis (STA) to explore the maximum clocking frequency.
@@ -676,6 +676,25 @@ Efabless, the original developer of OpenLane and OpenLane2, exited the business 
 \section{Tiny Tapeout}
 
 \section{Maybe something from Edu4Chip?}
+
+\section{Use Cases}
+
+With the initial Google-sponsored tapeout, a lot of projects have been taped out on SkyWater130. All projects have been submitted through eFabless, and the open-source projects have been listed on the eFabless website. However, with the closure of eFabless, the list of projects got lost. \todo{Check Matt Venn on his list.}
+
+We tried to recover as many projects as possible as a reference for future open-source tapeouts.
+
+\todo{Leo Moser's eFPGA, ...}
+
+\todo{Copy this into our tapeout paper.}
+In this section, we describe some uses of open-source tools with open-access PDKs.
+
+Basilisk is a RISC-V core developed at the ETH Zurich and the University of Bologna~\cite{scheffler2024basiliskendtoendopensourcelinuxcapable}.
+Basilisk is one of the largest designs today implemented with open-source tools. It is a 64-bit Linux-capable RISC-V code. Besides the core itself, it includes IO devices, such as a DRMA controller, USB host, and video output.
+The core was implemented in the IHP's 130 nm BiCMOS technology with the open-source PDK in 34 mm2 and can be clocked at a nominal 1.2 V voltage at 62 MHz.
+
+\todo{This is a quite lousy written paper. Don't write too much about it.}
+
+\todo{Our design as an example.}
 
 
 \chapter{Acronyms}
