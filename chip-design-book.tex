@@ -62,6 +62,8 @@
 % \usepackage{inconsolata}
 % \usepackage[T1]{fontenc} % needed as well?
 
+
+
 % Smaller verbatim text
 \usepackage{etoolbox}
 \makeatletter
@@ -301,7 +303,7 @@ We include links to further reading in the running text, primarily to
 Very early chips have been designed by hand, and the photo masks have been produced by \emph{drawing} them with tapes. \todo{What was the last chip done this way?} As this process does not scale, computer-aided design (CAD) tools have been developed. Another term used is: electronic design automation (EDA).
 
 
-Alberto was invited to give a keynote speech at the 40th Design Automation Conference (DAC). That speech resulted in a paper on the history (and future) of EDA~\cite{tides:eda}, mostly work as presented at DAC.
+Alberto Sangiovanni-Vincentelli was invited to give a keynote speech at the 40th Design Automation Conference (DAC). That speech resulted in a paper on the history (and future) of EDA~\cite{tides:eda}, mostly work as presented at DAC.
 
 Alberto co-founded Cadence Design Systems and Synopsys, the two major EDA tool vendors.
 
@@ -435,7 +437,10 @@ Would it fit into a Tiny Tapeout Tile? How large is a Tiny Tapeout tile?
 When you expand the adder in Cells, you can see which cells have been used.
 By double-clicking on a cell type, it is removed from the display. This is an indirect way to show the cells in the GDS.
 
-\todo{Matt has a better selection of layers to see the design with this summary.pl tool.}
+Matt Venn has a good selection of layers and color assignments at \myref{https://github.com/mattvenn/librelane_summary/blob/librelane/klayout_gds.xml}{klayout\_gds.xml}. You can use it with klayout as follows:
+\begin{verbatim}
+klayout -l klayout_gds
+\end{verbatim}
 
 At the time of this writing, the flow generates 75 folders containing the results and reports for each individual step. You can find those subfolders in the folder \code{runs/RUN\_DATE\_TIME}. Not all reports are equally important. We will explore some of them.
 
@@ -576,7 +581,8 @@ List of efabless projects: \url{https://github.com/mattvenn/efabless\_project\_t
 
 \code{./efabless\_tool.py --fields id,sumary,giturl --list | grep -i sram}
 
-New summary tool form Matt: \url{https://github.com/mattvenn/openlane_summary/tree/librelane}
+New summary tool from Matt: \url{https://github.com/mattvenn/openlane_summary/tree/librelane} and
+\url{https://github.com/mattvenn/librelane_summary}
 
 \section{The MOSFET and CMOS Technology}
 
@@ -606,8 +612,19 @@ New summary tool form Matt: \url{https://github.com/mattvenn/openlane_summary/tr
 
 \section{Open-Source Tools}
 
-John Ousterhout wrote Magic at UCB. Now he is at Stanford and wrote a book on agile SW development.
+\subsection{Magic}
+
+John Ousterhout wrote Magic at UCB. Now he is at Stanford and has written a book on agile SW development.
 \url{https://web.stanford.edu/~ouster/cgi-bin/home.php}
+
+\subsection{ABC}
+
+
+\subsection{Yosys}
+
+Yosys~\cite{yosys:austrochip} started as a Bachelor's project by Clifford Wolf at the Technical University of Vienna~\cite{yosys:bachelor}. Yosys is a free and open-source software for Verilog HDL synthesis.
+Yosys synthesizes Verilog HDL to logically equivalent netlists. Yosys uses external tools, such as Berkeley's ABC~\cite{abc:cav:2010} for combinational logic minimization.
+
 
 \section{Open-Source Production Frameworks}
 
@@ -669,9 +686,37 @@ Efabless, the original developer of OpenLane and OpenLane2, exited the business 
 
 
 
-\section{Caravel and Efabless}
+\section{Caravel}
 
-\myref{https://caravel-harness.readthedocs.io/}{Caravel}
+\myref{https://caravel-harness.readthedocs.io/}{Caravel} is a SoC framework developed by Efabless for the Google/Skywater 130nm Open PDK. It contains a RISC-V core, a management area, and a padframe. The user area is 3000um x 3600um (10 mm2). To put this into perspective, a simple 3-stage RISC-V pipeline, such as Wildcat~\cite{wildcat:arcs2025}, fits into a 0.2 mm2 area. A 4~KiB memory from eFabless is 0.18 mm2 area.
+
+ChipFoundry now maintains Caravel. Note that the transition to ChipFoundry is still in progress; therefore, some documentation still contains the eFabless name. Additionally, some datasheets are outdated (e.g., referring to the PicoRV as the management processor, which is now the VexRV).
+
+Caravel itself is split into two repositories: the \myref{https://github.com/chipfoundry/caravel_user_project}{user project} and \myref{https://github.com/chipfoundry/caravel}{Caravel itself}. The user project contains a tiny example (a counter) to get started. Within that project, all the needed tools are installed, including a lite version of Caravel, the management core for simulation, OpenLane, and the Sky130 PDK.
+
+The starting point is the user project. The flow is run within Docker. Follow the instructions in \myref{https://github.com/chipfoundry/caravel_user_project/blob/main/docs/source/index.md}{Caravel User Project}. The dependencies on Docker and Python are listed there. Missing is the dependency on two Python libraries: \code{python-tk} and \code{Click}.
+
+There are two ways to integrate your design into Caravel: (1) Harden your user project first and then instantiate it in the wrapper as a hard macro, and then run the hardening of the wrapper; (2) Harden the whole project at once (include your user project as Verilog files in the wrapper configuration). The example project performs the individual hardening.
+
+
+
+
+
+
+\subsection{Notes for the Tapeout}
+
+The Caravel needs Docker running on Mac. On chipdesign1 we have podman).
+
+The project contains two example projects: \code{user\_proj\_example} and \code{user\_project\_wrapper} in folder \code{openlane}. They are both built with
+\begin{verbatim}
+    make user_proj_example
+\end{verbatim}
+
+The default configuration looks like hardening the user project first and including that GDS as a hard macro in the wrapper.
+
+chipfoundry upload: \url{https://github.com/chipfoundry/cf-cli?tab=readme-ov-file#installation}
+
+register an account at: \url{https://chipfoundry.io/sftp-registration}
 
 \section{Tiny Tapeout}
 
@@ -679,22 +724,19 @@ Efabless, the original developer of OpenLane and OpenLane2, exited the business 
 
 \section{Use Cases}
 
-With the initial Google-sponsored tapeout, a lot of projects have been taped out on SkyWater130. All projects have been submitted through eFabless, and the open-source projects have been listed on the eFabless website. However, with the closure of eFabless, the list of projects got lost. \todo{Check Matt Venn on his list.}
-
-We tried to recover as many projects as possible as a reference for future open-source tapeouts.
-
-\todo{Leo Moser's eFPGA, ...}
-
-\todo{Copy this into our tapeout paper.}
 In this section, we describe some uses of open-source tools with open-access PDKs.
+
+With the initial Google-sponsored tapeout, a lot of projects have been taped out on SkyWater130. All projects have been submitted through eFabless, and the open-source projects have been listed on the eFabless website. However, with the closure of eFabless, the list of projects got lost. \todo{Check Matt Venn on his list.}
+We tried to recover as many projects as possible as a reference for future open-source tapeouts.
 
 Basilisk is a RISC-V core developed at the ETH Zurich and the University of Bologna~\cite{scheffler2024basiliskendtoendopensourcelinuxcapable}.
 Basilisk is one of the largest designs today implemented with open-source tools. It is a 64-bit Linux-capable RISC-V code. Besides the core itself, it includes IO devices, such as a DRMA controller, USB host, and video output.
-The core was implemented in the IHP's 130 nm BiCMOS technology with the open-source PDK in 34 mm2 and can be clocked at a nominal 1.2 V voltage at 62 MHz.
+The core was implemented in the IHP's 130 nm BiCMOS technology with the open-source PDK in 34 mm2 and can be clocked at a nominal 1.2 V voltage at 77 MHz.
 
 \todo{This is a quite lousy written paper. Don't write too much about it.}
 
-\todo{Our design as an example.}
+\todo{Leo Moser's eFPGA, ...}
+
 
 
 \chapter{Acronyms}
