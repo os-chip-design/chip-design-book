@@ -270,8 +270,8 @@ It is an exciting time to be in the world of chip design....
 
 \chapter{Preface}
 
-% This text goes on the backside of the book, and in Amazon description
-This book is an introduction to chip design with a focus on using open-source tools. 
+% This text goes on the back cover of the book, and in the Amazon description
+This book is an introduction to chip design with a focus on using open-source tools and open-source PDKs.
 
 
 
@@ -366,6 +366,8 @@ nix-shell
 librelane --version
 \end{verbatim}
 
+LibreLane also installs the Sky130 PDK using the \code{ciel} tool. The PDKs are stored under \code{$HOME:/.ciel}.
+
 \subsection{Further Packages}
 
 There are several other distributions of the open-source chip design tools available:
@@ -440,6 +442,19 @@ By double-clicking on a cell type, it is removed from the display. This is an in
 Matt Venn has a good selection of layers and color assignments at \myref{https://github.com/mattvenn/librelane_summary/blob/librelane/klayout_gds.xml}{klayout\_gds.xml}. You can use it with klayout as follows:
 \begin{verbatim}
 klayout -l klayout_gds
+\end{verbatim}
+
+That configuration file is part of \myref{https://github.com/mattvenn/librelane_summary}{summary tools}, which can be used for a quick exploration of the design. Clone the repository, add it to your path, and set the \code{PDK_ROOT} variable (easiest into a file that you source, or add those lines to your \code{$HOME/.bashrc}):
+
+\begin{verbatim}
+export PATH=$PATH:$HOME/path/to/librelane_summary
+export PDK_ROOT=$HOME/.ciel
+\end{verbatim}
+
+Explore the tool with:
+
+\begin{verbatim}
+summary.py --help
 \end{verbatim}
 
 At the time of this writing, the flow generates 75 folders containing the results and reports for each individual step. You can find those subfolders in the folder \code{runs/RUN\_DATE\_TIME}. Not all reports are equally important. We will explore some of them.
@@ -581,12 +596,24 @@ List of efabless projects: \url{https://github.com/mattvenn/efabless\_project\_t
 
 \code{./efabless\_tool.py --fields id,sumary,giturl --list | grep -i sram}
 
-New summary tool from Matt: \url{https://github.com/mattvenn/openlane_summary/tree/librelane} and
-\url{https://github.com/mattvenn/librelane_summary}
+New summary tool from Matt: \url{https://github.com/mattvenn/librelane_summary}
 
 \section{The MOSFET and CMOS Technology}
 
-\section{Building Standard Cells}
+\section{Standard Cells}
+
+We can explore the standard cells contained in the Sky130 PDK with KLayout:
+
+\begin{verbatim}
+klayout $HOME/.ciel/sky130A/libs.ref/sky130_fd_sc_hd/gds/sky130_fd_sc_hd.gds
+\end{verbatim}
+ However, with Matt's summary tool, the invocation is easier and the layers have names and better colors:
+\begin{verbatim}
+summary.py --show-sky130
+\end{verbatim}
+
+Right-click on any cell in the \emph{Cells} window to select a new one with \emph{Show as New Top}.
+
 
 \subsection{FABs}
 
@@ -719,6 +746,8 @@ chipfoundry upload: \url{https://github.com/chipfoundry/cf-cli?tab=readme-ov-fil
 register an account at: \url{https://chipfoundry.io/sftp-registration}
 
 \section{Tiny Tapeout}
+
+
 
 \section{Maybe something from Edu4Chip?}
 
