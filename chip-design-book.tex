@@ -333,7 +333,13 @@ Harald Prettl, from the Johannes Kepler University of Linz, provides
 \myref{https://github.com/iic-jku/IIC-OSIC-TOOLS}{IIC-OSIC-TOOLS} (Integrated Infrastructure for Collaborative Open Source IC Tools), a Docker container based on Ubuntu 24.04 LTS for the following
 CPU architectures: x86\_64/amd64 and aarch64/arm64.
 
-Note that, as the time of writing, the default PDK is the IHP PDK, which is not yet supported in the OpenLane flow from within the container.\footnote{See: \url{https://github.com/iic-jku/IIC-OSIC-TOOLS/issues/147}} Switch to the Sky130 PDK with the following command:
+The folder \code{/foss/designs} is the place to access user data on your local machine. It points to the directory pointed by the environment variable \code{DESIGNS}, the default is \code{$HOME/eda/designs}. To change this to start with your home folder, invoke the Docker image with:
+
+\begin{verbatim}
+DESIGNS=$HOME ./start_x.sh
+\end{verbatim}
+
+Note that, as of the time of writing, the default PDK is the IHP PDK, which is not yet supported in the LibreLane flow from within the container.\footnote{See: \url{https://github.com/iic-jku/IIC-OSIC-TOOLS/issues/147}} Switch to the Sky130 PDK with the following command:
 
 \begin{verbatim}
 sak-pdk sky130A
@@ -390,7 +396,7 @@ on the code shown in Listing~\ref{lst:version}.
 \lstinputlisting[float, caption={A pipelined adder as a Hello World example for LibreLane (\myref{https://github.com/os-chip-design/chip-design-book/blob/main/code/adder.v}{\code{adder.v}}).}, label={lst:adder}, frame=tb, captionpos=b]{code/adder.v}
 
 
-\lstinputlisting[float, caption={The JSON configuration file (\myref{https://github.com/os-chip-design/chip-design-book/blob/main/code/adder.json}{\code{adder.json}}).}, label={lst:adder}, frame=tb, captionpos=b]{code/adder.json}
+\lstinputlisting[float, caption={The JSON configuration file (\myref{https://github.com/os-chip-design/chip-design-book/blob/main/code/adder.yaml}{\code{adder.yaml}}).}, label={lst:adder}, frame=tb, captionpos=b]{code/adder.yaml}
 
 Then, switch to a working directory and create the following small Verilog design ({\code{adder.v}), as shown in Listing~\ref{lst:adder}.
 This example is an adder, including registers at the input and output ports, so we can use static timing analysis (STA) to explore the maximum clocking frequency.
@@ -400,12 +406,12 @@ Furthermore, you need a configuration for your flow. You can find all possible c
 \myref{https://librelane.readthedocs.io/en/latest/reference/common_flow_vars.html}{Universal Flow Configuration Variables} section of the LibreLane documentation. However, most variables can be left at their default values.
 
 Config files can support more than one PDK, see the \myref{https://github.com/librelane/librelane/blob/main/librelane/examples/spm/config.yaml}{LibreLane example}. Configuration can be in YAML or JSON format.
-We will use the \code{adder.json} file with a minimal configuration, as shown in Listing~\ref{lst:config}.
+We will use the \code{adder.yaml} file with a minimal configuration, as shown in Listing~\ref{lst:config}.
 
 For a fully automatic run of the full flow, you can execute:
 
 \begin{verbatim}
-librelane adder.json
+librelane adder.yaml
 \end{verbatim}
 
 This single command runs the complete synthesis flow from RTL to GDSII.
@@ -431,13 +437,13 @@ The name of the folder will be \code{RUN\_year\_month\_day\_hh-mm-ss}.
 A first step to explore the design is to view the GDS in KLayout with:
 
 \begin{verbatim}
-librelane --last-run --flow openinklayout adder.json
+librelane --last-run --flow openinklayout adder.yaml
 \end{verbatim}
 
 In Klayout, you can explore the design. Use the rulers to measure your design. How large is it?
 Would it fit into a Tiny Tapeout Tile? How large is a Tiny Tapeout tile?
 When you expand the adder in Cells, you can see which cells have been used.
-By double-clicking on a cell type, it is removed from the display. This is an indirect way to show the cells in the GDS.
+By double-clicking on a cell type, it is removed from the display. This is an indirect way to show the cells in the GDS. The fild-flop standard cells in Sky130 have names that include ``dfxtp'' in their name. Double clock that cell to see how many flip-flops are used. How many should there be?
 
 Matt Venn has a good selection of layers and color assignments at \myref{https://github.com/mattvenn/librelane_summary/blob/librelane/klayout_gds.xml}{klayout\_gds.xml}. You can use it with klayout as follows:
 \begin{verbatim}
@@ -457,6 +463,11 @@ Explore the tool with:
 summary.py --help
 \end{verbatim}
 
+When in a folder that contains the LibreLane runs, explore the GDS of the latest run with:
+\begin{verbatim}
+summary.py --gds
+\end{verbatim}
+
 At the time of this writing, the flow generates 75 folders containing the results and reports for each individual step. You can find those subfolders in the folder \code{runs/RUN\_DATE\_TIME}. Not all reports are equally important. We will explore some of them.
 
 \subsubsection{Linting and a First Area Estimate}
@@ -473,7 +484,7 @@ The first four steps perform linting of the design, and any Verilog syntax error
 \end{verbatim}
 
 \noindent We use the Sky130 PDK and can find the documentation of each cell \myref{https://skywater-pdk.readthedocs.io/en/main/}{online}.
-E.g., the DFF is described at \myref{https://skywater-pdk.readthedocs.io/en/main/contents/libraries/sky130_fd_sc_hd/cells/dfxtp/README.html}{dfxtp\_2}.
+E.g., the DFF is described at \myref{https://skywater-pdk.readthedocs.io/en/main/contents/libraries/sky130_fd_sc_hd/cells/dfxtp/README.html}{dfxtp}.
 The file \code{adder.nl.v} contains the design synthesized to standard cells from the used PDK. As our example is very simple, we can manually inspect the generated Verilog.
 
 \subsubsection{xxx}
