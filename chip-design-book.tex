@@ -307,6 +307,8 @@ Alberto Sangiovanni-Vincentelli was invited to give a keynote speech at the 40th
 
 Alberto co-founded Cadence Design Systems and Synopsys, the two major EDA tool vendors.
 
+Read \url{https://arxiv.org/pdf/2311.02055}
+
 \subsection{Simulation} 
 IBM's Astap (advanced statistical
 analysis program) and UC Berkeley's
@@ -726,19 +728,23 @@ Efabless, the original developer of OpenLane and OpenLane2, exited the business 
 
 \section{Caravel}
 
-\myref{https://caravel-harness.readthedocs.io/}{Caravel} is a SoC framework developed by Efabless for the Google/Skywater 130nm Open PDK. It contains a RISC-V core, a management area, and a padframe. The user area is 3000um x 3600um (10 mm2). To put this into perspective, a simple 3-stage RISC-V pipeline, such as Wildcat~\cite{wildcat:arcs2025}, fits into a 0.2 mm2 area. A 4~KiB memory from eFabless is 0.18 mm2 area.
+\myref{https://caravel-harness.readthedocs.io/}{Caravel} is a SoC framework developed by Efabless for the Google/Skywater 130nm Open PDK. It is the basis for the \myref{https://chipfoundry.io/chipignite}{chipIgnite} MPW shuttles.
+It contains a padframe, a houskeeping block, a management area including a RISC-V core, and user project wrapper.
+The user area is 3000um x 3600um (10 mm2). To put this into perspective, a simple 3-stage RISC-V pipeline, such as Wildcat~\cite{wildcat:arcs2025}, fits into a 0.2 mm2 area. A 4~KiB memory from eFabless is 0.18 mm2 area.
 
-ChipFoundry now maintains Caravel. Note that the transition to ChipFoundry is still in progress; therefore, some documentation still contains the eFabless name. Additionally, some datasheets are outdated (e.g., referring to the PicoRV as the management processor, which is now the VexRV).
+ChipFoundry now maintains Caravel. Note that the transition to ChipFoundry is still in progress; therefore, some documentation still contains the eFabless name. Additionally, some datasheets are outdated (e.g., referring to the PicoRV as the management processor, which is now the \myref{https://github.com/SpinalHDL/VexRiscv}{VexRiscv}).
 
-Caravel itself is split into two repositories: the \myref{https://github.com/chipfoundry/caravel_user_project}{user project} and \myref{https://github.com/chipfoundry/caravel}{Caravel itself}. The user project contains a tiny example (a counter) to get started. Within that project, all the needed tools are installed, including a lite version of Caravel, the management core for simulation, OpenLane, and the Sky130 PDK.
+
+
+\subsection{Caravel User Project}
+The Caravel framework itself is split into two repositories: the \myref{https://github.com/chipfoundry/caravel_user_project}{user project} and \myref{https://github.com/chipfoundry/caravel}{Caravel itself}. The user project contains a tiny example (a counter) to get started. Within that project, all the needed tools are installed, including a lite version of Caravel, the management core for simulation, OpenLane, and the Sky130 PDK.
 
 The starting point is the user project. The flow is run within Docker. Follow the instructions in \myref{https://github.com/chipfoundry/caravel_user_project/blob/main/docs/source/index.md}{Caravel User Project}. The dependencies on Docker and Python are listed there. Missing is the dependency on two Python libraries: \code{python-tk} and \code{Click}.
 
 There are two ways to integrate your design into Caravel: (1) Harden your user project first and then instantiate it in the wrapper as a hard macro, and then run the hardening of the wrapper; (2) Harden the whole project at once (include your user project as Verilog files in the wrapper configuration). The example project performs the individual hardening.
 
 
-
-
+\todo{There is also a LibreLane tutorial on this \url{https://librelane.readthedocs.io/en/latest/usage/caravel/index.html}. Is this still valid?}
 
 
 \subsection{Notes for the Tapeout}
@@ -755,6 +761,10 @@ The default configuration looks like hardening the user project first and includ
 chipfoundry upload: \url{https://github.com/chipfoundry/cf-cli?tab=readme-ov-file#installation}
 
 register an account at: \url{https://chipfoundry.io/sftp-registration}
+
+When running the user project with LibreLane, it finishes in 20' on a Mac with M1. When running from within Caravel it uses a Docker image and runs for 2 hours. The main difference is that the magic spice extraction runs for 1h30 in the caraval flow, and 1' with local LibreLane.
+
+Run it with Nix instead of the Docker image with: \code{make user_proj_example LIBRELANE_USE_NIX=1} also executes in 15'.
 
 \section{Tiny Tapeout}
 
