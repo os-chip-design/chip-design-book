@@ -318,12 +318,12 @@ circuits emphasis)
 Early tools, still in use today: Spice, Espresso, Magic, 
 \section{Tool Installation}
 
-The magic of open-source tools is that we can install them on a personal computer without any concerns of licensing and license servers. The downside of open-source tools is the variety of installation options. There is no single best way for the installation. Furthermore, open-source tools are best supported on a Unix operating system, and preferably Linux. Support under MacOS comes second. MS Windows is best served by using the Windows Subsystem for Linux.
+The magic of open-source tools is that we can install them on a personal computer without any concerns of licensing and license servers. The downside of open-source tools is the variety of installation options. There is no single best way for the installation. Furthermore, open-source tools are best supported on a Unix operating system, and preferably Linux. Support under macOS comes second. MS Windows is best served by using the Windows Subsystem for Linux.
 
 
 \subsection{Nix Based}
 
-From OpenLane-2 (now LibreLane) on, the preferred installation is \myref{https://en.wikipedia.org/wiki/Nix_(package_manager)}{Nix}-based. Nix is a cross-platform package manager, also enabling native binaries for ARM-based systems (e.g., Mac laptops). The OpenLane 
+From OpenLane2 (now LibreLane) on, the preferred installation is \myref{https://en.wikipedia.org/wiki/Nix_(package_manager)}{Nix}-based. Nix is a cross-platform package manager, also enabling native binaries for ARM-based systems (e.g., Mac laptops). The OpenLane 
 \myref{https://openlane2.readthedocs.io/en/latest/getting_started/common/nix_installation/index.html}{getting started} documentation explains how to install Nix, and also how to set up the Nix cache for the OpenLane tools.
 
 Another option to install Nix is via \myref{https://docs.determinate.systems/}{Determinate}. Note that you need to install the OpenLane cache to avoid building all the tools yourself.
@@ -472,6 +472,8 @@ summary.py --gds
 
 At the time of this writing, the flow generates 75 folders containing the results and reports for each individual step. You can find those subfolders in the folder \code{runs/RUN\_DATE\_TIME}. Not all reports are equally important. We will explore some of them.
 
+\todo{Numbering might change, depending on tool version and probably on configuration}
+
 \subsubsection{Linting and a First Area Estimate}
 
 The first four steps perform linting of the design, and any Verilog syntax errors are identified during this process. An initial estimate of the used cells can be found in the report \code{06-yosys-synthesis/reports/stat.rpt}. For our pipelined adder, we can identify the 24 flip-flops as \code{dfxtp_2} cells in that report:
@@ -533,6 +535,174 @@ The last command shows us help with the steps.
 \lstinputlisting[float, caption={Running the synthesis (\myref{https://github.com/os-chip-design/chip-design-book/blob/main/code/synth.py}{\code{synth.py}}).}, label={lst:synth}, frame=tb, captionpos=b]{code/synth.py}
 
 We can run the synthesis with the code from Listing~\ref{lst:synth}.
+
+\chapter{Open-Source Production Frameworks}
+
+Chip design consists of several steps from synthesis down to GDSII files. Scripts usually orchestrate those steps. In the following, we describe different frameworks that contain the needed open-source tool, but also the scripts to run the flow.
+
+\section{OpenROAD}
+
+\myref{https://github.com/The-OpenROAD-Project}{OpenROAD}~\cite{OpenROAD} started as a DARPA-sponsored project to enable an end-to-end design flow of chips from RTL to the final chips without human intervention, within a maximum of 24 hours. The documentation is published on \myref{https://openroad.readthedocs.io/en/latest/}{Read the Docs}.
+OpenROAD includes the following open-source \myref{https://openlane.readthedocs.io/en/latest/flow_overview.html}{tools}:
+
+\begin{itemize}
+\item \myref{https://github.com/the-openroad-project/openroad/tree/master/src/ifp}{ifp} defines the core are, the rows, and the tracks.
+\item \myref{https://github.com/the-openroad-project/openroad/tree/master/src/pdn}{pdn} is a power distribution network (PDN) generator.
+\item \myref{https://github.com/the-openroad-project/openroad/tree/master/src/tap}{Tapcell} inserts tapcells or endcaps.
+\item \myref{https://github.com/the-openroad-project/openroad/tree/master/src/gpl}{gpl} performs global placement. The tool is an extension of the \myref{https://github.com/The-OpenROAD-Project/RePlAce}{RePlAce} tool.
+\item \myref{https://github.com/the-openroad-project/openroad/tree/master/src/rsz}{Gate Resizer} to optimize the design until the maximum utilization is reached.
+\item \myref{https://github.com/the-openroad-project/openroad/tree/master/src/dpl}{OpenDP} performs detailed placements.
+\item \myref{https://github.com/the-openroad-project/openroad/tree/master/src/cts}{TritonCTS 2.0} is performs clock tree synthesis.
+\item \myref{https://github.com/the-openroad-project/openroad/tree/master/src/grt}{FastRoute} performs global routing.
+\item \myref{https://github.com/the-openroad-project/openroad/tree/master/src/drt}{TritonRoute} performs detailed routing.
+\item \myref{https://github.com/the-openroad-project/openroad/tree/master/src/rcx}{OpenRCX} performs parasitics extraction.
+\item And some more.
+\end{itemize}
+
+Use the links for documentation of the individual tools.
+
+\todo{what else is part of OpenROAD?}
+
+ 
+\section{OpenLane}
+
+\myref{https://github.com/The-OpenROAD-Project/OpenLane}{OpenLane}~\cite{OpenLANE, openlane:woset:2020} is a collection of EDA tools, such as Yosys, Magic, Netgen, and KLayout. It also includes OpenROAD. OpenLane consists of TCL scripts to automate the flow from RTL, described in Verilog, to the chip production data as a GDSII file.
+
+OpenLane was developed by eFabless, and the documentation is published on \myref{https://openlane.readthedocs.io/en/latest/}{Read the Docs}.
+
+\subsection{The Design Flow}
+
+\begin{figure}
+  \centering
+  \includegraphics[width=\textwidth]{figures/flow}
+  \caption{OpenLane design flow, including the OpenROAD flow in blue.}
+  \label{fig:flow}
+\end{figure}
+
+Figure~\ref{fig:flow}\footnote{Copyright 2020-2022 Efabless Corporation and contributors, License: Apache 2.0.} shows the design flow of OpenLane.
+
+
+
+
+
+\subsection{OpenLane2 and LibreLane}
+
+\myref{https://github.com/efabless/openlane2}{OpenLane2} is a new, partly rewritten,\footnote{OpenLane2 started out of OpenLane and OpenROAD scripts} framework for chip design with a focus on substituting TCL scripts with Python scripts. The documentation is published on \myref{https://openlane2.readthedocs.io/}{Read the Docs}.
+However, the original OpenLane \myref{https://openlane.readthedocs.io/en/latest/}{documentation} is richer than the OpenLane2 documentation. Therefore, consider reading that one as a basis.
+
+Efabless, the original developer of OpenLane and OpenLane2, exited the business in spring 2024. To continue the development of OpenLane, the repository was cloned/forked in April 2025, and the project was renamed to \myref{https://github.com/librelane/librelane}{LibreLane}.
+
+\subsection{Running the Flow \emph{Manually}}
+
+
+
+\section{Caravel}
+
+\myref{https://caravel-harness.readthedocs.io/}{Caravel} is a SoC framework developed by Efabless for the Google/Skywater 130nm Open PDK. It is the basis for the \myref{https://chipfoundry.io/chipignite}{chipIgnite} MPW shuttles.
+It contains a padframe, a houskeeping block, a management area including a RISC-V core, and user project wrapper.
+The user area is 3000um x 3600um (10 mm2). To put this into perspective, a simple 3-stage RISC-V pipeline, such as Wildcat~\cite{wildcat:arcs2025}, fits into a 0.2 mm2 area. A 4~KiB memory from eFabless has a 0.18 mm2 area.
+
+ChipFoundry now maintains Caravel. Note that the transition to ChipFoundry is still in progress; therefore, some documentation still contains the eFabless name. Additionally, some datasheets are outdated (e.g., referring to the PicoRV as the management processor, which is now the \myref{https://github.com/SpinalHDL/VexRiscv}{VexRiscv}).
+
+\todo{Write about the management core, the Wishbone bus, and the logic analyzer. And about running tests.}
+
+
+\subsection{Caravel User Project}
+
+The Caravel framework itself is split into two repositories: the \myref{https://github.com/chipfoundry/caravel_user_project}{user project} and \myref{https://github.com/chipfoundry/caravel}{Caravel} itself. The user project contains a tiny example (a counter) to get started. Within that project, all the needed tools are installed, including a lite version of Caravel, the management core for simulation, OpenLane, and the Sky130 PDK.
+
+The starting point is the user project. The flow is run within Docker. Follow the instructions in \myref{https://github.com/chipfoundry/caravel_user_project/blob/main/docs/source/index.md}{Caravel User Project}. The dependencies on Docker and Python are listed there. Missing is the dependency on two Python libraries: \code{python-tk} and \code{Click}.
+
+There are two ways to integrate your design into Caravel: (1) Harden your user project first and then instantiate it in the wrapper as a hard macro, and then run the hardening of the wrapper; (2) Harden the whole project at once (include your user project as Verilog files in the wrapper configuration). The example project performs the individual hardening.
+
+Following \myref{https://www.youtube.com/watch?v=YWj4HhRU36U&t=302s}{video} from ChipFoundry gives an overview of the flow of the example project. Then follow the instructions in \myref{https://github.com/chipfoundry/caravel_user_project/blob/main/docs/source/index.md}{Caravel User Project}.
+
+\subsection{Setup}
+
+Start by cloning the \myref{https://github.com/chipfoundry/caravel_user_project}{user project} by selecting \emph{Use this template}. Install the prerequisites and clone your repository. Note that the project requires several GB of space on your hard disc. The initial clone is 1/4 GB. The needed tools are installed with:
+
+\begin{verbatim}
+make setup
+\end{verbatim}
+
+During this setup phase, a lightweight version of Caravel (\code{caravel\_lite}), the management core for simulation, the Sky130 PDK, a Docker with LibreLane, and timing scripts are downloaded.
+
+The download will take several minutes and needs around 7.5 GB of hard disk space.
+
+\subsection{Hardening the User Project}
+
+
+The example project consists of a simple 16-bit counter that is connected to the \myref{https://en.wikipedia.org/wiki/Wishbone_(computer_bus)}{Wishbone} bus, the logic analyzer, and 16 output pins.
+With the Wishbone connection, the counter can be controlled (i.e., started and stopped) from the management core.
+The source can be found in \code{verilog/rtl/user_proj_example.v}.
+
+To get started, we recommend hardening and testing the user project as it is.  After you have successfully hardened and tested the example, add your modules to the project. The default configuration is set up to harden the user project first and include the GDS as a hard macro in the wrapper project.
+
+The \myref{https://github.com/chipfoundry/caravel_user_project}{user project} contains two projects in folder \code{openlane}:
+\begin{enumerate}
+\item \code{user\_proj\_example} and
+\item  \code{user\_project\_wrapper}
+\end{enumerate}
+
+To simplify the hardening, it is recommended to keep those names.\footnote{Although a name that includes a word such as \emph{example} sounds a bit silly, most projects keep the names.} Both folders contain a \code{config.json} for the LibreLane run. Explore the two configuration files. You will see that the die area for the user project is set to 2800\;{\textmu}m by 1760\;{\textmu}m, which is smaller than the available 10 mm2 on the Caravel project. Change this setting later to fit your design. In the configuration file of the wrapper, we can see that the user project is instantiated as a hard macro at position \code{[60, 15]}.
+
+The user project is hardened with:
+\begin{verbatim}
+make user_proj_example
+\end{verbatim}
+
+That command starts the hardening of the user project with LibreLane, generating the GDS file and a gate-level netlist with instances of the Sky130 standard cells for gate-level simulation. That GDS can be found in folder \code{gds}. Use e.g., KLayout to explore that hard macro. The gate-level netlist in folder \code{verilog/gl}. The LibreLane reports and generated files can be found in the folder \code{openlane/user_proj_example/runs}.
+
+The project now needs 10 GB of disk space. Note that many of the generated files have already been committed to the original git repository, which creates annoying false source changes. Avoid committing those changes after every run.
+
+The default configuration uses Docker to run the LibreLane tools. Depending on your setup (processor and operating system), running with Docker can be significantly slower than running the tools natively. For example, the user project required 2 hours to harden on my Mac with an M1. Most of the time was spent on magic spice extraction (1h30). When running it natively using Nix, the whole run executes in 15'. You can select Nix with:
+
+\begin{verbatim}
+make user_proj_example LIBRELANE_USE_NIX=1
+\end{verbatim}
+
+The next step is to harden the project wrapper with:
+\begin{verbatim}
+make user_project_wrapper
+\end{verbatim}
+
+This wrapper includes the user project as a hard macro. Similar to the user project, the run generates the GDS file and the Verilog file for gate-level simulation. The GDS file is the one that is submitted to the fab for production.
+
+\subsection{Precheck}
+
+Precheck generates a new folder \code{precheck_results} for all the logs. precheck.log is the main log. There are also reports, e.g., the LVS report.
+
+\subsection{Submission to ChipFoundry}
+
+
+
+Submission to chipfactory needs only two files: the \code{gds/user_project_wrapper.gds} and \code{verilog/rtl/user_defines.v}, where the default for the GPIO pins directions are defined.
+
+The files can also be compressed with \code{gzip}.
+
+\todo{Talk about how ChipFoundry will combine the design with the Caravel harness.}
+
+\subsection{Notes}
+
+\todo{I have seen three ways to harden - find it.}
+
+chipfoundry upload: \url{https://github.com/chipfoundry/cf-cli?tab=readme-ov-file#installation}
+
+register an account at: \url{https://chipfoundry.io/sftp-registration}
+
+
+\todo{There is also a LibreLane tutorial on this \url{https://librelane.readthedocs.io/en/latest/usage/caravel/index.html}. Is this still valid?}
+
+
+\todo{We can use the Caravel mini project to integrate four student projects (Edu4Chip?) into one run.}
+
+
+
+\section{Tiny Tapeout}
+
+
+
+\section{Maybe something from Edu4Chip?}
 
 \chapter{Memories}
 
@@ -665,112 +835,6 @@ John Ousterhout wrote Magic at UCB. Now he is at Stanford and has written a book
 Yosys~\cite{yosys:austrochip} started as a Bachelor's project by Clifford Wolf at the Technical University of Vienna~\cite{yosys:bachelor}. Yosys is a free and open-source software for Verilog HDL synthesis.
 Yosys synthesizes Verilog HDL to logically equivalent netlists. Yosys uses external tools, such as Berkeley's ABC~\cite{abc:cav:2010} for combinational logic minimization.
 
-
-\section{Open-Source Production Frameworks}
-
-Chip design consists of several steps from synthesis down to GDSII files. Scripts usually orchestrate those steps. In the following, we describe different frameworks that contain the needed open-source tool, but also the scripts to run the flow.
-
-\subsection{OpenROAD}
-
-\myref{https://github.com/The-OpenROAD-Project}{OpenROAD}~\cite{OpenROAD} started as a DARPA-sponsored project to enable an end-to-end design flow of chips from RTL to the final chips without human intervention, within a maximum of 24 hours. The documentation is published on \myref{https://openroad.readthedocs.io/en/latest/}{Read the Docs}.
-OpenROAD includes the following open-source \myref{https://openlane.readthedocs.io/en/latest/flow_overview.html}{tools}:
-
-\begin{itemize}
-\item \myref{https://github.com/the-openroad-project/openroad/tree/master/src/ifp}{ifp} defines the core are, the rows, and the tracks.
-\item \myref{https://github.com/the-openroad-project/openroad/tree/master/src/pdn}{pdn} is a power distribution network (PDN) generator.
-\item \myref{https://github.com/the-openroad-project/openroad/tree/master/src/tap}{Tapcell} inserts tapcells or endcaps.
-\item \myref{https://github.com/the-openroad-project/openroad/tree/master/src/gpl}{gpl} performs global placement. The tool is an extension of the \myref{https://github.com/The-OpenROAD-Project/RePlAce}{RePlAce} tool.
-\item \myref{https://github.com/the-openroad-project/openroad/tree/master/src/rsz}{Gate Resizer} to optimize the design until the maximum utilization is reached.
-\item \myref{https://github.com/the-openroad-project/openroad/tree/master/src/dpl}{OpenDP} performs detailed placements.
-\item \myref{https://github.com/the-openroad-project/openroad/tree/master/src/cts}{TritonCTS 2.0} is performs clock tree synthesis.
-\item \myref{https://github.com/the-openroad-project/openroad/tree/master/src/grt}{FastRoute} performs global routing.
-\item \myref{https://github.com/the-openroad-project/openroad/tree/master/src/drt}{TritonRoute} performs detailed routing.
-\item \myref{https://github.com/the-openroad-project/openroad/tree/master/src/rcx}{OpenRCX} performs parasitics extraction.
-\item And some more.
-\end{itemize}
-
-Use the links for documentation of the individual tools.
-
-\todo{what else is part of OpenROAD?}
-
- 
-\subsection{OpenLane}
-
-\myref{https://github.com/The-OpenROAD-Project/OpenLane}{OpenLane}~\cite{OpenLANE, openlane:woset:2020} is a collection of EDA tools, such as Yosys, Magic, Netgen, and KLayout. It also includes OpenROAD. OpenLane consists of TCL scripts to automate the flow from RTL, described in Verilog, to the chip production data as a GDSII file.
-
-OpenLane was developed by eFabless, and the documentation is published on \myref{https://openlane.readthedocs.io/en/latest/}{Read the Docs}.
-
-\subsubsection{The Design Flow}
-
-\begin{figure}
-  \centering
-  \includegraphics[width=\textwidth]{figures/flow}
-  \caption{OpenLane design flow, including the OpenROAD flow in blue.}
-  \label{fig:flow}
-\end{figure}
-
-Figure~\ref{fig:flow}\footnote{Copyright 2020-2022 Efabless Corporation and contributors, License: Apache 2.0.} shows the design flow of OpenLane.
-
-
-
-
-
-\subsubsection{OpenLane2 and LibreLane}
-
-\myref{https://github.com/efabless/openlane2}{OpenLane2} is a new, partly rewritten,\footnote{OpenLane2 started out of OpenLane and OpenROAD scripts} framework for chip design with a focus on substituting TCL scripts with Python scripts. The documentation is published on \myref{https://openlane2.readthedocs.io/}{Read the Docs}.
-However, the original OpenLane \myref{https://openlane.readthedocs.io/en/latest/}{documentation} is richer than the OpenLane2 documentation. Therefore, consider reading that one as a basis.
-
-Efabless, the original developer of OpenLane and OpenLane2, exited the business in spring 2024. To continue the development of OpenLane, the repository was cloned/forked in April 2025, and the project was renamed to \myref{https://github.com/librelane/librelane}{LibreLane}.
-
-\subsubsection{Running the Flow \emph{Manually}}
-
-
-
-\section{Caravel}
-
-\myref{https://caravel-harness.readthedocs.io/}{Caravel} is a SoC framework developed by Efabless for the Google/Skywater 130nm Open PDK. It is the basis for the \myref{https://chipfoundry.io/chipignite}{chipIgnite} MPW shuttles.
-It contains a padframe, a houskeeping block, a management area including a RISC-V core, and user project wrapper.
-The user area is 3000um x 3600um (10 mm2). To put this into perspective, a simple 3-stage RISC-V pipeline, such as Wildcat~\cite{wildcat:arcs2025}, fits into a 0.2 mm2 area. A 4~KiB memory from eFabless is 0.18 mm2 area.
-
-ChipFoundry now maintains Caravel. Note that the transition to ChipFoundry is still in progress; therefore, some documentation still contains the eFabless name. Additionally, some datasheets are outdated (e.g., referring to the PicoRV as the management processor, which is now the \myref{https://github.com/SpinalHDL/VexRiscv}{VexRiscv}).
-
-
-
-\subsection{Caravel User Project}
-The Caravel framework itself is split into two repositories: the \myref{https://github.com/chipfoundry/caravel_user_project}{user project} and \myref{https://github.com/chipfoundry/caravel}{Caravel itself}. The user project contains a tiny example (a counter) to get started. Within that project, all the needed tools are installed, including a lite version of Caravel, the management core for simulation, OpenLane, and the Sky130 PDK.
-
-The starting point is the user project. The flow is run within Docker. Follow the instructions in \myref{https://github.com/chipfoundry/caravel_user_project/blob/main/docs/source/index.md}{Caravel User Project}. The dependencies on Docker and Python are listed there. Missing is the dependency on two Python libraries: \code{python-tk} and \code{Click}.
-
-There are two ways to integrate your design into Caravel: (1) Harden your user project first and then instantiate it in the wrapper as a hard macro, and then run the hardening of the wrapper; (2) Harden the whole project at once (include your user project as Verilog files in the wrapper configuration). The example project performs the individual hardening.
-
-
-\todo{There is also a LibreLane tutorial on this \url{https://librelane.readthedocs.io/en/latest/usage/caravel/index.html}. Is this still valid?}
-
-
-\subsection{Notes for the Tapeout}
-
-The Caravel needs Docker running on Mac. On chipdesign1 we have podman).
-
-The project contains two example projects: \code{user\_proj\_example} and \code{user\_project\_wrapper} in folder \code{openlane}. They are both built with
-\begin{verbatim}
-    make user_proj_example
-\end{verbatim}
-
-The default configuration looks like hardening the user project first and including that GDS as a hard macro in the wrapper.
-
-chipfoundry upload: \url{https://github.com/chipfoundry/cf-cli?tab=readme-ov-file#installation}
-
-register an account at: \url{https://chipfoundry.io/sftp-registration}
-
-When running the user project with LibreLane, it finishes in 20' on a Mac with M1. When running from within Caravel it uses a Docker image and runs for 2 hours. The main difference is that the magic spice extraction runs for 1h30 in the caraval flow, and 1' with local LibreLane.
-
-Run it with Nix instead of the Docker image with: \code{make user_proj_example LIBRELANE_USE_NIX=1} also executes in 15'.
-
-\section{Tiny Tapeout}
-
-
-
-\section{Maybe something from Edu4Chip?}
 
 \section{Use Cases}
 
