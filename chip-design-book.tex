@@ -575,11 +575,11 @@ OpenLane was developed by eFabless, and the documentation is published on \myref
 \begin{figure}
   \centering
   \includegraphics[width=\textwidth]{figures/flow}
-  \caption{OpenLane design flow, including the OpenROAD flow in blue.}
+  \caption{OpenLane design flow, including the OpenROAD flow in blue. Copyright 2020-2022 Efabless Corporation and contributors, License: Apache 2.0.}
   \label{fig:flow}
 \end{figure}
 
-Figure~\ref{fig:flow}\footnote{Copyright 2020-2022 Efabless Corporation and contributors, License: Apache 2.0.} shows the design flow of OpenLane.
+Figure~\ref{fig:flow} shows the design flow of OpenLane.
 
 
 
@@ -600,16 +600,30 @@ Efabless, the original developer of OpenLane and OpenLane2, exited the business 
 
 \myref{https://caravel-harness.readthedocs.io/}{Caravel} is a SoC framework developed by Efabless for the Google/Skywater 130nm Open PDK. It is the basis for the \myref{https://chipfoundry.io/chipignite}{chipIgnite} MPW shuttles.
 It contains a padframe, a houskeeping block, a management area including a RISC-V core, and user project wrapper.
-The user area is 3000um x 3600um (10 mm2). To put this into perspective, a simple 3-stage RISC-V pipeline, such as Wildcat~\cite{wildcat:arcs2025}, fits into a 0.2 mm2 area. A 4~KiB memory from eFabless has a 0.18 mm2 area.
+The user area is 3000\;{\textmu}m x 3600\;{\textmu}m (10 mm$^2$). To put this into perspective, a simple 3-stage RISC-V pipeline, such as Wildcat~\cite{wildcat:arcs2025}, fits into a 0.2 mm$^2$ area. A 4~KiB memory from eFabless has a 0.18 mm$^2$ area.
 
 ChipFoundry now maintains Caravel. Note that the transition to ChipFoundry is still in progress; therefore, some documentation still contains the eFabless name. Additionally, some datasheets are outdated (e.g., referring to the PicoRV as the management processor, which is now the \myref{https://github.com/SpinalHDL/VexRiscv}{VexRiscv}).
+
+\begin{figure}
+  \centering
+  \includegraphics[width=\textwidth]{figures/layout}
+  \caption{The combination of the Caravel harness with the user project results in the final Caravel tile for the MPW run. Copyright 2020-2022 Efabless Corporation and contributors, License: Apache 2.0.}
+  \label{fig:layout}
+\end{figure}
+
+Caravel is in fact two artifacts that are combined at the MPW chip production. The Caravel harness, which combines the RISC-V CPU and IO management with the user project, is used to build the final Caravel tile.
+Figure~\ref{fig:layout} shows this combination of the two components to the final Caravel. The so-called \code{user_project_wrapper} is the design that is submitted to ChipFoundry. As users, we do not need to directly deal with Caravel.
 
 \todo{Write about the management core, the Wishbone bus, and the logic analyzer. And about running tests.}
 
 
+
+
+The PCB for the chipIgnite project: \url{https://github.com/fossi-foundation/caravel_board}.
+
 \subsection{Caravel User Project}
 
-The Caravel framework itself is split into two repositories: the \myref{https://github.com/chipfoundry/caravel_user_project}{user project} and \myref{https://github.com/chipfoundry/caravel}{Caravel} itself. The user project contains a tiny example (a counter) to get started. Within that project, all the needed tools are installed, including a lite version of Caravel, the management core for simulation, OpenLane, and the Sky130 PDK.
+The Caravel framework itself is split into two repositories: the \myref{https://github.com/chipfoundry/caravel_user_project}{user project} (often called \code{user_project_wrapper}, as this is the top-level of the user project) and \myref{https://github.com/chipfoundry/caravel}{Caravel} itself. The example user project contains a tiny example (a counter) to get started. Within that project, all the needed tools are installed, including a lite version of Caravel, the management core for simulation, OpenLane, and the Sky130 PDK.
 
 The starting point is the user project. The flow is run within Docker. Follow the instructions in \myref{https://github.com/chipfoundry/caravel_user_project/blob/main/docs/source/index.md}{Caravel User Project}. The dependencies on Docker and Python are listed there. Missing is the dependency on two Python libraries: \code{python-tk} and \code{Click}.
 
@@ -666,25 +680,84 @@ The next step is to harden the project wrapper with:
 make user_project_wrapper
 \end{verbatim}
 
-This wrapper includes the user project as a hard macro. Similar to the user project, the run generates the GDS file and the Verilog file for gate-level simulation. The GDS file is the one that is submitted to the fab for production.
+This wrapper includes the user project as a hard macro. Similar to the user project, the run generates the GDS file and the Verilog file for gate-level simulation. The GDS file is the one that is submitted to the fab for production. The project has expanded to 11\;GB.
+
+
+\subsubsection{GPIO Configuration}
+
+Finally, before we can run a precheck, we need to update the default configuration for the GPIO pins in \code{verilog/rtl/user_defines.v}. GPIO[0] to GPIO[4] are used by the management core and cannot be changed. The example design uses 16 output pins. Therefore, we set them to OUTPUT and all other pins, which are not used as an INPUT, as following:
+
+
+\begin{verbatim}
+...
+`define USER_CONFIG_GPIO_5_INIT  `GPIO_MODE_USER_STD_OUTPUT
+`define USER_CONFIG_GPIO_6_INIT  `GPIO_MODE_USER_STD_OUTPUT
+`define USER_CONFIG_GPIO_7_INIT  `GPIO_MODE_USER_STD_OUTPUT
+`define USER_CONFIG_GPIO_8_INIT  `GPIO_MODE_USER_STD_INPUT_NOPULL
+`define USER_CONFIG_GPIO_9_INIT  `GPIO_MODE_USER_STD_INPUT_NOPULL
+`define USER_CONFIG_GPIO_10_INIT `GPIO_MODE_USER_STD_INPUT_NOPULL
+...
+\end{verbatim}
+
+\todo{The example user project wrapper connects the user project output (the counter) to the lowest eight pins and to the highest eight pins (\code{.io\_out({io\_out[37:30],io\_out[7:0]})}). However, the documentation states that the management core uses the lowest five pins. This is a contradiction.}
+\todo{Write about it. Here some text from Matt: I am recommending avoiding the use of GPIO pins 0 to 7, 36 and 37 (see Z2A)}
+
+Tim wrote on FOSSI chat:
+\begin{quotation}
+The user project example is certainly not using best practices. The way I designed the caravel harness (I did not design the user project example), pins 1 to 4 are used by the housekeeping SPI to communicate with the host computer through the FTDI chip and USB. So it is generally "occupied" and becomes a bit difficult to make use of for a user project. It can be done (contrary to what the instructions might say): The purpose of the harness chip design was to give the user project the maximum number of pins to use, if needed. Best practice (again, not the user example) is to leave the lower five pins (or seven, if you count the UART) alone unless you run out of pins and absolutely need them. It is always possible to run a program off of the flash that reconfigures all of the pins, including the lower ones, to whatever you want. Reconfiguring the pins that are connected to the FTDI will result in the inability to communicate with the chip without doing a complicated power cycle and simultaneous reset. So that's why it's not recommended: It will make working with the chip very annoying. But it is neither prohibited, nor impossible.
+\end{quotation}
+
+\subsection{Testing}
+
+The Caravel project uses \myref{https://www.cocotb.org/}{cocotb}, a Python-based testing framework for testing the RTL of the design and also the gate-level netlist.
+
+\subsection{Timing Analysis}
+
+
 
 \subsection{Precheck}
 
-Precheck generates a new folder \code{precheck_results} for all the logs. precheck.log is the main log. There are also reports, e.g., the LVS report.
+
+\begin{verbatim}
+make precheck
+\end{verbatim}
+
+Clones the \code{mpw_precheck} repository in the home folder, which is the default location.
+The installation location can be overwritten by setting \code{PRECHECK_ROOT}.
+
+\begin{verbatim}
+make run-precheck
+\end{verbatim}
+
+As the LVS may take a long time, we can skip it with:
+
+\begin{verbatim}
+DISABLE_LVS=1 make run-precheck
+\end{verbatim}
+
+Precheck generates a new folder \code{precheck_results} for all the logs. The main logfile is \code{precheck.log}. The results folder also includes individual reports, e.g., the LVS report.
+Precheck also checks for documentation issues, which gives errors from the cocotb documentation.
+Change the \code{Makrfile} for the \code{run-prechcheck} target and add \code{--private} to the call \code{mpw_precheck.py}.
+
+The Docker for the precheck is built for an x86 and therefore runs very slowly on a Mac M1 with the Rosetta x86 emulation. The precheck of the simple example ran for almost 4 hours.
+
 
 \subsection{Submission to ChipFoundry}
 
 
 
 Submission to chipfactory needs only two files: the \code{gds/user_project_wrapper.gds} and \code{verilog/rtl/user_defines.v}, where the default for the GPIO pins directions are defined.
-
 The files can also be compressed with \code{gzip}.
 
+ChipFoundry uses a \myref{https://github.com/chipfoundry/cf-cli}{command-line tool} (\code{cf}) to manage uploading of your design via SFTP.
+Before uploading your design for manufacturing, you need to register an \myref{https://chipfoundry.io/sftp-registration}{SFTP Account}. However, that account will only be enabled after paying the initial \$ 500 non-refundable reservation deposit.
+
+\todo{Shall we talk about configuration?}
 \todo{Talk about how ChipFoundry will combine the design with the Caravel harness.}
 
 \subsection{Notes}
 
-\todo{I have seen three ways to harden - find it.}
+\todo{I have seen three ways to harden -- it is in the later part of the user project documentation.}
 
 chipfoundry upload: \url{https://github.com/chipfoundry/cf-cli?tab=readme-ov-file#installation}
 
