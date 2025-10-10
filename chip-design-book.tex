@@ -611,7 +611,7 @@ ChipFoundry now maintains Caravel. Note that the transition to ChipFoundry is st
   \label{fig:layout}
 \end{figure}
 
-Caravel is in fact two artifacts that are combined at the MPW chip production. The Caravel harness, which combines the RISC-V CPU and IO management with the user project, is used to build the final Caravel tile.
+Caravel is, in fact, two artifacts that are combined during the MPW chip production. The Caravel harness, which combines the RISC-V CPU and IO management with the user project, is used to build the final Caravel tile.
 Figure~\ref{fig:layout} shows this combination of the two components to the final Caravel. The so-called \code{user_project_wrapper} is the design that is submitted to ChipFoundry. As users, we do not need to directly deal with Caravel.
 
 \todo{Write about the management core, the Wishbone bus, and the logic analyzer. And about running tests.}
@@ -619,7 +619,31 @@ Figure~\ref{fig:layout} shows this combination of the two components to the fina
 
 
 
-The PCB for the chipIgnite project: \url{https://github.com/fossi-foundation/caravel_board}.
+
+
+\subsection{Caravel Harness}
+
+\begin{figure}
+  \centering
+  \includegraphics[width=\textwidth]{figures/caravel}
+  \caption{The Caravel Harness}
+  \label{fig:caravel}
+\end{figure}
+
+Figure~\ref{fig:caravel} shows a simplified block diagram of the Caravel harness.
+
+The Caravel harness contains the \myref{https://github.com/chipfoundry/caravel_mgmt_soc_litex}{management core}, the user project, the padframe, and GPIOs configured by an SPI controller.
+
+The management core contains a \myref{https://github.com/SpinalHDL/VexRiscv}{VexRiscv} RISC-V core, 
+256-word memory (latch-based), shared for instruction and data, and peripherals, connected via a Wishbone bus. The peripherals include a flash controller, a UART, an SPI master, and a logic analyzer. The Wishbone bus and the logic analyzer are connected to the user area.
+
+The RISC-V core in the management runs firmware out of the Flash to configure the user project GPIOs, interact with the user area via the Wishbone bus, and interact with the logic analyzer.
+
+Internally, all components are split into a wrapper and the \emph{real} component. For example, the user project is split into a \code{user_project_wrapper} and a \code{user_proj_example}.
+
+The chipIgnite project includes a \myref{https://github.com/fossi-foundation/caravel_board}{board} containing the Caravel chip, a power supply, a serial Flash for the firmware, and an FTDI FT232 for communication between a PC via USB. 
+
+The management core is built with the \myref{https://github.com/enjoy-digital/litex}{LiteX} framework, which itself uses \myref{https://github.com/m-labs/migen}{Migen}, a Python project to build digital hardware.
 
 \subsection{Caravel User Project}
 
@@ -629,7 +653,7 @@ The starting point is the user project. The flow is run within Docker. Follow th
 
 There are two ways to integrate your design into Caravel: (1) Harden your user project first and then instantiate it in the wrapper as a hard macro, and then run the hardening of the wrapper; (2) Harden the whole project at once (include your user project as Verilog files in the wrapper configuration). The example project performs the individual hardening.
 
-Following \myref{https://www.youtube.com/watch?v=YWj4HhRU36U&t=302s}{video} from ChipFoundry gives an overview of the flow of the example project. Then follow the instructions in \myref{https://github.com/chipfoundry/caravel_user_project/blob/main/docs/source/index.md}{Caravel User Project}.
+Following \myref{https://www.youtube.com/watch?v=YWj4HhRU36U&t=302s}{video} from ChipFoundry gives an overview of the flow of the example project. Then follow the instructions in the \myref{https://github.com/chipfoundry/caravel_user_project/blob/main/docs/source/index.md}{Caravel User Project}.
 
 \subsection{Setup}
 
@@ -685,7 +709,7 @@ This wrapper includes the user project as a hard macro. Similar to the user proj
 
 \subsubsection{GPIO Configuration}
 
-Finally, before we can run a precheck, we need to update the default configuration for the GPIO pins in \code{verilog/rtl/user_defines.v}. GPIO[0] to GPIO[4] are used by the management core and cannot be changed. The example design uses 16 output pins. Therefore, we set them to OUTPUT and all other pins, which are not used as an INPUT, as following:
+Finally, before we can run a precheck, we need to update the default configuration for the GPIO pins in \code{verilog/rtl/user_defines.v}. GPIO[0] to GPIO[4] are used by the management core and cannot be changed. The example design uses 16 output pins. Therefore, we set them to OUTPUT and all other pins, which are not used as an INPUT, as follows:
 
 
 \begin{verbatim}
@@ -773,7 +797,15 @@ register an account at: \url{https://chipfoundry.io/sftp-registration}
 
 \section{Tiny Tapeout}
 
+\myref{https://tinytapeout.com/}{Tiny Tapeout} is a project that takes the idea of a multi-project wafer to the next level. Tiny Tapeout uses one tile of an MPW shuttle on Skywater130 and divides that tile into 512 smaller tiles. Therefore, the production cost can be further split, allowing for the sale of one tile for less than 100 USD.
 
+Tiny Tapeout uses GitHub actions to harden user designs. Therefore, this is the easiest way to produce a chip. No tools neeed to be installed locally.
+ 
+
+\section{wafer.space}
+
+\myref{https://wafer.space/}{wafer.space} is a new MPW service started by Tim Ansell and Leo Moser. It uses GF130 and offers 1000 dies with a user space of 20\;mm$^2$.
+The \myref{https://github.com/wafer-space/gf180mcu-project-template}{project template} is just the pad ring and a counter as an example design.
 
 \section{Maybe something from Edu4Chip?}
 
@@ -874,6 +906,8 @@ Right-click on any cell in the \emph{Cells} window to select a new one with \emp
 \subsection{FABs}
 
 \subsection{PDK}
+
+We have three PDKs available in open source. Therefore, we can compare them as an exercise.
 
 \section{The Design Flow}
 
