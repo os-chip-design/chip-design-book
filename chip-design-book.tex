@@ -62,7 +62,9 @@
 % \usepackage{inconsolata}
 % \usepackage[T1]{fontenc} % needed as well?
 
-
+\usepackage{tikz-timing}
+\usetikztiminglibrary[rising arrows]{clockarrows}
+\usetikztiminglibrary{either}
 
 % Smaller verbatim text
 \usepackage{etoolbox}
@@ -774,12 +776,122 @@ Submission to chipfactory needs only two files: the \code{gds/user_project_wrapp
 The files can also be compressed with \code{gzip}.
 
 ChipFoundry uses a \myref{https://github.com/chipfoundry/cf-cli}{command-line tool} (\code{cf}) to manage uploading of your design via SFTP.
-Before uploading your design for manufacturing, you need to register an \myref{https://chipfoundry.io/sftp-registration}{SFTP Account}. However, that account will only be enabled after paying the initial \$ 500 non-refundable reservation deposit.
+Before uploading your design for manufacturing, you need to register for an \myref{https://chipfoundry.io/sftp-registration}{SFTP Account}. However, that account will only be enabled after paying the initial \$ 500 non-refundable reservation deposit.
 
 \todo{Shall we talk about configuration?}
 \todo{Talk about how ChipFoundry will combine the design with the Caravel harness.}
 
+\subsection{A Wishbone Peripheral}
+
+\begin{figure}
+  \centering
+  \includegraphics[width=0.6\textwidth]{figures/Wishbone_Interface}
+  \caption{Wishbone interface}
+  \label{fig:wishbone}
+\end{figure}
+
+Caravel uses the \myref{https://en.wikipedia.org/wiki/Wishbone_(computer_bus)}{Wishbone}~\cite{soc:wishbone} bus to interface the processor core with the user design.
+Wishbone is an open-source bus definition intended to be used on-chip.
+The Wishbone specification defines a point-to-point communication.
+Wishbone is a public domain standard used by several open-source IP cores.
+
+
+Figure~\ref{fig:wishbone} shows the connection between a Wishbone master and a Wishbone servant.
+Wishbone is a simple request/acknowledgment interface. The master signals a request by asserting \code{SEL_O} and \code{STB_O}.
+An asynchronous slave can, in the same cycle, reply with \code{ACK_O}.
+A synchronous slave can delay the acknowledgment.
+The master needs to hold the address, data, and control signals valid through the whole read or write cycle.
+
+\begin{figure}
+\centering
+\begin{tikztimingtable}[
+font=\tt,
+timing/yunit=2.5ex,
+timing/xunit=3ex,
+timing/text format=\raisebox{.4ex}\strut\tt\Large,
+timing/u/background/.style={fill=lightgray},
+timing/e/background/.style={fill=lightgray}
+]
+{CLK\_I}     & [L] 12{C} \\
+{ADR\_O}   & .1U 2U 2D{addr} 4U 2D{addr} 1.9U \\
+{DAT\_I}   & .1U 2U 2D{data} 7.9U \\
+{DAT\_O}   & .1U 8U 2D{data} 1.9U \\
+{WE\_O} & .1U 2U 2L 4U 2H 1.9U \\
+{CYC\_O} & .1L 2L 2H 4L 2H 1.9L \\
+{STB\_O} & .1L 2L 2H 4L 2H 1.9L \\
+{ACK\_I}   & .1U 2U 2H 4L 2H1.9L \\
+\extracode
+\vertlines[semitransparent, dashed]{2,4,6,8,10}
+\endextracode
+\end{tikztimingtable}  \caption{Wishbone asynchronous read followed by an asynchronous write}
+\label{fig:timing}
+\end{figure}
+
+\todo{Describe the two figures.}
+
+\begin{figure}
+\centering
+\begin{tikztimingtable}[
+font=\tt,
+timing/yunit=2.5ex,
+timing/xunit=3ex,
+timing/text format=\raisebox{.4ex}\strut\tt\Large,
+timing/u/background/.style={fill=lightgray},
+timing/e/background/.style={fill=lightgray}
+]
+{CLK\_I}     & [L] 14{C} \\
+{ADR\_O}   & .1U 2U 4D{address} 2U 4D{address} 1.9U \\
+{DAT\_I}   & .1U 4U 2D{data} 7.9U \\
+{DAT\_O}   & .1U 8U 4D{data} 1.9U \\
+{WE\_O} & .1U 2U 4L 2U 4H 1.9U \\
+{CYC\_O} & .1L 2L 4H 2L 4H 1.9L \\
+{STB\_O} & .1L 2L 4H 2L 4H 1.9L \\
+{ACK\_I}   & .1U 2U 2L 2H 4L 2H1.9L \\
+\extracode
+\vertlines[semitransparent, dashed]{2,4,6,8,10,12}
+%\node[font=\sf] at (1,-11)  {\footnotesize 1};
+%\node[font=\sf] at (3,-11)  {\footnotesize 2};
+%\node[font=\sf] at (5,-11)  {\footnotesize 3};
+%\node[font=\sf] at (7,-11)  {\footnotesize 4};
+%\node[font=\sf] at (9,-11)  {\footnotesize 5};
+\endextracode
+\end{tikztimingtable}  \caption{Wishbone synchronous read followed by a sunchronous write}
+\label{fig:timing}
+\end{figure}
+
+The latest Wishbone specification (B4) adds a pipelined definition.
+Note that the specification now includes two different, not necessarily compatible, specifications.
+The non-pipelined access is then called Wishbone \emph{classic}.
+The pipelined mode has the following Issue: the slave does not know if the master will issue a pipelined request. It would need to observe changing addresses, which is not practical. To be on the safe side, a synchronous slave would need to assert \code{STALL\_O}. However, as the Wishbone interface of the user project does not include a \code{STALL\_I} input, we assume that there will be no pipelined Wishbone transaction.
+
+
+
+
+
+
+Mention 3.10 for easy peripheral, 3.40 (async HS)
+Pipelined mode is under specified 
+GT (zip cpu) uses pipelined mode only - just use stall to avoid pipelining
+
+
+
+
+Wishbone B4
+PERMISSION 3.10
+If in standard mode the SLAVE guarantees it can keep pace with all MASTER interfaces
+and if the [ERR\_I] and [RTY\_I] signals are not used, then the SLAVE's [ACK\_O] signal
+MAY be tied to the logical AND of the SLAVE's [STB\_I] and [CYC\_I] inputs. The interface
+will function normally under these circumstances.
+
+RULE 3.40
+As a minimum, the MASTER interface MUST include the following signals: [ACK\_I],
+[CLK\_I], [CYC\_O], [RST\_I], and [STB\_O]. As a minimum, the SLAVE interface MUST
+include the following signals: [ACK\_O], [CLK\_I], [CYC\_I], [STB\_I], and [RST\_I]. All
+other signals are optional.
+
 \subsection{Notes}
+
+
 
 \todo{I have seen three ways to harden -- it is in the later part of the user project documentation.}
 
@@ -1009,6 +1121,7 @@ related to digital design and computer architecture.
 \item [OO] object oriented
 \item [OOO] out-of-order
 \item [OS] operating system
+\item [PDK] Process Development Kit
 \item [RAM] random access memory
 \item [RISC] reduced instruction set computer
 \item [SDRAM] synchronous DRAM
