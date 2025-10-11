@@ -802,6 +802,22 @@ An asynchronous slave can, in the same cycle, reply with \code{ACK_O}.
 A synchronous slave can delay the acknowledgment.
 The master needs to hold the address, data, and control signals valid through the whole read or write cycle.
 
+Although the bus specification is relatively simple, the Wishbone documentation is a bit lengthy, with 128 pages.
+However, we can follow RULE 3.40 and PERMISSION 3.10 from the specification we can build very simple Wishbone devices.
+
+RULE 3.40:
+\begin{quotation}
+As a minimum, the master interface must include the following signals: \code{ACK\_I}, \code{CLK\_I}, \code{CYC\_O}, \code{RST\_I}, and \code{STB\_O}. As a minimum, the slave interface must include the following signals: \code{ACK\_O}, \code{CLK\_I}, \code{CYC\_I}, \code{STB\_I}, and \code{RST\_I}. All other signals are optional.
+\end{quotation}
+
+PERMISSION 3.10:
+\begin{quotation}
+If in standard mode, the slave guarantees it can keep pace with all master interfaces, and if the \code{ERR\_I} and \code{RTY\_I} signals are not used, then the slave's \code{ACK\_O} signal may be tied to the logical AND of the slave's \code{STB\_I} and \code{CYC\_I} inputs. The interface will function normally under these circumstances.
+\end{quotation}
+
+Of course, to build a useful peripheral device, we also need to include the address, data, and write enable signals.
+
+
 \begin{figure}
 \centering
 \begin{tikztimingtable}[
@@ -824,8 +840,13 @@ timing/e/background/.style={fill=lightgray}
 \vertlines[semitransparent, dashed]{2,4,6,8,10}
 \endextracode
 \end{tikztimingtable}  \caption{Wishbone asynchronous read followed by an asynchronous write}
-\label{fig:timing}
+\label{fig:async:timing}
 \end{figure}
+
+Figure~\ref{fig:async:timing} shows a read and write transaction with an so-called \emph{asynchronous} device. The terminology of ... is from the spec, read and check....
+
+\todo{is asynchronous the right word?}
+
 
 \todo{Describe the two figures.}
 
@@ -856,7 +877,7 @@ timing/e/background/.style={fill=lightgray}
 %\node[font=\sf] at (9,-11)  {\footnotesize 5};
 \endextracode
 \end{tikztimingtable}  \caption{Wishbone synchronous read followed by a sunchronous write}
-\label{fig:timing}
+\label{fig:sync:timing}
 \end{figure}
 
 The latest Wishbone specification (B4) adds a pipelined definition.
@@ -865,29 +886,6 @@ The non-pipelined access is then called Wishbone \emph{classic}.
 The pipelined mode has the following Issue: the slave does not know if the master will issue a pipelined request. It would need to observe changing addresses, which is not practical. To be on the safe side, a synchronous slave would need to assert \code{STALL\_O}. However, as the Wishbone interface of the user project does not include a \code{STALL\_I} input, we assume that there will be no pipelined Wishbone transaction.
 
 
-
-
-
-
-Mention 3.10 for easy peripheral, 3.40 (async HS)
-Pipelined mode is under specified 
-GT (zip cpu) uses pipelined mode only - just use stall to avoid pipelining
-
-
-
-
-Wishbone B4
-PERMISSION 3.10
-If in standard mode the SLAVE guarantees it can keep pace with all MASTER interfaces
-and if the [ERR\_I] and [RTY\_I] signals are not used, then the SLAVE's [ACK\_O] signal
-MAY be tied to the logical AND of the SLAVE's [STB\_I] and [CYC\_I] inputs. The interface
-will function normally under these circumstances.
-
-RULE 3.40
-As a minimum, the MASTER interface MUST include the following signals: [ACK\_I],
-[CLK\_I], [CYC\_O], [RST\_I], and [STB\_O]. As a minimum, the SLAVE interface MUST
-include the following signals: [ACK\_O], [CLK\_I], [CYC\_I], [STB\_I], and [RST\_I]. All
-other signals are optional.
 
 \subsection{Notes}
 
