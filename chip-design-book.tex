@@ -740,14 +740,29 @@ Note that this Docker image is an x86 image, which will run slowly on a Mac ARM.
 make cocotb-verify-all-rtl
 \end{verbatim}
 
+
 The tests can be found on \code{verilog/dv/cocotb}. The above \code{make} target runs four tests for the counter user project. Running the tests generates a \code{sim} folder and timestamped folders for each run. Within this folder, you find \code{runs.log} summarizing the test runs.
+
+\todo{Just notes for running the tests locally...}
+\begin{verbatim}
+pip install caravel-cocotb
+\end{verbatim}
+\url{https://pypi.org/project/caravel-cocotb/}
 
 \subsection{Timing Analysis}
 
+Extract parasitics for \code{user_project_wrapper} and its macros, create the spef file, and finally run the timing analysis with OpenSTA.
+
+\begin{verbatim}
+make extract-parasitics
+make create-spef-mapping
+make caravel-sta
+\end{verbatim}
 
 
 \subsection{Precheck}
 
+Before submitting your design to the fab (i.e., to ChipFoundry), it is highly recommended to run the precheck.
 
 \begin{verbatim}
 make precheck
@@ -774,8 +789,6 @@ The Docker for the precheck is built for an x86 and therefore runs very slowly o
 
 
 \subsection{Submission to ChipFoundry}
-
-
 
 Submission to chipfactory needs only two files: the \code{gds/user_project_wrapper.gds} and \code{verilog/rtl/user_defines.v}, where the default for the GPIO pins directions are defined.
 The files can also be compressed with \code{gzip}.
@@ -892,6 +905,8 @@ The pipelined mode has the following Issue: the slave does not know if the maste
 
 The Wishbone interface for the user device is mapped to address \code{0x3000_0000} till \code{0x3fff_ffff}.
 We will design a very simple user device example with an 8-bit output port and an 8-bit input port. Both ports can be mapped on the same address and we do not need any addition address decoding.
+
+\lstinputlisting[float, caption={A simple Wishbone device in Chisel (\myref{https://github.com/os-chip-design/chip-design-book/blob/main/src/main/scala/WishboneExample.scala}{\code{WishboneExample.scala}}).}, label={lst:wb:chisel}, frame=tb, captionpos=b]{src/main/scala/WishboneExample.scala}
 
 \subsection{Notes}
 
