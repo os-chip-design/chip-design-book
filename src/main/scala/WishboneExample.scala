@@ -13,7 +13,7 @@ class WishboneIO(addrWidth: Int, dataWidth: Int) extends Bundle {
 
 // Simple Wishbone device: 8-bit in, 8-bit out
 class WishboneExample extends Module {
-    val wb = IO(new WishboneIO(addrWidth = 1, dataWidth = 8))
+    val wb = IO(new WishboneIO(addrWidth = 1, dataWidth = 32))
     val io = IO(new Bundle {
         val in  = Input(UInt(8.W))
         val out = Output(UInt(8.W))
