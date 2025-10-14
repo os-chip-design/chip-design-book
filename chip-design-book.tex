@@ -447,7 +447,9 @@ librelane --last-run --flow openinklayout adder.yaml
 In Klayout, you can explore the design. Use the rulers to measure your design. How large is it?
 Would it fit into a Tiny Tapeout Tile? How large is a Tiny Tapeout tile?
 When you expand the adder in Cells, you can see which cells have been used.
-By double-clicking on a cell type, it is removed from the display. This is an indirect way to show the cells in the GDS. The fild-flop standard cells in Sky130 have names that include ``dfxtp'' in their name. Double clock that cell to see how many flip-flops are used. How many should there be?
+By double-clicking on a cell type, it is removed from the display. This is an indirect way to show the cells in the GDS. The flip-flop standard cells in Sky130 have names that include ``dfxtp'' in their name. Double-clock that cell to see how many flip-flops are used. How many should there be?
+
+\todo{Also open road viewer} % \url{https://librelane.readthedocs.io/en/latest/reference/flows.html#openinopenroad}}
 
 Matt Venn has a good selection of layers and color assignments at \myref{https://github.com/mattvenn/librelane_summary/blob/librelane/klayout_gds.xml}{klayout\_gds.xml}. You can use it with klayout as follows:
 \begin{verbatim}
@@ -601,7 +603,7 @@ Efabless, the original developer of OpenLane and OpenLane2, exited the business 
 \section{Caravel}
 
 \myref{https://caravel-harness.readthedocs.io/}{Caravel} is a SoC framework developed by Efabless for the Google/Skywater 130nm Open PDK. It is the basis for the \myref{https://chipfoundry.io/chipignite}{chipIgnite} MPW shuttles.
-It contains a padframe, a houskeeping block, a management area including a RISC-V core, and user project wrapper.
+It contains a padframe, a houskeeping block, a management area including a RISC-V core, and a user project wrapper.
 The user area is 3000\;{\textmu}m x 3600\;{\textmu}m (10 mm$^2$). To put this into perspective, a simple 3-stage RISC-V pipeline, such as Wildcat~\cite{wildcat:arcs2025}, fits into a 0.2 mm$^2$ area. A 4~KiB memory from eFabless has a 0.18 mm$^2$ area.
 
 ChipFoundry now maintains Caravel. Note that the transition to ChipFoundry is still in progress; therefore, some documentation still contains the eFabless name. Additionally, some datasheets are outdated (e.g., referring to the PicoRV as the management processor, which is now the \myref{https://github.com/SpinalHDL/VexRiscv}{VexRiscv}).
@@ -616,12 +618,6 @@ ChipFoundry now maintains Caravel. Note that the transition to ChipFoundry is st
 Caravel is, in fact, two artifacts that are combined during the MPW chip production. The Caravel harness, which combines the RISC-V CPU and IO management with the user project, is used to build the final Caravel tile.
 Figure~\ref{fig:layout} shows this combination of the two components to the final Caravel. The so-called \code{user_project_wrapper} is the design that is submitted to ChipFoundry. As users, we do not need to directly deal with Caravel.
 
-\todo{Write about the management core, the Wishbone bus, and the logic analyzer. And about running tests.}
-
-
-
-
-
 
 \subsection{Caravel Harness}
 
@@ -633,25 +629,26 @@ Figure~\ref{fig:layout} shows this combination of the two components to the fina
 \end{figure}
 
 Figure~\ref{fig:caravel} shows a simplified block diagram of the Caravel harness.
-
 The Caravel harness contains the \myref{https://github.com/chipfoundry/caravel_mgmt_soc_litex}{management core}, the user project, the padframe, and GPIOs configured by an SPI controller.
 
 The management core contains a \myref{https://github.com/SpinalHDL/VexRiscv}{VexRiscv} RISC-V core, 
 256-word memory (latch-based), shared for instruction and data, and peripherals, connected via a Wishbone bus. The peripherals include a flash controller, a UART, an SPI master, and a logic analyzer. The Wishbone bus and the logic analyzer are connected to the user area.
+The management core is built with the \myref{https://github.com/enjoy-digital/litex}{LiteX} framework, which itself uses \myref{https://github.com/m-labs/migen}{Migen}, a Python project to build digital hardware.
 
 The RISC-V core in the management runs firmware out of the Flash to configure the user project GPIOs, interact with the user area via the Wishbone bus, and interact with the logic analyzer.
+
+The user project is connected to the GPIO pins, the Wishbone bus of the RISC-V CPU, the logic analyzer and interrupt pins to the RISC-V CPU.
 
 Internally, all components are split into a wrapper and the \emph{real} component. For example, the user project is split into a \code{user_project_wrapper} and a \code{user_proj_example}.
 
 The chipIgnite project includes a \myref{https://github.com/fossi-foundation/caravel_board}{board} containing the Caravel chip, a power supply, a serial Flash for the firmware, and an FTDI FT232 for communication between a PC via USB. 
 
-The management core is built with the \myref{https://github.com/enjoy-digital/litex}{LiteX} framework, which itself uses \myref{https://github.com/m-labs/migen}{Migen}, a Python project to build digital hardware.
 
 \subsection{Caravel User Project}
 
 The Caravel framework itself is split into two repositories: the \myref{https://github.com/chipfoundry/caravel_user_project}{user project} (often called \code{user_project_wrapper}, as this is the top-level of the user project) and \myref{https://github.com/chipfoundry/caravel}{Caravel} itself. The example user project contains a tiny example (a counter) to get started. Within that project, all the needed tools are installed, including a lite version of Caravel, the management core for simulation, OpenLane, and the Sky130 PDK.
 
-The starting point is the user project. The flow is run within Docker. Follow the instructions in \myref{https://github.com/chipfoundry/caravel_user_project/blob/main/docs/source/index.md}{Caravel User Project}. The dependencies on Docker and Python are listed there. Missing is the dependency on two Python libraries: \code{python-tk} and \code{Click}.
+The starting point is the user project. The flow is run within Docker. Follow the instructions in the \myref{https://github.com/chipfoundry/caravel_user_project/blob/main/docs/source/index.md}{Caravel User Project}. The dependencies on Docker and Python are listed there. Missing is the dependency on two Python libraries: \code{python-tk} and \code{Click}.
 
 There are two ways to integrate your design into Caravel: (1) Harden your user project first and then instantiate it in the wrapper as a hard macro, and then run the hardening of the wrapper; (2) Harden the whole project at once (include your user project as Verilog files in the wrapper configuration). The example project performs the individual hardening.
 
@@ -736,6 +733,14 @@ The user project example is certainly not using best practices. The way I design
 \subsection{Testing}
 
 The Caravel project uses \myref{https://www.cocotb.org/}{cocotb}, a Python-based testing framework for testing the RTL of the design and also the gate-level netlist.
+The tests with cocotb run in their own Docker image. Therefore, on the first run, the Docker image will be downloaded.
+Note that this Docker image is an x86 image, which will run slowly on a Mac ARM.
+
+\begin{verbatim}
+make cocotb-verify-all-rtl
+\end{verbatim}
+
+The tests can be found on \code{verilog/dv/cocotb}. The above \code{make} target runs four tests for the counter user project. Running the tests generates a \code{sim} folder and timestamped folders for each run. Within this folder, you find \code{runs.log} summarizing the test runs.
 
 \subsection{Timing Analysis}
 
@@ -803,19 +808,21 @@ A synchronous slave can delay the acknowledgment.
 The master needs to hold the address, data, and control signals valid through the whole read or write cycle.
 
 Although the bus specification is relatively simple, the Wishbone documentation is a bit lengthy, with 128 pages.
-However, we can follow RULE 3.40 and PERMISSION 3.10 from the specification we can build very simple Wishbone devices.
+However, we can follow RULE 3.40 and PERMISSION 3.10 from the specification to build simple Wishbone devices.
 
-RULE 3.40:
+\medskip
+
+Rule 3.40:
 \begin{quotation}
 As a minimum, the master interface must include the following signals: \code{ACK\_I}, \code{CLK\_I}, \code{CYC\_O}, \code{RST\_I}, and \code{STB\_O}. As a minimum, the slave interface must include the following signals: \code{ACK\_O}, \code{CLK\_I}, \code{CYC\_I}, \code{STB\_I}, and \code{RST\_I}. All other signals are optional.
 \end{quotation}
 
-PERMISSION 3.10:
+Permission 3.10:
 \begin{quotation}
 If in standard mode, the slave guarantees it can keep pace with all master interfaces, and if the \code{ERR\_I} and \code{RTY\_I} signals are not used, then the slave's \code{ACK\_O} signal may be tied to the logical AND of the slave's \code{STB\_I} and \code{CYC\_I} inputs. The interface will function normally under these circumstances.
 \end{quotation}
 
-Of course, to build a useful peripheral device, we also need to include the address, data, and write enable signals.
+Of course, to build a useful peripheral device, we also need to include the address, data in and out, and write enable signals.
 
 
 \begin{figure}
@@ -843,12 +850,7 @@ timing/e/background/.style={fill=lightgray}
 \label{fig:async:timing}
 \end{figure}
 
-Figure~\ref{fig:async:timing} shows a read and write transaction with an so-called \emph{asynchronous} device. The terminology of ... is from the spec, read and check....
-
-\todo{is asynchronous the right word?}
-
-
-\todo{Describe the two figures.}
+Figure~\ref{fig:async:timing} shows a read and write transaction with an so-called \emph{asynchronous} device. The terminology of asynchronous devices is from the Wishbone spec. It just means that for a single clock cycle bus transaction, the \code{ACK} signals need to be generated combinationally from \code{CYC} and \code{STB}. 
 
 \begin{figure}
 \centering
@@ -880,12 +882,16 @@ timing/e/background/.style={fill=lightgray}
 \label{fig:sync:timing}
 \end{figure}
 
+Having this combinational loop from the master to the device and back to the master can lead to large combinational circuits when several devices are connected to the Wishbone bus. To break this loop, the \code{ACK} signal can be registered, leading to a two-clock-cycle-long transaction. This configuration is called a synchronous slave in the Wishbone specification. Figure~\ref{fig:sync:timing} shows the timing diagram for a read and write on a synchronous device.
+
+
 The latest Wishbone specification (B4) adds a pipelined definition.
 Note that the specification now includes two different, not necessarily compatible, specifications.
 The non-pipelined access is then called Wishbone \emph{classic}.
-The pipelined mode has the following Issue: the slave does not know if the master will issue a pipelined request. It would need to observe changing addresses, which is not practical. To be on the safe side, a synchronous slave would need to assert \code{STALL\_O}. However, as the Wishbone interface of the user project does not include a \code{STALL\_I} input, we assume that there will be no pipelined Wishbone transaction.
+The pipelined mode has the following Issue: the slave does not know if the master will issue a pipelined request. It would need to observe changing addresses, which is not practical. To be on the safe side, a synchronous slave would need to assert \code{STALL\_O}. However, as the Wishbone interface of the Caravel user project does not include a \code{STALL\_I} input, we assume that there will be no pipelined Wishbone transaction.
 
-
+The Wishbone interface for the user device is mapped to address \code{0x3000_0000} till \code{0x3fff_ffff}.
+We will design a very simple user device example with an 8-bit output port and an 8-bit input port. Both ports can be mapped on the same address and we do not need any addition address decoding.
 
 \subsection{Notes}
 
@@ -1068,7 +1074,19 @@ The core was implemented in the IHP's 130 nm BiCMOS technology with the open-sou
 
 \todo{Leo Moser's eFPGA, ...}
 
+\appendix
 
+\chapter{Resources}
+
+\begin{itemize}
+\item \myref{https://github.com/librelane/librelane}{LibreLane} is the current collection of tools for open-source chip design
+\item The \myref{https://github.com/chipfoundry/caravel_user_project}{Caravel User Project} is the starting point for a chip designed for the Caravel platform produced by 
+\item \myref{https://chipfoundry.io/}{ChipFoundry} can produce you prototyping chip 
+\item \myref{https://github.com/chipfoundry/caravel}{Caravel} the harness for the ChipFoundry MPW run
+\item The \myref{https://caravel-harness.readthedocs.io/en/latest/}{Caravel documentation} is a bit outdated
+\item \myref{https://caravel-mgmt-soc-litex.readthedocs.io/en/latest/}{Management core documentation}
+\item The \myref{https://github.com/fossi-foundation/caravel_board}{PCB} containing the Caravel chip
+\end{itemize}
 
 \chapter{Acronyms}
 
