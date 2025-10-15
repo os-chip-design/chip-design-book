@@ -11,6 +11,9 @@ mem:
 mem-view:
 	librelane --last-run --flow openinklayout memory.yaml
 
+ffmem:
+	librelane ffmem.yaml
+
 version:
 	python version.py
 

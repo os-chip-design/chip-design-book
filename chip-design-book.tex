@@ -681,7 +681,7 @@ The \myref{https://github.com/chipfoundry/caravel_user_project}{user project} co
 \item  \code{user\_project\_wrapper}
 \end{enumerate}
 
-To simplify the hardening, it is recommended to keep those names.\footnote{Although a name that includes a word such as \emph{example} sounds a bit silly, most projects keep the names.} Both folders contain a \code{config.json} for the LibreLane run. Explore the two configuration files. You will see that the die area for the user project is set to 2800\;{\textmu}m by 1760\;{\textmu}m, which is smaller than the available 10 mm2 on the Caravel project. Change this setting later to fit your design. In the configuration file of the wrapper, we can see that the user project is instantiated as a hard macro at position \code{[60, 15]}.
+To simplify the hardening, it is recommended to keep those names.\footnote{Although a name that includes a word such as \emph{example} sounds a bit silly, most projects keep the names.} Both folders contain a \code{config.json} for the LibreLane run. Explore the two configuration files. You will see that the die area for the user project is set to 2800\;{\textmu}m x 1760\;{\textmu}m, which is smaller than the available 10 mm2 on the Caravel project. Change this setting later to fit your design. In the configuration file of the wrapper, we can see that the user project is instantiated as a hard macro at position \code{[60, 15]}.
 
 The user project is hardened with:
 \begin{verbatim}
@@ -957,7 +957,7 @@ The \myref{https://github.com/wafer-space/gf180mcu-project-template}{project tem
 
 \chapter{Memories}
 
-When describing memories in an HDL, the synthesis tool will not generate on-chip memories, as we are used to in an FPGA. It will use generated storage out of DFF and multiplexers, which is very expensive. As an example, a 1024-bit memory is needed to implement the register file for an RISC-V processor. Implementing an RV-32I version in a 3-stage pipeline, the register file needs about 55\% of the processor area~\cite{wildcat:2024}.
+When describing memories in an HDL, the synthesis tool will not generate on-chip memories, as we are used to in an FPGA. It will use generated storage out of DFF and multiplexers, which is very expensive. As an example, a 1024-bit memory is needed to implement the register file for an RISC-V processor. Implementing an RV-32I version in a 3-stage pipeline, the register file needs 320\;{\textmu}m x 320\;{\textmu}m or about 55\% of the processor area~\cite{wildcat:2024}.
 
 An efficient memory cell is built out of six-transistor (6T) SRAM cells, as shown in Figure~\ref{fig:sram:cell}. The middle four transistors implement two cross-coupled inverters. The other two transistors are used for reading and writing the bit.
 
@@ -979,14 +979,27 @@ When describing memories in an HDL, the synthesis tool will usually infer FFs fo
 \lstinputlisting[float, caption={128 Bytes of Flip-Flop based Memory (\myref{https://github.com/os-chip-design/chip-design-book/blob/main/src/main/scala/FlipFlopMemory.scala}{\code{FlipFlopMemory.scala}}).}, label={lst:ffmem}, frame=tb, captionpos=b]{src/main/scala/FlipFlopMemory.scala}
 
 Listing~\ref{lst:ffmem} shows the Chisel code of a flip-flop-based memory. The memory is 128 bytes, which is 1024 bits, the same size as the register file example discussed at the start of the chapter.
+The area for that memory in Sky130 is 290\;{\textmu}m x 290\;{\textmu}m (0.08 mm$^2$), which is similar to that of the register file mentioned at the beginning of the chapter. The 1~KiB register-based memory, organized as 256 x 32-bit, uses 810\;{\textmu}m x 810\;{\textmu}m (0.66 mm$^2$).
+% Running for about 15' for 1 KiB
+\todo{Check synth results in Wildcat comparing Chisel 3.6 and Chisel 6}
+% Chisel 3.6 320\;{\textmu}m x 320\;{\textmu}m, which is the same as for the register file mentioned at the beginning of the chapter.
 
 \section{Exploring OpenRAM Memories}
-The process of including those macros is not straightforward. First errors occur in nn-magic-writelef. To ignore those errors, we can add following line into our .yaml file:
+The process of including those macros is not straightforward. First errors occur in nn-magic-writelef. To ignore those errors, we can add the following line to our .yaml file:
 
 \begin{verbatim}
 MAGIC_CAPTURE_ERRORS: false
 \end{verbatim}
 
+The 1~KiB OpenRAM memory, organized as 256 x 32-bit, uses 490\;{\textmu}m x 420\;{\textmu}m (0.2 mm$^2$).
+
+\section{DFFRAM}
+
+\myref{https://github.com/AUCOHL/DFFRAM}{DFFRAM} is a memory generator using FFs or latches. The releases contain ready-to-use GDS macros. A 1 KiB memory, latch-based, uses 430\;{\textmu}m x 440\;{\textmu}m (0.19 mm$^2$).
+
+\section{CF RAM}
+
+4 KiB (1024 x 32) 0.17 mm2
 
 \subsection{SRAM links}
 

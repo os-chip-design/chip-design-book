@@ -35,5 +35,5 @@ class WishboneExample extends Module {
 }
 
 object WishboneExample extends App {
-    emitVerilog(new WishboneExample)
+    emitVerilog(new WishboneExample, Array("--target-dir", "generated"))
 }

@@ -17,5 +17,5 @@ class FlipFlopMemory extends Module {
 }
 
 object FlipFlopMemory extends App {
-    emitVerilog(new FlipFlopMemory)
+    emitVerilog(new FlipFlopMemory, Array("--target-dir", "generated"))
 }
