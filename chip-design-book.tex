@@ -972,6 +972,15 @@ An efficient memory cell is built out of six-transistor (6T) SRAM cells, as show
 
 However, standard synthesis tools do not generate memories based on 6T SRAM cells. The tools to generate on-chip memories are called memory compilers. \myref{https://openram.org/}{OpenRAM} is an open-source memory compiler~\cite{opeRAM:2016}. Furthermore, the Sky130 PDK includes a few memories generated with OpenRAM.
 
+\section{Flip-Flop and Latch-based Memories}
+
+When describing memories in an HDL, the synthesis tool will usually infer FFs for the storage and large multiplexers for reading. The register file example is probably a bit extreme, as it describes a memory with two read ports, meaning we need two read multiplexers.
+
+\lstinputlisting[float, caption={128 Bytes of Flip-Flop based Memory (\myref{https://github.com/os-chip-design/chip-design-book/blob/main/src/main/scala/FlipFlopMemory.scala}{\code{FlipFlopMemory.scala}}).}, label={lst:ffmem}, frame=tb, captionpos=b]{src/main/scala/FlipFlopMemory.scala}
+
+Listing~\ref{lst:ffmem} shows the Chisel code of a flip-flop-based memory. The memory is 128 bytes, which is 1024 bits, the same size as the register file example discussed at the start of the chapter.
+
+\section{Exploring OpenRAM Memories}
 The process of including those macros is not straightforward. First errors occur in nn-magic-writelef. To ignore those errors, we can add following line into our .yaml file:
 
 \begin{verbatim}

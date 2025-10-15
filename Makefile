@@ -1,4 +1,12 @@
+DOC=chip-design-book
+
 all:
+	pdflatex $(DOC)
+	pdflatex $(DOC)
+	bibtex $(DOC)
+	makeindex $(DOC)
+	pdflatex $(DOC)
+	pdflatex $(DOC)
 
 
 msbib:
