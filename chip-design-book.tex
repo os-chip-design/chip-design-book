@@ -502,6 +502,11 @@ The file \code{adder.nl.v} contains the design synthesized to standard cells fro
 In folder \code{nn-openroad-stapostpnr}, the static timing analysis (STA) reports are found.
 \todo{continue here***************}
 
+\subsubsection{Size}
+
+When not constraining the chip's size, LibreLane will choose the size.
+
+
 \subsubsection{Design Rule Checks}
 
 \subsubsection{Summary}
@@ -997,6 +1002,13 @@ The area for that memory in Sky130 is 290\;{\textmu}m x 290\;{\textmu}m (0.08 mm
 % Running for about 15' for 1 KiB
 \todo{Check synth results in Wildcat comparing Chisel 3.6 and Chisel 6}
 % Chisel 3.6 320\;{\textmu}m x 320\;{\textmu}m, which is the same as for the register file mentioned at the beginning of the chapter.
+
+128 x 8:
+Chisel 3.6: 314 x 310, but DRC errors (setup violations).
+Chisel 6.x: 290 x 290, DRC OK
+
+CF RAM 1024x32: 310 x 390
+OpenRAM: 256x32: 500x400
 
 \section{Exploring OpenRAM Memories}
 The process of including those macros is not straightforward. First errors occur in nn-magic-writelef. To ignore those errors, we can add the following line to our .yaml file:
