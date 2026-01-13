@@ -276,6 +276,7 @@ It is an exciting time to be in the world of chip design....
 This book is an introduction to chip design with a focus on using open-source tools and open-source PDKs.
 
 
+I have not used any large language model (LLM) to write even a single sentence. All mistakes are mine, not a halizunisation by an LLM. I use Grammarly for grammar checking and Copilot for writing code.
 
 
 
@@ -388,8 +389,10 @@ There are several other distributions of the open-source chip design tools avail
 \end{description}
 
 \section{Hello World}
+\label{sec:hello}
 
 After installing the tools, we want to explore them in action. The \emph{Hello World} version for the backend chip design is to synthesize a minimal circuit from the HDL description to generate a \myref{https://en.wikipedia.org/wiki/GDSII}{GDSII} file and visualize it in an editor.
+Note that all code examples in this book are part of the book's \myref{https://github.com/os-chip-design/chip-design-book/tree/main/code}{GitHub repository}.
 
 Execute `nix-shell` in your LibreLane installation. Try to check your LibreLane version by invoking Python
 on the code shown in Listing~\ref{lst:version}.
@@ -423,7 +426,7 @@ As the design is very simple, the flow will run in about a minute.
 Figure~\ref{fig:adder} shows the final GDSII file for the adder in KLayout.
 
 
-A flow takes, at the time of this writing, 75 steps, each reporting in its folder.
+A flow takes, at the time of this writing, with LibreLane v2.4.8, 74 steps, each reporting in its folder.
 During the flow, a lot of information is printed out.
 Scrolling back in the terminal, you can see reports of design checks and resource usage.
 Every time you run the flow, it will create a new folder under folder \code{runs}.
@@ -449,14 +452,17 @@ Would it fit into a Tiny Tapeout Tile? How large is a Tiny Tapeout tile?
 When you expand the adder in Cells, you can see which cells have been used.
 By double-clicking on a cell type, it is removed from the display. This is an indirect way to show the cells in the GDS. The flip-flop standard cells in Sky130 have names that include ``dfxtp'' in their name. Double-clock that cell to see how many flip-flops are used. How many should there be?
 
-\todo{Also open road viewer} % \url{https://librelane.readthedocs.io/en/latest/reference/flows.html#openinopenroad}}
+Another option is to open the design with the OpenROAD viewer:
+\begin{verbatim}
+librelane --last-run --flow openinopenroad adder.yaml
+\end{verbatim}
 
 Matt Venn has a good selection of layers and color assignments at \myref{https://github.com/mattvenn/librelane_summary/blob/librelane/klayout_gds.xml}{klayout\_gds.xml}. You can use it with klayout as follows:
 \begin{verbatim}
 klayout -l klayout_gds
 \end{verbatim}
 
-That configuration file is part of \myref{https://github.com/mattvenn/librelane_summary}{summary tools}, which can be used for a quick exploration of the design. Clone the repository, add it to your path, and set the \code{PDK_ROOT} variable (easiest into a file that you source, or add those lines to your \code{$HOME/.bashrc}):
+That configuration file is part of the \myref{https://github.com/mattvenn/librelane_summary}{summary tools}, which can be used for a quick exploration of the design. Clone the repository, add it to your path, and set the \code{PDK_ROOT} variable (easiest into a file that you source, or add those lines to your \code{$HOME/.bashrc}):
 
 \begin{verbatim}
 export PATH=$PATH:$HOME/path/to/librelane_summary
@@ -474,9 +480,7 @@ When in a folder that contains the LibreLane runs, explore the GDS of the latest
 summary.py --gds
 \end{verbatim}
 
-At the time of this writing, the flow generates 75 folders containing the results and reports for each individual step. You can find those subfolders in the folder \code{runs/RUN\_DATE\_TIME}. Not all reports are equally important. We will explore some of them.
-
-\todo{Numbering might change, depending on tool version and probably on configuration}
+At the time of this writing, the flow generates 74 folders containing the results and reports for each individual step. You can find those subfolders in the folder \code{runs/RUN\_DATE\_TIME}. Not all reports are equally important. We will explore some of them.
 
 \subsubsection{Linting and a First Area Estimate}
 
@@ -514,12 +518,16 @@ When not constraining the chip's size, LibreLane will choose the size.
 The subfolder \code{final} contains a summary of the project in files \code{metrics.csv} and \code{metrics.json}.
 It includes timing information, size of the design, number of standard cells used, and other detailed metrics.
 
-\subsection{Manual Flow -- A Very Rough Start}
+\subsection{Manual Flow with Python}
 
-However, we can also run the individual steps from Python.
-The following example is inspired by running \myref{https://colab.research.google.com/github/librelane/librelane/blob/main/notebook.ipynb}{LibreLane on Google Colab}, a nice way to explore LibreLane just from your browser
+However, we can also run the individual steps from Python. We will reuse the pipelined adder for this exploration from Section~\ref{sec:hello}. The following example is inspired by running \myref{https://colab.research.google.com/github/librelane/librelane/blob/main/notebook.ipynb}{LibreLane on Google Colab}, a nice way to explore LibreLane just from your browser.
 
-Start Python and run the following commands:\footnote{All code from this book can be found in the GitHub repo of the book: \url{https://github.com/os-chip-design/chip-design-book/tree/main/code}. You can execute those scripts from within Python with the following command: \code{exec(open('script.py').read())}}
+Start Python from within your Nix shell and run the following commands. All code from this book can be found in the GitHub repo of the book: \myref{https://github.com/os-chip-design/chip-design-book/tree/main/code}{code}. You can execute those scripts from within Python with the following command:
+
+\begin{verbatim}
+python
+exec(open("pdk.py").read())
+\end{verbatim}
 
 \lstinputlisting[float, caption={Setting up the PDK (\myref{https://github.com/os-chip-design/chip-design-book/blob/main/code/pdk.py}{\code{pdk.py}}).}, label={lst:pdk}, frame=tb, captionpos=b]{code/pdk.py}
 
@@ -528,11 +536,9 @@ Start Python and run the following commands:\footnote{All code from this book ca
 \begin{itemize}
 \item Execute Listing~\ref{lst:pdk} to setup the PDK.
 \item A \code{Flow} needs to be configured. Execute Listing~\ref{lst:config} to configure your project.
+The configuration is similar to the YAML file we used in the initial example.
 \end{itemize}
 
-\todo{Donn has updated stuff: see \url{https://gist.github.com/donn/ae9571b14432097241fdfcfeea53719e}} %\url{https://element.fossi-chat.org/#/room/#librelane:fossi-chat.org}}
-
-\todo{Maybe read up in \url{https://openlane2.readthedocs.io/en/latest/usage/writing_custom_flows.html}}
 
 
 \lstinputlisting[float, caption={Get started with the steps (\myref{(https://github.com/os-chip-design/chip-design-book/blob/main/code/steps.py}{\code{steps.py}}).}, label={lst:steps}, frame=tb, captionpos=b]{code/steps.py}
@@ -544,6 +550,13 @@ The last command shows us help with the steps.
 \lstinputlisting[float, caption={Running the synthesis (\myref{https://github.com/os-chip-design/chip-design-book/blob/main/code/synth.py}{\code{synth.py}}).}, label={lst:synth}, frame=tb, captionpos=b]{code/synth.py}
 
 We can run the synthesis with the code from Listing~\ref{lst:synth}.
+
+
+
+\todo{Donn has updated stuff: see \url{https://gist.github.com/donn/ae9571b14432097241fdfcfeea53719e}} %\url{https://element.fossi-chat.org/#/room/#librelane:fossi-chat.org}}
+
+\todo{Maybe read up in \url{https://openlane2.readthedocs.io/en/latest/usage/writing_custom_flows.html}}
+
 
 \subsection{Tuning the Synthesis Flow}
 
