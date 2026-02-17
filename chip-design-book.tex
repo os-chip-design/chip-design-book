@@ -146,8 +146,8 @@
 \fi
 
 % uncomment following for final submission
-%\renewcommand{\todo}[1]{}
-%\renewcommand{\martin}[1]{}
+\renewcommand{\todo}[1]{}
+\renewcommand{\martin}[1]{}
 
 \makeindex
 
@@ -206,7 +206,7 @@
 {\small
 
 %\lowertitleback{
-Copyright \copyright{} 2025 Martin...
+Copyright \copyright{} 2026 Martin...
   \medskip\\
   \begin{tabular}{lp{.8\textwidth}}
     \raisebox{-12pt}{\includegraphics[height=18pt]{figures/cc_by_sa}} &
@@ -222,7 +222,7 @@ Email: \url{martin@jopdesign.com}\\
 Visit the source at \url{https://github.com/os-chip-design/chip-design-book}
 \medskip
 
-First edition published 2025 by Kindle Direct Publishing,\\
+First edition published 2026 by Kindle Direct Publishing,\\
 \url{https://kdp.amazon.com/}
 \medskip
 \medskip
@@ -450,7 +450,7 @@ librelane --last-run --flow openinklayout adder.yaml
 In Klayout, you can explore the design. Use the rulers to measure your design. How large is it?
 Would it fit into a Tiny Tapeout Tile? How large is a Tiny Tapeout tile?
 When you expand the adder in Cells, you can see which cells have been used.
-By double-clicking on a cell type, it is removed from the display. This is an indirect way to show the cells in the GDS. The flip-flop standard cells in Sky130 have names that include ``dfxtp'' in their name. Double-clock that cell to see how many flip-flops are used. How many should there be?
+By double-clicking on a cell type, it is removed from the display. This is an indirect way to show the cells in the GDS. The flip-flop standard cells in Sky130 have names that include ``dfxtp'' in their name. Double-click that cell to see how many flip-flops are used. How many should there be?
 
 Another option is to open the design with the OpenROAD viewer:
 \begin{verbatim}
@@ -499,7 +499,6 @@ The first four steps perform linting of the design, and any Verilog syntax error
 E.g., the DFF is described at \myref{https://skywater-pdk.readthedocs.io/en/main/contents/libraries/sky130_fd_sc_hd/cells/dfxtp/README.html}{dfxtp}.
 The file \code{adder.nl.v} contains the design synthesized to standard cells from the used PDK. As our example is very simple, we can manually inspect the generated Verilog.
 
-\subsubsection{xxx}
 
 \subsubsection{Static Timing Analysis}
 
@@ -518,14 +517,48 @@ When not constraining the chip's size, LibreLane will choose the size.
 The subfolder \code{final} contains a summary of the project in files \code{metrics.csv} and \code{metrics.json}.
 It includes timing information, size of the design, number of standard cells used, and other detailed metrics.
 
-\subsection{Manual Flow with Python}
+\subsection{Change the Design}
+
+The current example has non-initialized registers after power-up.
+Although those random values will be cleared with valid values after on and two clock cycles,
+it is good practise to reset registers. This expcially useful for verification.
+
+There are two ways flip-flops can be reset: (1) with an asynchronous reset or (2) with a synchronous reset.
+Explain which one is to be preferred and why. Which one needs a larger area? This question is not
+easy to explain by a back-of-the-envelope calculation when we do (yet) not know the available standard cells and their sizes.
+
+However, we can easily decide this question by exploring both versions with SkyWater130.
+Change the design to reset all registers. Run both versions through the flow.
+Then explore the size and which flip-flop types have been used.
+
+
+\section{Manual Flow with Python}
 
 However, we can also run the individual steps from Python. We will reuse the pipelined adder for this exploration from Section~\ref{sec:hello}. The following example is inspired by running \myref{https://colab.research.google.com/github/librelane/librelane/blob/main/notebook.ipynb}{LibreLane on Google Colab}, a nice way to explore LibreLane just from your browser.
 
-Start Python from within your Nix shell and run the following commands. All code from this book can be found in the GitHub repo of the book: \myref{https://github.com/os-chip-design/chip-design-book/tree/main/code}{code}. You can execute those scripts from within Python with the following command:
+All code from this book can be found in the GitHub repo of the book: \myref{https://github.com/os-chip-design/chip-design-book/tree/main/code}{code}.
+
+Start Python from within your Nix shell,
 
 \begin{verbatim}
 python
+\end{verbatim}
+
+and run the following commands. Import LibreLane and print its version.
+
+\begin{verbatim}
+import librelane
+print(librelane.__version__)
+\end{verbatim}
+
+\subsection{Configuration}
+
+To run our steps we need to configure the PDK via \code{ciel}\footnote{\code{ciel} is a PDK managemant tool, part of LibreLane.} and configure our project.
+
+Execute the code from Listing~\ref{lst:pdk} to setup the PDK.
+If you have downloaded the code from the book, you can execute the script from within Python with the following command:
+
+\begin{verbatim}
 exec(open("pdk.py").read())
 \end{verbatim}
 
@@ -533,13 +566,12 @@ exec(open("pdk.py").read())
 
 \lstinputlisting[float, caption={Configure the project (\myref{https://github.com/os-chip-design/chip-design-book/blob/main/code/config.py}{\code{config.py}}).}, label={lst:config}, frame=tb, captionpos=b]{code/config.py}
 
-\begin{itemize}
-\item Execute Listing~\ref{lst:pdk} to setup the PDK.
-\item A \code{Flow} needs to be configured. Execute Listing~\ref{lst:config} to configure your project.
+A LibreLane \code{Flow} needs to be configured. Execute Listing~\ref{lst:config} to configure your project.
 The configuration is similar to the YAML file we used in the initial example.
-\end{itemize}
 
+\subsection{Synthesis with Yosys}
 
+\todo{Explore now Yosys results. Includign .dot figures. Add them to the paper and slides.}
 
 \lstinputlisting[float, caption={Get started with the steps (\myref{(https://github.com/os-chip-design/chip-design-book/blob/main/code/steps.py}{\code{steps.py}}).}, label={lst:steps}, frame=tb, captionpos=b]{code/steps.py}
 
