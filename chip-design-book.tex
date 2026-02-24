@@ -679,10 +679,39 @@ Figure~\ref{fig:dlp} shows the now well-aligned cells.
   \label{fig:dlp}
 \end{figure}
 
+\subsection{Clock Tree Synthesis (CTS)}
 
+After placing all cell we create the clock tree, including buffers for the clock.
+Run the detailed placement with the code from Listing~\ref{lst:cts}.
 
+\lstinputlisting[float, caption={Local placement (\myref{https://github.com/os-chip-design/chip-design-book/blob/main/code/cts.py}{\code{cts.py}}).}, label={lst:cts}, frame=tb, captionpos=b]{code/cts.py}
 
+% The CTS step creates the cells and places the between the gaps in the detailed placement above.
 
+\subsection{Global and Detailed Routing}
+
+Global ... Local ...
+
+As the result of global routing is stored in an internal data structure, we see no effect on the actual design.
+Therefore, we combine global routing and local routing in a single Python script to be executed (Listing~\ref{lst:route}).
+Figure~\ref{fig:dlp} shows the routed design.
+
+\lstinputlisting[float, caption={Global and local routing (\myref{https://github.com/os-chip-design/chip-design-book/blob/main/code/route.py}{\code{route.py}}).}, label={lst:route}, frame=tb, captionpos=b]{code/route.py}
+
+\begin{figure}
+  \centering
+  \includegraphics[width=0.5\textwidth]{figures/route}
+  \caption{The routed design.}
+  \label{fig:route}
+\end{figure}
+
+TODO: below is not my text.
+
+Global routing "plans" the routes the wires between two gates (or gates and I/O pins/the PDN) will take. The results of global routing (which are called "routing guides") are stored in internal data structures and have no effect on the actual design, so there is no display() statement.
+
+Detailed routing uses the guides from Global Routing to actually create wires on the metal layers and connect the gates, making the connections finally physical.
+
+This is typically the longest step in the flow.
 
 
 
