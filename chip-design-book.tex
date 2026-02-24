@@ -303,7 +303,7 @@ We include links to further reading in the running text, primarily to
 
 \section{History of Design Tools}
 
-Very early chips have been designed by hand, and the photo masks have been produced by \emph{drawing} them with tapes. \todo{What was the last chip done this way?} As this process does not scale, computer-aided design (CAD) tools have been developed. Another term used is: electronic design automation (EDA).
+Very early chips were designed by hand, and the photo masks were produced by \emph{drawing} them with tape. \todo{What was the last chip done this way?} As this process does not scale, computer-aided design (CAD) tools have been developed. Another term used is: electronic design automation (EDA).
 
 
 Alberto Sangiovanni-Vincentelli was invited to give a keynote speech at the 40th Design Automation Conference (DAC). That speech resulted in a paper on the history (and future) of EDA~\cite{tides:eda}, mostly work as presented at DAC.
@@ -571,24 +571,32 @@ The configuration is similar to the YAML file we used in the initial example.
 
 \subsection{Synthesis with Yosys}
 
-\todo{Explore now Yosys results. Includign .dot figures. Add them to the paper and slides.}
+\todo{Explore now Yosys results. Including .dot figures. Add them to the paper and slides.}
 
 \lstinputlisting[float, caption={Get started with the steps (\myref{(https://github.com/os-chip-design/chip-design-book/blob/main/code/steps.py}{\code{steps.py}}).}, label={lst:steps}, frame=tb, captionpos=b]{code/steps.py}
 
-Let us start with the Yosys synthesis. The design is split into so-called \emph{steps}.
+
+The design is split into so-called \emph{steps}.
 Therefore, we need to import \code{Step} and \code{State}, as shown in Listing~\ref{lst:steps}).
 The last command shows us help with the steps.
 
 \lstinputlisting[float, caption={Running the synthesis (\myref{https://github.com/os-chip-design/chip-design-book/blob/main/code/synth.py}{\code{synth.py}}).}, label={lst:synth}, frame=tb, captionpos=b]{code/synth.py}
 
+We start with the Yosys synthesis. Yosys converts high-level Verilog to a low-level Verilog that includes instances of standard cells. We pass the Verilog files to \code{Yosys.Synthesis}.
 We can run the synthesis with the code from Listing~\ref{lst:synth}.
-
-
 
 \todo{Donn has updated stuff: see \url{https://gist.github.com/donn/ae9571b14432097241fdfcfeea53719e}} %\url{https://element.fossi-chat.org/#/room/#librelane:fossi-chat.org}}
 
 \todo{Maybe read up in \url{https://openlane2.readthedocs.io/en/latest/usage/writing_custom_flows.html}}
 
+
+\subsection{Floorplanning}
+
+The next step is floorplanning. It determines the size of the chip and generates a cell placement grid.
+Each cell in the grid is called a \emph{site}. A standard cell usually occupies multiple sites by width (e.g., a D-FF has a larger width than a NAND gate).
+We run the floorplanning with the code from Listing~\ref{lst:floor}.
+
+\lstinputlisting[float, caption={Running the floorplanning (\myref{https://github.com/os-chip-design/chip-design-book/blob/main/code/floor.py}{\code{floor.py}}).}, label={lst:floor}, frame=tb, captionpos=b]{code/floor.py}
 
 \subsection{Tuning the Synthesis Flow}
 
@@ -611,7 +619,7 @@ Chip design consists of several steps from synthesis down to GDSII files. Script
 OpenROAD includes the following open-source \myref{https://openlane.readthedocs.io/en/latest/flow_overview.html}{tools}:
 
 \begin{itemize}
-\item \myref{https://github.com/the-openroad-project/openroad/tree/master/src/ifp}{ifp} defines the core are, the rows, and the tracks.
+\item \myref{https://github.com/the-openroad-project/openroad/tree/master/src/ifp}{ifp} defines the core area, the rows, and the tracks.
 \item \myref{https://github.com/the-openroad-project/openroad/tree/master/src/pdn}{pdn} is a power distribution network (PDN) generator.
 \item \myref{https://github.com/the-openroad-project/openroad/tree/master/src/tap}{Tapcell} inserts tapcells or endcaps.
 \item \myref{https://github.com/the-openroad-project/openroad/tree/master/src/gpl}{gpl} performs global placement. The tool is an extension of the \myref{https://github.com/The-OpenROAD-Project/RePlAce}{RePlAce} tool.
