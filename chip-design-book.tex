@@ -641,9 +641,48 @@ Figure~\ref{fig:pdn} shows the PDN of our small adder example.
 \begin{figure}
   \centering
   \includegraphics[width=0.5\textwidth]{figures/pdn}
-  \caption{Power distribution network.}
+  \caption{Chip layout with pins and power distribution network.}
   \label{fig:pdn}
 \end{figure}
+
+\subsection{Global Placement}
+
+Global placement places the standard cells, aiming to minimize the distance between connected cells.
+The cells are not exactly placed, as we can see in Figure~\ref{fig:glp}.
+The placement is even \emph{illegal} as it is not properly aligned with the grid.
+This is fixed in the next step of detailed placement, also called placement legalization.
+
+Run the global placement with the code from Listing~\ref{lst:glp} and explore the result with the OpenRoad GUI.
+
+\lstinputlisting[float, caption={Global placement (\myref{https://github.com/os-chip-design/chip-design-book/blob/main/code/glp.py}{\code{glp.py}}).}, label={lst:glp}, frame=tb, captionpos=b]{code/glp.py}
+
+\begin{figure}
+  \centering
+  \includegraphics[width=0.5\textwidth]{figures/glp}
+  \caption{Global placement.}
+  \label{fig:glp}
+\end{figure}
+
+
+\subsection{Detailed Placement}
+
+Detailed placement aligns the cells with the grid; we call this also \emph{legalizing} it.
+Run the detailed placement with the code from Listing~\ref{lst:dlp} and explore the result with the OpenRoad GUI.
+Figure~\ref{fig:dlp} shows the now well-aligned cells.
+
+\lstinputlisting[float, caption={Local placement (\myref{https://github.com/os-chip-design/chip-design-book/blob/main/code/glp.py}{\code{dlp.py}}).}, label={lst:dlp}, frame=tb, captionpos=b]{code/dlp.py}
+
+\begin{figure}
+  \centering
+  \includegraphics[width=0.5\textwidth]{figures/dlp}
+  \caption{Legalized placement}
+  \label{fig:dlp}
+\end{figure}
+
+
+
+
+
 
 
 
