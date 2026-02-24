@@ -605,8 +605,52 @@ Explore the reports in folder \code{2-openroad-floorplan}.
 This step places endcap cells and tap cells. Endcap cells are placed at the beginning and end of each row. They terminate each power line.
 
 The tap cells connect VDD to the n-well and GND to the p-substrate. To save area, the standard cells do not connect to the tap themself. The maximum distance between tap cells is dependent on the foundry process.
+Run the tap placements with the code from Listing~\ref{lst:tap}.
 
 \lstinputlisting[float, caption={Running the tap cell insertation (\myref{https://github.com/os-chip-design/chip-design-book/blob/main/code/tap.py}{\code{tap.py}}).}, label={lst:tap}, frame=tb, captionpos=b]{code/tap.py}
+
+To view the result, start the OpenRoad GUI with:
+
+\begin{verbatim}
+openroad -gui
+\end{verbatim}
+
+and then open \code{adder.odb} from folder \code{3-openroad-tapendcapinsertion}.
+
+\subsection{I/O Placement}
+
+Metal pins are placed at the edges of the design for the top-level inputs and outputs. The default placement can be overridden by a placement configuration.
+
+Run the tap placements with the code from Listing~\ref{lst:io} and explore the result with the OpenRoad GUI.
+
+\lstinputlisting[float, caption={Running the I/O placement (\myref{https://github.com/os-chip-design/chip-design-book/blob/main/code/io.py}{\code{io.py}}).}, label={lst:io}, frame=tb, captionpos=b]{code/io.py}
+
+\subsection{Power Distribution Network (PDN)}
+
+The next step is to generate the power distribution network (PDN).
+It is a pattern of vertical and horizontal straps.
+The vertical straps are thicker and distribute power to the horizontal straps.
+The horizontal straps are delivering power to the individual standard cells.
+More details of the configuration of the PDN can be found in the LibreLane documentation.
+
+Run the PDN generation with the code from Listing~\ref{lst:pdn} and explore the result with the OpenRoad GUI.
+Figure~\ref{fig:pdn} shows the PDN of our small adder example. 
+
+\lstinputlisting[float, caption={Running PDN generation (\myref{https://github.com/os-chip-design/chip-design-book/blob/main/code/pdn.py}{\code{pdn.py}}).}, label={lst:pdn}, frame=tb, captionpos=b]{code/pdn.py}
+
+\begin{figure}
+  \centering
+  \includegraphics[width=0.5\textwidth]{figures/pdn}
+  \caption{Power distribution network.}
+  \label{fig:pdn}
+\end{figure}
+
+
+
+
+\section{Notes}
+
+Collect notes here for the flow.
 
 \subsection{Tuning the Synthesis Flow}
 
