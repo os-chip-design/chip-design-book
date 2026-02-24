@@ -681,7 +681,7 @@ Figure~\ref{fig:dlp} shows the now well-aligned cells.
 
 \subsection{Clock Tree Synthesis (CTS)}
 
-After placing all cell we create the clock tree, including buffers for the clock.
+After placing all cells, we create the clock tree, including buffers for the clock.
 Run the detailed placement with the code from Listing~\ref{lst:cts}.
 
 \lstinputlisting[float, caption={Local placement (\myref{https://github.com/os-chip-design/chip-design-book/blob/main/code/cts.py}{\code{cts.py}}).}, label={lst:cts}, frame=tb, captionpos=b]{code/cts.py}
@@ -690,7 +690,7 @@ Run the detailed placement with the code from Listing~\ref{lst:cts}.
 
 \subsection{Global and Detailed Routing}
 
-Global ... Local ...
+%Global ... Local ...
 
 As the result of global routing is stored in an internal data structure, we see no effect on the actual design.
 Therefore, we combine global routing and local routing in a single Python script to be executed (Listing~\ref{lst:route}).
@@ -705,15 +705,97 @@ Figure~\ref{fig:dlp} shows the routed design.
   \label{fig:route}
 \end{figure}
 
-TODO: below is not my text.
+%TODO: below is not my text.
 
-Global routing "plans" the routes the wires between two gates (or gates and I/O pins/the PDN) will take. The results of global routing (which are called "routing guides") are stored in internal data structures and have no effect on the actual design, so there is no display() statement.
+%Global routing "plans" the routes the wires between two gates (or gates and I/O pins/the PDN) will take. The results of global routing (which are called "routing guides") are stored in internal data structures and have no effect on the actual design, so there is no display() statement.
 
-Detailed routing uses the guides from Global Routing to actually create wires on the metal layers and connect the gates, making the connections finally physical.
+%Detailed routing uses the guides from Global Routing to actually create wires on the metal layers and connect the gates, making the connections finally physical.
 
-This is typically the longest step in the flow.
+%This is typically the longest step in the flow.
+
+\subsection{Fill Insertion}
+
+%Finally, as we're done placing all the essential cells, the only thing left to do is fill in the gaps.
+
+%We prioritize the use of decap (decoupling capacitor) cells, which further supports the power distribution network, but when there aren't any small enough cells, we just use regular fill cells.
+
+Execute Listing~\ref{lst:fill} and explore the output with the OpenRoad GUI.
+
+\lstinputlisting[float, caption={Fill insertion (\myref{https://github.com/os-chip-design/chip-design-book/blob/main/code/fill.py}{\code{fill.py}}).}, label={lst:fill}, frame=tb, captionpos=b]{code/fill.py}
+
+\subsection{Resistance/Capacitance Extraction (RCX)}
+
+Extracting resistance and capacitance as preparation for timing analysis.
+
+Execute Listing~\ref{lst:rcx}.
+
+\lstinputlisting[float, caption={Fill insertion (\myref{https://github.com/os-chip-design/chip-design-book/blob/main/code/rcx.py}{\code{rcx.py}}).}, label={lst:rcx}, frame=tb, captionpos=b]{code/rcx.py}
 
 
+
+%This step does not alter the design- rather, it computes the Parasitic elements of the circuit, which have an effect of timing, as we prepare to do the final timing analysis.
+
+%The parasitic elements are saved in the Standard Parasitics Exchange Format, or SPEF. LibreLane creates a SPEF file for each interconnect corner as described in the Corners and STA section of the documentation.
+
+\subsection{Static Timing Analysis (STA)}
+
+Execute Listing~\ref{lst:sta}.
+
+\lstinputlisting[float, caption={Static timing analysis (\myref{https://github.com/os-chip-design/chip-design-book/blob/main/code/sta.py}{\code{sta.py}}).}, label={lst:sta}, frame=tb, captionpos=b]{code/sta.py}
+
+%STA is a process that verifies that a chip meets certain constraints on clock and data timings to run at its rated clock speed. See Corners and STA in the documentation for more info.
+%
+%This step generates two kinds of files:
+%
+%    .lib: Libertyª-compatible Library files. Can be used to do static timing analysis when creating a design with this design as a sub-macro.
+%    .sdf: Standard Delay Format. Can be used with certain simulation software to do dynamic timing analysis.
+%
+%Unfortunately, the .lib files coming out of LibreLane right now are not super reliable for timing purposes and are only provided for completeness.
+%
+%When using LibreLane-created macros withing other designs, it is best to use the macro's final netlist and extracted parasitics instead.
+
+\subsection{Generating the GDSII}
+
+Finally, we can stream out the GDSII of our design to ship for manufacturing.
+
+Execute Listing~\ref{lst:gds}. It is now again time to explore the final result with KLayout
+
+\lstinputlisting[float, caption={Stream out the GDS file (\myref{https://github.com/os-chip-design/chip-design-book/blob/main/code/gds.py}{\code{gds.py}}).}, label={lst:gds}, frame=tb, captionpos=b]{code/gds.py}
+
+\subsection{Design Rule Checks (DRC)}
+
+Execute Listing~\ref{lst:drc} for the design rules check.
+
+\lstinputlisting[float, caption={Design rule checks (\myref{https://github.com/os-chip-design/chip-design-book/blob/main/code/drc.py}{\code{drc.py}}).}, label={lst:drc}, frame=tb, captionpos=b]{code/drc.py}
+
+\subsection{SPICE Extraction}
+
+ for Layout vs. Schematic Check>
+
+%This step tries to reconstruct a SPICE netlist from the GDSII file, so it can later be used for the Layout vs. Schematic (LVS) check.
+
+Execute Listing~\ref{lst:spice} for the spice extraction.
+
+\lstinputlisting[float, caption={Spice extraction (\myref{https://github.com/os-chip-design/chip-design-book/blob/main/code/spice.py}{\code{spice.py}}).}, label={lst:dpice}, frame=tb, captionpos=b]{code/spice.py}
+
+\subsection{Layout vs. Schematic (LVS)}
+
+Execute Listing~\ref{lst:lvs} for the spice extraction.
+
+\lstinputlisting[float, caption={Spice extraction (\myref{https://github.com/os-chip-design/chip-design-book/blob/main/code/lvs.py}{\code{lvs.py}}).}, label={lst:lvs}, frame=tb, captionpos=b]{code/lvs.py}
+
+%A comparison between the final Verilog netlist (from PnR) and the final SPICE netlist (extracted.)
+%
+%This check effectively compares the physically implemented circuit to the final Verilog netlist output by OpenROAD.
+%
+%The idea is, if there are any disconnects, shorts or other mismatches in the physical implementation that do not exist in the logical view of the design, they would be caught at this step.
+%
+%Common issues that result in LVS violations include:
+%
+%    Lack of fill cells or tap cells in the design
+%    Two unrelated signals to be shorted, or a wire to be disconnected (most commonly seen with misconfigured PDN)
+%
+%Chips with LVS errors are typically dead on arrival.
 
 
 \section{Notes}
