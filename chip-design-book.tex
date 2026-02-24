@@ -569,6 +569,8 @@ exec(open("pdk.py").read())
 A LibreLane \code{Flow} needs to be configured. Execute Listing~\ref{lst:config} to configure your project.
 The configuration is similar to the YAML file we used in the initial example.
 
+The results are placed into the folder \code{librelane_run}.
+
 \subsection{Synthesis with Yosys}
 
 \todo{Explore now Yosys results. Including .dot figures. Add them to the paper and slides.}
@@ -582,21 +584,29 @@ The last command shows us help with the steps.
 
 \lstinputlisting[float, caption={Running the synthesis (\myref{https://github.com/os-chip-design/chip-design-book/blob/main/code/synth.py}{\code{synth.py}}).}, label={lst:synth}, frame=tb, captionpos=b]{code/synth.py}
 
+\todo{Donn has updated stuff: see \url{https://gist.github.com/donn/ae9571b14432097241fdfcfeea53719e}} %\url{https://element.fossi-chat.org/#/room/#librelane:fossi-chat.org}}
+
 We start with the Yosys synthesis. Yosys converts high-level Verilog to a low-level Verilog that includes instances of standard cells. We pass the Verilog files to \code{Yosys.Synthesis}.
 We can run the synthesis with the code from Listing~\ref{lst:synth}.
 
-\todo{Donn has updated stuff: see \url{https://gist.github.com/donn/ae9571b14432097241fdfcfeea53719e}} %\url{https://element.fossi-chat.org/#/room/#librelane:fossi-chat.org}}
-
-\todo{Maybe read up in \url{https://openlane2.readthedocs.io/en/latest/usage/writing_custom_flows.html}}
-
+Explore the reports and the generated low-level Verilog in folder \code{1-yosys-synthesis}.
 
 \subsection{Floorplanning}
 
 The next step is floorplanning. It determines the size of the chip and generates a cell placement grid.
 Each cell in the grid is called a \emph{site}. A standard cell usually occupies multiple sites by width (e.g., a D-FF has a larger width than a NAND gate).
 We run the floorplanning with the code from Listing~\ref{lst:floor}.
+Explore the reports in folder \code{2-openroad-floorplan}.
 
 \lstinputlisting[float, caption={Running the floorplanning (\myref{https://github.com/os-chip-design/chip-design-book/blob/main/code/floor.py}{\code{floor.py}}).}, label={lst:floor}, frame=tb, captionpos=b]{code/floor.py}
+
+\subsection{Tap/Endcap Cell Insertion}
+
+This step places endcap cells and tap cells. Endcap cells are placed at the beginning and end of each row. They terminate each power line.
+
+The tap cells connect VDD to the n-well and GND to the p-substrate. To save area, the standard cells do not connect to the tap themself. The maximum distance between tap cells is dependent on the foundry process.
+
+\lstinputlisting[float, caption={Running the tap cell insertation (\myref{https://github.com/os-chip-design/chip-design-book/blob/main/code/tap.py}{\code{tap.py}}).}, label={lst:tap}, frame=tb, captionpos=b]{code/tap.py}
 
 \subsection{Tuning the Synthesis Flow}
 
