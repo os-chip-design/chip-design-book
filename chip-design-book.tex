@@ -1390,7 +1390,7 @@ We will design a very simple user device example with an 8-bit output port and a
  It contains a \code{Bundle} definition for the interface and the main module \code{WishboneExample}.
  That module has two IO interfaces: (1) \code{wb} to the Wishbone bus from Caravel, and (2) \code{io} to 8 input and output pins. Note that we do not use the original, a bit dated, names for the Wishbine bus.
  
-To keep the device simple, we use a combination acknowledgement for Wishbone. On a write, the output register \code{outReg} is written. It is directly connected to the 8-bit output pins. The input is connected to two levels of FFs to contain metastability. Otherwise, that input is directly connected to the Wishbone data input ports.
+To keep the device simple, we use a combination acknowledgment for Wishbone. On a write, the output register \code{outReg} is written. It is directly connected to the 8-bit output pins. The input is connected to two levels of FFs to contain metastability. Otherwise, that input is directly connected to the Wishbone data input ports.
 
 \lstinputlisting[float, caption={A simple Wishbone device in Verilog (\myref{https://github.com/os-chip-design/chip-design-book/blob/main/code/WishboneExample.v}{\code{WishboneExample.v}}).}, label={lst:wb:verilog}, frame=tb, captionpos=b]{code/WishboneExample.v}
 
@@ -1449,23 +1449,37 @@ The \myref{https://github.com/wafer-space/gf180mcu-project-template}{project tem
 \chapter{Testing and Verification}
 
 As chip production is very expensive, we want to make sure that our design works.
-To ensure a working design we need to test (or verify) our design at RTL level.
-This form of testing is part of the digital design and not a topic of this boook.
-If you use Chisel based designs, see the testing chapter of the Chisel book~\cite{chisel:book}.
+To ensure a working design, we need to test (or verify) our design at the RTL level.
+This form of testing is part of the digital design and not a topic of this book.
+If you use Chisel-based designs, see the testing chapter of the Chisel book~\cite{chisel:book}.
 
 However, we are still interested in testing our design after synthesis.
-We can use gate-level simulation or even spice based simulation of our design.
-This part of testing is not to ctach design errors, but to make sure that the full flow did not introduce any errors.
+We can use gate-level simulation or even Spice-based simulation of our design.
+This part of testing is not to catch design errors, but to make sure that the full flow does not introduce any errors.
 
 There are several ways to write test benches for a design.
-Straigth forward is to write the test bench in Verilog using also non-synthesizable features of Verilog.
+It is straightforward to write the test bench in Verilog using non-synthesizable features of Verilog.
 More complex testing often uses frameworks, such as UVM.
-Open-source project often us \href{https://www.cocotb.org/}{Cocotb}, a testing framework written in Pythoon.
+Open-source projects often use \href{https://www.cocotb.org/}{Cocotb}, a testing framework written in Python.
+Another option is to use ChiselTest to write tests in Scala (or Java).
+Although ChiselTest is intended for designs written in Chisel, any design in Verilog can be tested by using a Chisel black box.
 
 \section{Cocotb Testing}
 
-Cocotb as a Python library needs Python installed and Cocotb itself (e.g., with \code{pip install cocotb}, or with \code{brew} on a Mac).
-We will explain Cocotb by an example testbench for our adder example that we can use to test the original Verilog code and the gate-level netlist. For further information read the \href{https://docs.cocotb.org/en/stable/quickstart.html}{Cocotb Quickstart Guide}.
+Cocotb, as a Python library, needs Python installed and Cocotb itself (e.g., with \code{pip install cocotb}, or with \code{brew} on a Mac).
+We will explain Cocotb by an example testbench for our pipelined adder design that we can use to test the original Verilog code and the gate-level netlist. For further information, read the \href{https://docs.cocotb.org/en/stable/quickstart.html}{Cocotb Quickstart Guide}.
+
+A cocotb test does not need any extra top-level Verilog component. The Python cocotb code is the top-level that drives the DUT signals and asserts the expected outputs.
+A minimal cocotb test consists of: (1) the DUT Verilog file, (2) test code written in Python, and (3) a Makefile to compile and run the test.
+We will add our cocotb test in a subfolder \code{test}.
+
+Listing~\ref{lst:test:cocotb} shows the cocotb test bench.
+
+Listing~\ref{lst:test:Makefile} shows the accompanying Makefile for the test.
+
+\lstinputlisting[float, caption={A simple Python cocotb test bench (\myref{https://github.com/os-chip-design/chip-design-book/blob/main/code/test/test_adder.py}{\code{test_adder.py}}).}, label={lst:test:cocotb}, frame=tb, captionpos=b]{code/test/test_adder.py}
+
+\lstinputlisting[float, caption={The Makefile for the Python cocotb test bench (\myref{https://github.com/os-chip-design/chip-design-book/blob/main/code/test/Makefile}{\code{Makefile}}).}, label={lst:test:Makefile}, frame=tb, captionpos=b]{code/test/Makefile}
 
 \section{Spice Simulation}
 
