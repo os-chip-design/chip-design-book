@@ -559,8 +559,8 @@ The first four steps perform linting of the design, and any Verilog syntax error
      of which used for sequential elements: 510.489600 (59.13%)
 \end{verbatim}
 
-Furthermore, Yosys provides an area estimation by summing the sizes of all 60 cells used. The area is given in this example as 863\;{\textmu}mm$^2$.
-Note that this area estimate would result in a utilization of 100\;\%, which is impossible as we need some space for the tap cells and probably some for the routing of the design. The default in LibreLane is 50\;\%, which can be set via \code{FP_CORE_UTIL}.
+Furthermore, Yosys provides an area estimation by summing the sizes of all 60 cells used. The area is given in this example as 863\,{\textmu}mm$^2$.
+Note that this area estimate would result in a utilization of 100\;\%, which is impossible as we need some space for the tap cells and probably some for the routing of the design. The default utilization in LibreLane is 50\;\%, which can be set via \code{FP_CORE_UTIL}.
 
 We use the Sky130 PDK and can find the documentation of each cell \myref{https://skywater-pdk.readthedocs.io/en/main/}{online}.
 E.g., the DFF is described at \myref{https://skywater-pdk.readthedocs.io/en/main/contents/libraries/sky130_fd_sc_hd/cells/dfxtp/README.html}{dfxtp}.
@@ -612,25 +612,25 @@ using run runs/RUN_2026-04-03_12-05-14
 
 In folder \code{nn-openroad-stapostpnr}, the static timing analysis (STA) reports are found.
 The results are reported for different timing corners: process variations, temperature, and voltage.
-STA does not report a mximum clock frequence, by slack times. We have set our desired clock
-frequency in the configuration time and STA checks if that frequency can be met.
-The file \code{max.rpt} reports the slack for maximum setup time and also the path from the startpoint to the endpoint.
-For our example design the result for the typical timing corner is:
+STA does not report a maximum clock frequency, but slack times. We have set our desired clock
+frequency in the configuration time, and STA checks if that frequency can be met.
+The file \code{max.rpt} reports the slack for maximum setup time and also the path from the start point to the endpoint.
+For our example design, the result for the typical timing corner is:
 
 \begin{verbatim}
 14.939894   slack (MET)
 \end{verbatim}
 
-\noindent All timing results are reported in nanoseconds (ns). We have set our clock period to 20\,ns in the configuration file. With almost 15n\,s slack, we could reduce our clock period to 5\,ns, runnign our design at 200~MHz. If we have setup time violatons, we can reduce the clock frequency to run our design.
+\noindent All timing results are reported in nanoseconds (ns). We have set our clock period to 20\,ns in the configuration file. With almost 15n\,s slack, we could reduce our clock period to 5\,ns, running our design at 200~MHz. If we have setup time violations, we can reduce the clock frequency to run our design.
 
-For the hold time, we are interestd in the minimum hold time slack, with is reported in file \code{min.rpt}. 
-For our example design the result for the typical timing corner is:
+For the hold time, we are interested in the minimum hold time slack, which is reported in file \code{min.rpt}. 
+For our example design, the result for the typical timing corner is:
 
 \begin{verbatim}
 0.360400   slack (MET)
 \end{verbatim}
 
-\noindent Hold time violations will ruin our chip. Due to a misconfiguration of the STA tool the first Google sponsored MPW run had hold time violations and all dies where broken.
+\noindent Hold time violations will ruin our chip. Due to a misconfiguration of the STA tool, the first Google-sponsored MPW run had hold time violations, and all dies were broken.
 Hold time violations can be fixed by the tool by inserting delays into the clock tree.
 
 We can also get a summary with:
@@ -643,8 +643,19 @@ summary.py --timing
 
 \subsubsection{Size}
 
-When not constraining the chip's size, LibreLane will choose the size.
+When not constraining the chip's size, LibreLane will choose the size for the design. We can measure the chip size when exploring it with KLayout or read the results in the final report, e.g., in \code{final/metrics.json}. The following numbers are from our example design:
 
+\begin{verbatim}
+    "design__die__bbox": "0.0 0.0 52.595 63.315",
+    "design__core__bbox": "5.52 10.88 46.92 51.68",
+    "design__io": 27,
+    "design__die__area": 3330.05,
+    "design__core__area": 1689.12,
+\end{verbatim}
+
+\noindent We have two sizes: the size of the core area, which contains the logic, and the size of the whole die, which includes the IO pads.
+In our small example design, the core, the adders, and the registers fit into 1689\,{\textmu}mm$^2$, where the whole die, including the IO pads, needs 3330\,{\textmu}mm$^2$.
+The size of the dies is clearly dominated by the IO pads for our very simple example.
 
 \subsubsection{Design Rule Checks}
 
@@ -653,11 +664,47 @@ When not constraining the chip's size, LibreLane will choose the size.
 The subfolder \code{final} contains a summary of the project in files \code{metrics.csv} and \code{metrics.json}.
 It includes timing information, size of the design, number of standard cells used, and other detailed metrics.
 
+Furthermore, it includes all files that are needed to produce the chip or to include that design as a hard macro in another design. Table~\ref{tab:files} shows the most important files.
+
+\begin{table}
+ \centering
+  \begin{tabular}{ll}
+    \toprule
+    File & Content \\
+    \midrule
+    def/adder.def & The DEF file: placed cells and routing\\
+    gds/adder.gds & The GDS file containing the final layout\\
+    lef/adder.lef & The LEF file: size, pins, and obstractions\\
+    lib/*/*.lib & The LIB files for different timing corners \\
+    nl/adder.nl/v & The gate-level netlist for simulation\\
+    odb/adder.odb & ???\\
+    sdc/adder.sdc & The SDC timing constraints file\\
+    sdf/*/*.sdf & Delay files for different corners\\
+    spef/*/adder.max/min/nom.spef & Standard parasitic exchange format files\\
+    spice/adder.spice & Spice model of the design\\
+    \bottomrule
+  \end{tabular}
+  \caption{The final design files.}
+ \label{tab:files}
+\end{table}
+
+\subsection{Controlling the LibreLane Flow}
+
+The LibreLane flow can be controlled by writing \href{https://librelane.readthedocs.io/en/stable/usage/writing_custom_flows.html}{custom flows} or extended by writing \href{https://librelane.readthedocs.io/en/stable/usage/writing_custom_steps.html}{custom steps}. However, for simple runs of a subset of LibreLane, we can use command-line arguments. For example, to just run the synthesis flow for an early area estimation, we can run:
+\begin{verbatim}
+librelane adder.yaml --to Yosys.Synthesis --run-tag synth-only
+summary.py --yosys-report
+\end{verbatim}
+
+\noindent This command runs the steps till and including the Yosys synthesis. The \code{run-tag} option overwrites the default destination folder with \code{synth-estimate}. We can use the \code{summary} tool to explore the result.
+
+We can also start the flow from an initial state. For example, to explore different optimizations from an already synthesized design. The options are: \code{--from Yosys.Synthesis} for starting from the synthesis step, and we need to provide an initial state with \code{--with-initial-state .../06-yosys-synthesis/state_out.json}. 
+
 \subsection{Change the Design}
 
 The current example has non-initialized registers after power-up.
-Although those random values will be cleared with valid values after on and two clock cycles,
-it is good practise to reset registers. This expcially useful for verification.
+Although those random values will be cleared with valid values after one or two clock cycles,
+it is good practise to reset registers. This is especially useful for verification.
 
 There are two ways flip-flops can be reset: (1) with an asynchronous reset or (2) with a synchronous reset.
 Explain which one is to be preferred and why. Which one needs a larger area? This question is not
@@ -1398,6 +1445,30 @@ librelane config_merged.json
 The \myref{https://github.com/wafer-space/gf180mcu-project-template}{project template} is just the pad ring and a counter as an example design.
 
 \section{Maybe something from Edu4Chip?}
+
+\chapter{Testing and Verification}
+
+As chip production is very expensive, we want to make sure that our design works.
+To ensure a working design we need to test (or verify) our design at RTL level.
+This form of testing is part of the digital design and not a topic of this boook.
+If you use Chisel based designs, see the testing chapter of the Chisel book~\cite{chisel:book}.
+
+However, we are still interested in testing our design after synthesis.
+We can use gate-level simulation or even spice based simulation of our design.
+This part of testing is not to ctach design errors, but to make sure that the full flow did not introduce any errors.
+
+There are several ways to write test benches for a design.
+Straigth forward is to write the test bench in Verilog using also non-synthesizable features of Verilog.
+More complex testing often uses frameworks, such as UVM.
+Open-source project often us \href{https://www.cocotb.org/}{Cocotb}, a testing framework written in Pythoon.
+
+\section{Cocotb Testing}
+
+Cocotb as a Python library needs Python installed and Cocotb itself (e.g., with \code{pip install cocotb}, or with \code{brew} on a Mac).
+We will explain Cocotb by an example testbench for our adder example that we can use to test the original Verilog code and the gate-level netlist. For further information read the \href{https://docs.cocotb.org/en/stable/quickstart.html}{Cocotb Quickstart Guide}.
+
+\section{Spice Simulation}
+
 
 \chapter{Memories}
 
