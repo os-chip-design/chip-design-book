@@ -147,6 +147,14 @@
 
 % uncomment following for final submission
 \renewcommand{\todo}[1]{}
+
+
+\ifbook
+\renewcommand{\myref}[2]{{#2}{\footnote{\url{#1}}}}
+\fi
+
+% uncomment following for final submission
+\renewcommand{\todo}[1]{}
 \renewcommand{\martin}[1]{}
 
 \makeindex
@@ -268,6 +276,8 @@ Typeset by Martin Schoeberl.}
 
 It is an exciting time to be in the world of chip design....
 
+This booklet~\cite{chip:design:book} is part of the course at DTU on introduction into chip design\footnote{\url{https://github.com/os-chip-design/chip-design-intro}} that uses open-source tools only and where all teaching material is available in open source. In the spring semester of 2026, we design an open-source chip that will be taped out with the MPW schedule on SkyWater 130 nm.\footnote{\url{https://github.com/os-chip-design/dtu-soc-2026}}
+
 \todo{Could this be written by someone else?}
 
 \chapter{Preface}
@@ -379,6 +389,12 @@ librelane --version
 
 LibreLane also installs the Sky130 PDK using the \code{ciel} tool. The PDKs are stored under \code{$HOME:/.ciel}.
 
+You can run LibreLane also without cloning it locally with \code{nix run}:
+
+\begin{verbatim}
+nix run github:librelane/librelane -- --version
+\end{verbatim}
+
 \subsection{Further Packages}
 
 There are several other distributions of the open-source chip design tools available:
@@ -457,34 +473,78 @@ Another option is to open the design with the OpenROAD viewer:
 librelane --last-run --flow openinopenroad adder.yaml
 \end{verbatim}
 
+The OpenROAD viewer lets you explore your design in a graphical way. For example, we can visualize the generated clock tree. To see only the signals belonging to the clock tree, disable the following Nets: Signal, Power, and Ground. And disable Instances.
+
 Matt Venn has a good selection of layers and color assignments at \myref{https://github.com/mattvenn/librelane_summary/blob/librelane/klayout_gds.xml}{klayout\_gds.xml}. You can use it with klayout as follows:
 \begin{verbatim}
 klayout -l klayout_gds
 \end{verbatim}
 
-That configuration file is part of the \myref{https://github.com/mattvenn/librelane_summary}{summary tools}, which can be used for a quick exploration of the design. Clone the repository, add it to your path, and set the \code{PDK_ROOT} variable (easiest into a file that you source, or add those lines to your \code{$HOME/.bashrc}):
+That configuration file is part of the \myref{https://github.com/mattvenn/librelane_summary}{summary tools}, which can be used for a quick exploration of the design. Clone the repository, add it to your path, and set the \code{PDK_ROOT} variable (easiest into a file that you \code{source}, or add those lines to your \code{$HOME/.bashrc}):
 
 \begin{verbatim}
 export PATH=$PATH:$HOME/path/to/librelane_summary
 export PDK_ROOT=$HOME/.ciel
 \end{verbatim}
 
-Explore the tool with:
+\noindent Explore the tool with:
 
 \begin{verbatim}
 summary.py --help
 \end{verbatim}
 
-When in a folder that contains the LibreLane runs, explore the GDS of the latest run with:
+\noindent When calling the summary tool without flags, it reports which run it is using:
+\begin{verbatim}
+summary.py
+using latest run:
+using run runs/RUN_2026-04-03_12-05-14
+\end{verbatim}
+
+\noindent When in a folder that contains the LibreLane runs, explore the GDS of the latest run with:
 \begin{verbatim}
 summary.py --gds
 \end{verbatim}
 
-At the time of this writing, the flow generates 74 folders containing the results and reports for each individual step. You can find those subfolders in the folder \code{runs/RUN\_DATE\_TIME}. Not all reports are equally important. We will explore some of them.
+At the time of this writing, the flow generates 74 folders containing the results and reports for each individual step. You can find those subfolders in the folder \code{runs/RUN\_DATE\_TIME}.
+\begin{verbatim}
+01-verilator-lint
+02-checker-linttimingconstructs
+03-checker-linterrors
+04-checker-lintwarnings
+05-yosys-jsonheader
+06-yosys-synthesis
+...
+73-checker-maxcapviolations
+74-misc-reportmanufacturability
+error.log
+final
+flow.log
+resolved.json
+tmp
+warning.log
+\end{verbatim}
+
+The file \code{flow.log} lists all LibreLane commands that were run.
+\code{resolved.json} lists all configurations used during the flow.
+Check \code{error.log} for any errors in the flow.
+The folder \code{final} contains all files needed to integrate that macro into another design, or if it is the top-level of the design, the files that are sent to the foundry.
+Not all reports are equally important. We will explore some of them.
+For an overview of the errors, run:
+
+\begin{verbatim}
+summary.py --summary
+\end{verbatim}
+
+\noindent The output should not list any errors. You will see some \code{route__drc_errors__iter:n}, but they should decrease to 0 after several router fixes. 
+However, with our example design and configuration, we have two maximum fanout violations:
+
+\begin{verbatim}
+design__max_fanout_violation__count :                    2
+\end{verbatim}
 
 \subsubsection{Linting and a First Area Estimate}
 
-The first four steps perform linting of the design, and any Verilog syntax errors are identified during this process. An initial estimate of the used cells can be found in the report \code{06-yosys-synthesis/reports/stat.rpt}. For our pipelined adder, we can identify the 24 flip-flops as \code{dfxtp_2} cells in that report:
+The first four steps perform linting of the design, and any Verilog syntax errors are identified during this process. An initial estimate of the used cells can be found in the report \code{nn-yosys-synthesis/reports/stat.rpt}. For our pipelined adder, we can identify the 24 flip-flops as \code{dfxtp_2} cells in that report:
 
 \begin{verbatim}
 ...
@@ -493,17 +553,93 @@ The first four steps perform linting of the design, and any Verilog syntax error
      sky130_fd_sc_hd__and2_2         4
      sky130_fd_sc_hd__dfxtp_2       24
 ...
+     sky130_fd_sc_hd__xor2_2         3
+
+   Chip area for module '\adder': 863.328000
+     of which used for sequential elements: 510.489600 (59.13%)
 \end{verbatim}
 
-\noindent We use the Sky130 PDK and can find the documentation of each cell \myref{https://skywater-pdk.readthedocs.io/en/main/}{online}.
+Furthermore, Yosys provides an area estimation by summing the sizes of all 60 cells used. The area is given in this example as 863\;{\textmu}mm$^2$.
+Note that this area estimate would result in a utilization of 100\;\%, which is impossible as we need some space for the tap cells and probably some for the routing of the design. The default in LibreLane is 50\;\%, which can be set via \code{FP_CORE_UTIL}.
+
+We use the Sky130 PDK and can find the documentation of each cell \myref{https://skywater-pdk.readthedocs.io/en/main/}{online}.
 E.g., the DFF is described at \myref{https://skywater-pdk.readthedocs.io/en/main/contents/libraries/sky130_fd_sc_hd/cells/dfxtp/README.html}{dfxtp}.
 The file \code{adder.nl.v} contains the design synthesized to standard cells from the used PDK. As our example is very simple, we can manually inspect the generated Verilog.
+Yosys also generates visualization in the form of DOT graphs.
+With \myref{https://graphviz.org/}{Graphviz} installed, we can convert those files to PDF:
+
+\begin{verbatim}
+dot -Tpdf hierarchy.dot -o hierarchy.pdf
+\end{verbatim}
+
+\noindent The full details of the mapped design can be found in \code{primitive_techmap.dot}. However, that detailed view is only useful for very simple designs, such as our example design.
+
+We can also explore the synthesis report with the \code{summary} tool:
+\begin{verbatim}
+summary.py --yosys-report
+using latest run:
+using run runs/RUN_2026-04-03_12-05-14
+{'area': 863.328,
+ 'num_cells': 60,
+ 'num_cells_by_type': {'sky130_fd_sc_hd__a31oi_2': 1,
+                       'sky130_fd_sc_hd__and2_2': 4,
+                       'sky130_fd_sc_hd__dfxtp_2': 24,
+                       'sky130_fd_sc_hd__nand2_2': 6,
+                       'sky130_fd_sc_hd__nand2b_2': 1,
+                       'sky130_fd_sc_hd__nor2_2': 4,
+                       'sky130_fd_sc_hd__o21a_2': 1,
+                       'sky130_fd_sc_hd__o21ai_2': 2,
+                       'sky130_fd_sc_hd__o21ba_2': 1,
+                       'sky130_fd_sc_hd__o21bai_2': 1,
+                       'sky130_fd_sc_hd__o31a_2': 2,
+                       'sky130_fd_sc_hd__or2_2': 4,
+                       'sky130_fd_sc_hd__xnor2_2': 6,
+                       'sky130_fd_sc_hd__xor2_2': 3},
+ 'num_memories': 0,
+ 'num_memory_bits': 0,
+ 'num_port_bits': 25,
+ 'num_ports': 4,
+ 'num_processes': 0,
+ 'num_pub_wire_bits': 41,
+ 'num_pub_wires': 20,
+ 'num_wire_bits': 77,
+ 'num_wires': 56}
+\end{verbatim}
+
 
 
 \subsubsection{Static Timing Analysis}
 
 In folder \code{nn-openroad-stapostpnr}, the static timing analysis (STA) reports are found.
-\todo{continue here***************}
+The results are reported for different timing corners: process variations, temperature, and voltage.
+STA does not report a mximum clock frequence, by slack times. We have set our desired clock
+frequency in the configuration time and STA checks if that frequency can be met.
+The file \code{max.rpt} reports the slack for maximum setup time and also the path from the startpoint to the endpoint.
+For our example design the result for the typical timing corner is:
+
+\begin{verbatim}
+14.939894   slack (MET)
+\end{verbatim}
+
+\noindent All timing results are reported in nanoseconds (ns). We have set our clock period to 20\,ns in the configuration file. With almost 15n\,s slack, we could reduce our clock period to 5\,ns, runnign our design at 200~MHz. If we have setup time violatons, we can reduce the clock frequency to run our design.
+
+For the hold time, we are interestd in the minimum hold time slack, with is reported in file \code{min.rpt}. 
+For our example design the result for the typical timing corner is:
+
+\begin{verbatim}
+0.360400   slack (MET)
+\end{verbatim}
+
+\noindent Hold time violations will ruin our chip. Due to a misconfiguration of the STA tool the first Google sponsored MPW run had hold time violations and all dies where broken.
+Hold time violations can be fixed by the tool by inserting delays into the clock tree.
+
+We can also get a summary with:
+
+\begin{verbatim}
+summary.py --timing
+\end{verbatim}
+
+
 
 \subsubsection{Size}
 
@@ -512,7 +648,7 @@ When not constraining the chip's size, LibreLane will choose the size.
 
 \subsubsection{Design Rule Checks}
 
-\subsubsection{Summary}
+\subsubsection{The Final Design}
 
 The subfolder \code{final} contains a summary of the project in files \code{metrics.csv} and \code{metrics.json}.
 It includes timing information, size of the design, number of standard cells used, and other detailed metrics.
@@ -590,10 +726,16 @@ We start with the Yosys synthesis. Yosys converts high-level Verilog to a low-le
 We can run the synthesis with the code from Listing~\ref{lst:synth}.
 
 Explore the reports and the generated low-level Verilog in folder \code{1-yosys-synthesis}.
+Furthermore, Yosys also generates visualization in the form of DOT graphs.
+Install \myref{https://graphviz.org/}{Graphviz} to convert those files to PDF:
+
+\begin{verbatim}
+dot -Tpdf hierarchy.dot -o hierarchy.pdf
+\end{verbatim}
 
 \subsection{Floorplanning}
 
-The next step is floorplanning. It determines the size of the chip and generates a cell placement grid.
+The next step is floor planning. It determines the size of the chip and generates a cell placement grid.
 Each cell in the grid is called a \emph{site}. A standard cell usually occupies multiple sites by width (e.g., a D-FF has a larger width than a NAND gate).
 We run the floorplanning with the code from Listing~\ref{lst:floor}.
 Explore the reports in folder \code{2-openroad-floorplan}.
@@ -877,7 +1019,7 @@ Efabless, the original developer of OpenLane and OpenLane2, exited the business 
 
 \myref{https://caravel-harness.readthedocs.io/}{Caravel} is a SoC framework developed by Efabless for the Google/Skywater 130nm Open PDK. It is the basis for the \myref{https://chipfoundry.io/chipignite}{chipIgnite} MPW shuttles.
 It contains a padframe, a houskeeping block, a management area including a RISC-V core, and a user project wrapper.
-The user area is 3000\;{\textmu}m x 3600\;{\textmu}m (10 mm$^2$). To put this into perspective, a simple 3-stage RISC-V pipeline, such as Wildcat~\cite{wildcat:arcs2025}, fits into a 0.2 mm$^2$ area. A 4~KiB memory from eFabless has a 0.18 mm$^2$ area.
+The user area is 3000\,{\textmu}m x 3600\,{\textmu}m (10 mm$^2$). To put this into perspective, a simple 3-stage RISC-V pipeline, such as Wildcat~\cite{wildcat:arcs2025}, fits into a 0.2\,mm$^2$ area. A 4~KiB memory from eFabless has a 0.18\,mm$^2$ area.
 
 ChipFoundry now maintains Caravel. Note that the transition to ChipFoundry is still in progress; therefore, some documentation still contains the eFabless name. Additionally, some datasheets are outdated (e.g., referring to the PicoRV as the management processor, which is now the \myref{https://github.com/SpinalHDL/VexRiscv}{VexRiscv}).
 

@@ -6733,6 +6733,7 @@ title = {From Chisel to Chips with Open-Source Tools},
   pages   = {e2},
   volume  = {3},
   doi     = {10.1017/cbp.2025.1},
+  no-url     = {https://www.jopdesign.com/doc/worst-case-perf.pdf},
 }
 
 @InProceedings{Neuralcasting:2024,
@@ -6763,6 +6764,133 @@ title = {From Chisel to Chips with Open-Source Tools},
   booktitle = {Architecture of Computing Systems -- ARCS 2025},
   title     = {Wildcat: Educational RISC-V Microprocessors},
   year      = {2025},
+  no-url       = {https://www.jopdesign.com/doc/wildcat-arcs.pdf},
+}
+
+@Article{energy2025,
+  author  = {Kirkeby Maja H. and Krabben Thomas and Mikkelsen Maria B. and Rosendahl Mads and Larsen Mathias and Sundman Martin and Petersen Tjark and Schoeberl Martin},
+  journal = {Computer Science and Information Systems},
+  title   = {Energy-efficiency of software and hardware algorithms},
+  year    = {2025},
+  pages   = {649--671},
+  volume  = {22},
+  owner   = {martin},
+  no-url     = {https://www.jopdesign.com/doc/energy2025.pdf},
+}
+
+@InProceedings{neural:2025,
+  author    = {Cerioli, Alessandro and Laroche, Clement and Piechowiak, Tobias and Pezzarossa, Luca and Schoeberl, Martin},
+  booktitle = {2025 IEEE International Conference on Pervasive Computing and Communications Workshops and other Affiliated Events (PerCom Workshops)},
+  title     = {Neural Architecture Search for Efficient Mixed-Precision Quantization in Audio Denoising},
+  year      = {2025},
+  address   = {Los Alamitos, CA, USA},
+  month     = mar,
+  pages     = {273-279},
+  publisher = {IEEE Computer Society},
+  abstract  = {This work presents a neural architecture search approach based on evolutionary algorithms to tackle the problem of mixed-precision quantization considering 8, 16, and 32-bit depths for NSNet2, a neural network used for audio denoising tasks. The goal is to preserve high network performance while reducing the model size, making it suitable for deployment on embedded systems such as headsets. The neural architecture search (NAS) algorithm considers metrics such as (a) Perceptual Evaluation of Speech Quality (PESQ) to assess the audio quality after de-noising, (b) the inference time of the neural network, and (c) its memory footprint. Our results showcase remarkable improvements, with a 29.93% reduction in inference time and a 57.88% reduction in memory footprint compared to the full-precision float32 baseline, while preserving high performance in audio de-noising with a negligible drop of PESQ metric. This work provides a framework for estimating the optimal mixed-precision quantization configuration, which is beneficial for deploying neural networks on resource-constrained devices.},
+  doi       = {10.1109/PerComWorkshops65533.2025.00077},
+  keywords  = {Pervasive computing;Performance evaluation;Quantization (signal);Embedded systems;Conferences;Noise reduction;Neural networks;Evolutionary computation;Inference algorithms;Neural architecture search},
+  no-url       = {https://www.jopdesign.com/doc/nas_nsnet2.pdf},
+}
+
+@InProceedings{tp:nois:sup:2025,
+  author    = {Cerioli, Alessandro and Str{\o}m, T{\'o}rur Biskopst{\o} and Laroche, Clement and Piechowiak, Tobias and Pezzarossa, Luca and Schoeberl, Martin},
+  booktitle = {2025 28th International Symposium on Real-Time Distributed Computing (ISORC)},
+  title     = {Time-Predictable Deep Noise Suppression on an Edge Device},
+  year      = {2025},
+  pages     = {380-386},
+  doi       = {10.1109/ISORC65339.2025.00062},
+  keywords  = {Headphones;Performance evaluation;Codes;Quantization (signal);Noise reduction;Noise;Machine learning;Speech enhancement;Hearing aids;Real-time systems;machine learning. real-time systems;edge devices},
+  no-url       = {https://www.jopdesign.com/doc/rt_neuralcasting.pdf},
+}
+
+@InProceedings{sim:cont:cache,
+  author    = {Maroun, Emad Jacob and Schoeberl, Martin},
+  booktitle = {2025 28th International Symposium on Real-Time Distributed Computing (ISORC)},
+  title     = {Simulating Contention and Timeout Caches for a Mixed-Criticality 5G Radio Base Station},
+  year      = {2025},
+  pages     = {01-11},
+  doi       = {10.1109/ISORC65339.2025.00034},
+  keywords  = {Baseband;5G mobile communication;Merging;Throughput;Hardware;Real-time systems;Communications technology;Timing;Low latency communication;Research and development;5g;real-time systems;low latency;caches;radio baseband},
+  no-url       = {https://www.jopdesign.com/doc/simcache.pdf},
+}
+
+@InProceedings{const:exe:2025,
+  author    = {Maroun, Emad Jacob and Schoeberl, Martin and Puschner, Peter},
+  booktitle = {2025 28th International Symposium on Real-Time Distributed Computing (ISORC)},
+  title     = {Optimized Constant Execution Time Code},
+  year      = {2025},
+  pages     = {274-279},
+  doi       = {10.1109/ISORC65339.2025.00061},
+  keywords  = {Jacobian matrices;Pathology;Codes;Processor scheduling;Pipelines;Real-time systems;Registers;Distributed computing;Optimization;real-time systems;single-path code;optimization;constant execution time;instruction scheduling;dominance},
+}
+
+@Article{scala:def:hw:jnl,
+  author   = {Martin Schoeberl and Hans Jakob Damsgaard and Luca Pezzarossa and Oliver Keszocze and Erling Rennemo Jellum and Scott Beamer},
+  journal  = {Microprocessors and Microsystems},
+  title    = {Scala defined hardware generators for Chisel},
+  year     = {2025},
+  issn     = {0141-9331},
+  pages    = {105182},
+  volume   = {117},
+  abstract = {We describe digital hardware designs in hardware description languages such as VHDL and SystemVerilog. Both languages were developed in the 1980s and, although regularly updated, are still in the style of their time. They lack the constructs to write more configurable generators than just the number of bits for an operation. Based on Scala, Chisel is a hardware construction language that helps to write hardware generators. Hardware generators are not a new idea. Scripting languages, such as Perl and TCL, are often used to generate VHDL or Verilog code from other sources of system description. However, mixing two languages and embedding VHDL or Verilog strings in generator code is not scalable. As Chisel is embedded in Scala, we can write the generators using the same language/environment as we use to describe the digital logic. This paper explores different examples and patterns to describe parameterizable hardware generators. We are confident that practices from software development can improve the productivity of hardware designers to build and test the next billion transistor chips.},
+  doi      = {https://doi.org/10.1016/j.micpro.2025.105182},
+  keywords = {Hardware generators, Open-source hardware, Open-source digital design tools},
+  no-url      = {https://www.sciencedirect.com/science/article/pii/S014193312500050X},
+}
+
+@Article{forsyde:patmos,
+  author   = {Khodadad, Ehsan and Sander, Ingo and Pezzarossa, Luca and Schoeberl, Martin},
+  journal  = {IEEE Embedded Systems Letters},
+  title    = {ForSyDe on the Patmos Processor},
+  year     = {2025},
+  pages    = {1-1},
+  doi      = {10.1109/LES.2025.3597024},
+  keywords = {Hardware;Embedded systems;Codes;Software;Computational modeling;Adders;Translation;Root mean square;Delays;Skeleton;T-CREST;ForSyDe;real-time systems;time-predictable computer architecture;WCET Analysis},
+  no-url      = {https://www.jopdesign.com/doc/forsyde_patmos.pdf},
+}
+
+@Article{quasi:static:sched,
+  author     = {Lin, Shaokai and Jellum, Erling and Theile, Mirco and Tanneberger, Tassilo and Sun, Binqi and Jerad, Chadlia and Xu, Yimo and Feng, Guangyu and M\ae{}hlum, Magnus and Chen, Jian-Jia and Schoeberl, Martin and Phan, Linh Thi Xuan and Castrillon, Jeronimo and Seshia, Sanjit A. and Lee, Edward A.},
+  journal    = {ACM Trans. Embed. Comput. Syst.},
+  title      = {Quasi-Static Scheduling for Deterministic Timed Concurrent Models on Multi-Core Hardware},
+  year       = {2025},
+  issn       = {1539-9087},
+  month      = sep,
+  number     = {5s},
+  volume     = {24},
+  address    = {New York, NY, USA},
+  articleno  = {150},
+  doi        = {10.1145/3762653},
+  issue_date = {September 2025},
+  keywords   = {Quasi-Static Scheduling, Concurrency, DAG Scheduling, Predictability},
+  numpages   = {25},
+  publisher  = {Association for Computing Machinery},
+  no-url        = {https://doi.org/10.1145/3762653},
+}
+
+@InProceedings{verify:dsd:2025,
+  author    = {Tjark Petersen and Luca Pezzarossa and Martin Schoeberl},
+  booktitle = {Proceedings of the 2025 28th Euromicro Conference on Digital System Design (DSD)},
+  title     = {A Structured Approach to Verification of Digital Hardware in Scala},
+  year      = {2025},
+  address   = {United States},
+  note      = {2025 28th Euromicro Conference on Digital System Design (DSD) ; Conference date: 10-09-2025 Through 12-09-2025},
+  pages     = {8--15},
+  publisher = {IEEE},
+  doi       = {10.1109/DSD67783.2025.00014},
+  isbn      = {979-8-3315-8500-6},
+  keywords  = {Functional Verification, UVM, Chisel, Scala},
+  language  = {English},
+  no-url       = {https://www.jopdesign.com/doc/Structured_Verification_in_Scala.pdf},
+}
+
+@Misc{chip:design:book,
+  author       = {Martin Schoeberl},
+  howpublished = {\url{https://www.imm.dtu.dk/~masca/chip-design-book.html}},
+  title        = {Introduction to Chip Design Using Open-Source Tools},
+  year         = {2025},
+  owner        = {martin},
 }
 
 @Comment{jabref-meta: databaseType:bibtex;}
@@ -11363,16 +11491,14 @@ title = {From Chisel to Chips with Open-Source Tools},
   issn = {1943-0663}
 }
 
-@INPROCEEDINGS{OpenSoC:ispass2016,
-  author = {Farzaf Fatollahi-Fard and David Donofrio and George Michelogiannakis
-	and John Shalf},
-  title = {OpenSoC Fabric: On-chip network generator},
-  booktitle = {2016 IEEE International Symposium on Performance Analysis of Systems
-	and Software (ISPASS)},
-  year = {2016},
-  pages = {194--203},
-  month = {April},
-  doi = {10.1109/ISPASS.2016.7482094}
+@InProceedings{OpenSoC:ispass2016,
+  author    = {Farzad Fatollahi-Fard and David Donofrio and George Michelogiannakis and John Shalf},
+  booktitle = {2016 IEEE International Symposium on Performance Analysis of Systems and Software (ISPASS)},
+  title     = {OpenSoC Fabric: On-chip network generator},
+  year      = {2016},
+  month     = {April},
+  pages     = {194--203},
+  doi       = {10.1109/ISPASS.2016.7482094},
 }
 
 @INPROCEEDINGS{hoplite:2015,
