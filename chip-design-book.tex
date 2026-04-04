@@ -286,13 +286,19 @@ This booklet~\cite{chip:design:book} is part of the course at DTU on introductio
 This book is an introduction to chip design with a focus on using open-source tools and open-source PDKs.
 
 
-I have not used any large language model (LLM) to write even a single sentence. All mistakes are mine, not a halizunisation by an LLM. I use Grammarly for grammar checking and Copilot for writing code.
+I have not used any large language model (LLM) to write even a single sentence. All mistakes are mine, not a halizunisation by an LLM. I used Grammarly for grammar checking and Copilot for writing code.
 
 
 
 \section*{Acknowledgements}
 
-\todo{Maybe? Probably not yet ;-)}
+I want to thank everyone who has worked on LibreLane and all the open-source tools for EDA that are used by LibreLane.
+Using those tools is so joyful and, therefore, a big motivation to write a book about them.
+I am thankful to the whole open-source EDA community, which is so welcoming and friendly and never tired of answering questions.
+
+I would like to thank Matt Venn for creating the \myref{https://tinytapeout.com/}{Tiny Tapeout} project, which enables chip tapeout at a relatively low cost and therefore democratizes chip design.
+Furthermore, I very much enjoyed Matt's Zero2ASIC course, and several exercises in this book are inspired by Matt's course. I hope Matt is fine with this ;-)
+
 
 
 \mainmatter
@@ -690,7 +696,7 @@ Furthermore, it includes all files that are needed to produce the chip or to inc
 
 \subsection{Controlling the LibreLane Flow}
 
-The LibreLane flow can be controlled by writing \href{https://librelane.readthedocs.io/en/stable/usage/writing_custom_flows.html}{custom flows} or extended by writing \href{https://librelane.readthedocs.io/en/stable/usage/writing_custom_steps.html}{custom steps}. However, for simple runs of a subset of LibreLane, we can use command-line arguments. For example, to just run the synthesis flow for an early area estimation, we can run:
+The LibreLane flow can be controlled by writing \myref{https://librelane.readthedocs.io/en/stable/usage/writing_custom_flows.html}{custom flows} or extended by writing \myref{https://librelane.readthedocs.io/en/stable/usage/writing_custom_steps.html}{custom steps}. However, for simple runs of a subset of LibreLane, we can use command-line arguments. For example, to just run the synthesis flow for an early area estimation, we can run:
 \begin{verbatim}
 librelane adder.yaml --to Yosys.Synthesis --run-tag synth-only
 summary.py --yosys-report
@@ -1424,7 +1430,7 @@ Tiny Tapeout uses GitHub actions to harden user designs. Therefore, this is the 
 \subsection{Local Hardening}
 
 It is also possible to run the hardening locally, avoiding the long latency of GitHub actions.
-Follow the instructions on the \href{https://tinytapeout.com/guides/local-hardening/}{TT website}.
+Follow the instructions on the \myref{https://tinytapeout.com/guides/local-hardening/}{TT website}.
 
 However, we can also do the local hardening with our installation of LibreLane instead of using the Docker image. After installing the Python dependencies into a Python virtual environment, execute the Python script to generate the configuration:
 
@@ -1448,38 +1454,75 @@ The \myref{https://github.com/wafer-space/gf180mcu-project-template}{project tem
 
 \chapter{Testing and Verification}
 
-As chip production is very expensive, we want to make sure that our design works.
+As chip production is very expensive, we want to make sure that our design works at the first tapeout.
 To ensure a working design, we need to test (or verify) our design at the RTL level.
 This form of testing is part of the digital design and not a topic of this book.
-If you use Chisel-based designs, see the testing chapter of the Chisel book~\cite{chisel:book}.
+If you design your circuit with Chisel, see the testing chapter of the Chisel book~\cite{chisel:book}.
 
 However, we are still interested in testing our design after synthesis.
-We can use gate-level simulation or even Spice-based simulation of our design.
-This part of testing is not to catch design errors, but to make sure that the full flow does not introduce any errors.
+We can reuse our functional verification code to drive gate-level simulation or even use a Spice-based simulation of our design.
+This part of the testing is not intended to catch design errors, but to make sure that the full flow does not introduce any errors.
 
 There are several ways to write test benches for a design.
 It is straightforward to write the test bench in Verilog using non-synthesizable features of Verilog.
 More complex testing often uses frameworks, such as UVM.
-Open-source projects often use \href{https://www.cocotb.org/}{Cocotb}, a testing framework written in Python.
+Open-source projects often use \myref{https://www.cocotb.org/}{Cocotb}, a testing framework written in Python.
 Another option is to use ChiselTest to write tests in Scala (or Java).
 Although ChiselTest is intended for designs written in Chisel, any design in Verilog can be tested by using a Chisel black box.
 
 \section{Cocotb Testing}
 
 Cocotb, as a Python library, needs Python installed and Cocotb itself (e.g., with \code{pip install cocotb}, or with \code{brew} on a Mac).
-We will explain Cocotb by an example testbench for our pipelined adder design that we can use to test the original Verilog code and the gate-level netlist. For further information, read the \href{https://docs.cocotb.org/en/stable/quickstart.html}{Cocotb Quickstart Guide}.
+We will explain Cocotb by an example testbench for our pipelined adder design that we can use to test the original Verilog code and the gate-level netlist. For further information on Cocotb, read the \myref{https://docs.cocotb.org/en/stable/quickstart.html}{Cocotb Quickstart Guide}.
 
 A cocotb test does not need any extra top-level Verilog component. The Python cocotb code is the top-level that drives the DUT signals and asserts the expected outputs.
 A minimal cocotb test consists of: (1) the DUT Verilog file, (2) test code written in Python, and (3) a Makefile to compile and run the test.
-We will add our cocotb test in a subfolder \code{test}.
+We will add our cocotb test in the subfolder \code{test}.
 
-Listing~\ref{lst:test:cocotb} shows the cocotb test bench.
-
-Listing~\ref{lst:test:Makefile} shows the accompanying Makefile for the test.
 
 \lstinputlisting[float, caption={A simple Python cocotb test bench (\myref{https://github.com/os-chip-design/chip-design-book/blob/main/code/test/test_adder.py}{\code{test_adder.py}}).}, label={lst:test:cocotb}, frame=tb, captionpos=b]{code/test/test_adder.py}
 
 \lstinputlisting[float, caption={The Makefile for the Python cocotb test bench (\myref{https://github.com/os-chip-design/chip-design-book/blob/main/code/test/Makefile}{\code{Makefile}}).}, label={lst:test:Makefile}, frame=tb, captionpos=b]{code/test/Makefile}
+
+In cocotb, you can access the ports and also internal signals through an object that is passed to each test.
+A cocotb test is marked with \code{@cocotb.test()}.
+Listing~\ref{lst:test:cocotb} shows the cocotb testbench.
+In addition to the test, we define a function to generate the 50\,MHz clock, as we have defined in our LibreLane configuration.
+
+The testing code is in \code{test_adder(dut)}. That code is running sequentially from the beginning of the function till the end. With \code{await} we suspend the execution and wait for an event, e.g., that the simulator returns the control back to cocotb.
+
+With \code{cocotb.start()} we start the clock to run in the background, waiting for the start of the clock.
+We wait for the falling edge of the clock with
+\begin{verbatim}
+await FallingEdge(dut.clock)
+\end{verbatim}
+We read an output port with \code{dut.sum.value} and can print that value.
+As expected, the result is undefined ('X').
+We can set input ports by assigning a value, e.g., with \code{dut.a.value = 1}.
+As we have two registers in our pipelined adder, we need to wait two clock cycles for the result.
+We can use a \code{assert} statement for the test.
+
+For the test to be compiled and run with cocotb, we need a Makefile.
+Listing~\ref{lst:test:Makefile} shows the accompanying Makefile for the test.
+We need to define the simulator, e.g., Icarus Verilog, and the language.
+We need to define our Verilog sources, the toplevel module, and the Python test file.
+The test is run with a simple \code{make} and reports that one test is run and one passed.
+To generate wave files, we run:
+\begin{verbatim}
+make WAVES=1
+\end{verbatim}
+Icarus Verilog generates waveforms in the FST format, which can be viewed with GTKWave or with \myref{https://surfer-project.org/}{Surfer}.
+Figure~\ref{fig:adder-wave} shows the waveform from the Surfer plugin in VSC.
+We can see that it takes two clock cycles from providing the inputs until the output register becomes defined.
+
+\begin{figure}
+  \centering
+  \includegraphics[width=1\textwidth]{figures/adder-wave}
+  \caption{The simulation waveform.}
+  \label{fig:adder-wave}
+\end{figure}
+
+
 
 \section{Spice Simulation}
 
@@ -1694,7 +1737,7 @@ The core was implemented in the IHP's 130 nm BiCMOS technology with the open-sou
 \item \myref{https://chipfoundry.io/}{ChipFoundry} can produce you prototyping chip 
 \item \myref{https://github.com/chipfoundry/caravel}{Caravel} the harness for the ChipFoundry MPW run
 \item The \myref{https://caravel-harness.readthedocs.io/en/latest/}{Caravel documentation} is a bit outdated
-\item \href{https://caravel-sim-infrastructure.readthedocs.io/en/latest/usage.html}{Caravel Simulation}
+\item \myref{https://caravel-sim-infrastructure.readthedocs.io/en/latest/usage.html}{Caravel Simulation}
 \item \myref{https://caravel-mgmt-soc-litex.readthedocs.io/en/latest/}{Management core documentation}
 \item The \myref{https://github.com/fossi-foundation/caravel_board}{PCB} containing the Caravel chip
 \end{itemize}
