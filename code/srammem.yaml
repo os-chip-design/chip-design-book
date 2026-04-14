@@ -1,0 +1,18 @@
+DESIGN_NAME: OpenRAMMemory
+VERILOG_FILES: dir::../generated/OpenRAMMemory.sv
+CLOCK_PERIOD: 20
+CLOCK_PORT: clock
+MACROS:
+  sky130_sram_1kbyte_1rw1r_32x256_8:
+    instances:
+      mem:
+        location: [10, 10]
+        orientation: N
+    gds:
+      - pdk_dir::libs.ref/sky130_sram_macros/gds/sky130_sram_1kbyte_1rw1r_32x256_8.gds
+    lef:
+      - pdk_dir::libs.ref/sky130_sram_macros/lef/sky130_sram_1kbyte_1rw1r_32x256_8.lef
+    nl:
+      - pdk_dir::libs.ref/sky130_sram_macros/verilog/sky130_sram_1kbyte_1rw1r_32x256_8.v
+    lib:
+      "*": pdk_dir::libs.ref/sky130_sram_macros/lib/sky130_sram_1kbyte_1rw1r_32x256_8_TT_1p8V_25C.lib
