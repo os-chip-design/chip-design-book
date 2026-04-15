@@ -13,7 +13,7 @@ class OpenRAMMemory extends Module {
    mem.io.csb0 := false.B
    mem.io.web0 := !io.we
    mem.io.wmask0 := "b1111".U
-   mem.io.addr0 := io
+   mem.io.addr0 := io.addr
    mem.io.din0 := io.din
    io.dout := mem.io.dout0
 

@@ -4,6 +4,7 @@ CLOCK_PERIOD: 20
 CLOCK_PORT: clock
 #FP_SIZING: absolute
 #DIE_AREA: [0, 0, 1800, 1800]
+FP_PDN_CORE_RING: true
 VDD_NETS: ["vccd1"]
 GND_NETS: ["vssd1"]
 PDN_MACRO_CONNECTIONS:
@@ -17,8 +18,8 @@ MACROS:
     gds: pdk_dir::libs.ref/sky130_sram_macros/gds/sky130_sram_1kbyte_1rw1r_32x256_8.gds
     lef: pdk_dir::libs.ref/sky130_sram_macros/lef/sky130_sram_1kbyte_1rw1r_32x256_8.lef
     nl: pdk_dir::libs.ref/sky130_sram_macros/verilog/sky130_sram_1kbyte_1rw1r_32x256_8.v
-#    lib:
-#      "*": pdk_dir::libs.ref/sky130_sram_macros/lib/sky130_sram_1kbyte_1rw1r_32x256_8_TT_1p8V_25C.lib
+    lib:
+      "*": pdk_dir::libs.ref/sky130_sram_macros/lib/sky130_sram_1kbyte_1rw1r_32x256_8_TT_1p8V_25C.lib
 MAGIC_CAPTURE_ERRORS: false
 PRIMARY_GDSII_STREAMOUT_TOOL: klayout
 RUN_KLAYOUT_DRC: true

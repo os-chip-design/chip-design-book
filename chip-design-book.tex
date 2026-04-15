@@ -1564,10 +1564,17 @@ CF RAM 1024x32: 310 x 390
 OpenRAM: 256x32: 500x400
 
 \section{Exploring OpenRAM Memories}
+
+Description is available at \myref{https://openlane.readthedocs.io/en/latest/tutorials/openram.html}{old docu of openLane}.
+
 The process of including those macros is not straightforward. First errors occur in nn-magic-writelef. To ignore those errors, we can add the following line to our .yaml file:
 
 \begin{verbatim}
 MAGIC_CAPTURE_ERRORS: false
+PRIMARY_GDSII_STREAMOUT_TOOL: klayout
+RUN_KLAYOUT_DRC: true
+RUN_MAGIC_DRC: false
+RUN_KLAYOUT_XOR: false
 \end{verbatim}
 
 The 1~KiB OpenRAM memory, organized as 256 x 32-bit, uses 490\;{\textmu}m x 420\;{\textmu}m (0.2 mm$^2$).
