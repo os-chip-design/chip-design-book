@@ -3,6 +3,10 @@ VERILOG_FILES: dir::../generated/OpenRAMMemory.sv
 CLOCK_PERIOD: 20
 CLOCK_PORT: clock
 DIE_AREA: [0, 0, 1800, 1800]
+VDD_NETS: ["vccd1"]
+GND_NETS: ["vssd1"]
+PDN_MACRO_CONNECTIONS:
+  - "mem vccd1 vssd1 vccd1 vssd1"
 MACROS:
   sky130_sram_1kbyte_1rw1r_32x256_8:
     instances:
@@ -15,3 +19,4 @@ MACROS:
     lib:
       tt_025C_1v80:
         - pdk_dir::libs.ref/sky130_sram_macros/lib/sky130_sram_1kbyte_1rw1r_32x256_8_TT_1p8V_25C.lib
+MAGIC_CAPTURE_ERRORS: false
