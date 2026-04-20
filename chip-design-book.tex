@@ -1602,10 +1602,23 @@ ERROR    [RSZ-0090] Max transition time from SDC is 0.040ns.
 Best achievable transition time is 0.043ns with a load of 0.01p
 \end{verbatim}
 
+At the time of writing, we have not found a solution for this error, but as a workaround, we use a local copy of the LIB file and change all three entries for \code{max_transition}
+\begin{verbatim}
+        max_transition       : 0.04;
+\end{verbatim}
+to
+\begin{verbatim}
+        max_transition       : 0.045;
+\end{verbatim}
 
+\begin{figure}
+  \centering
+  \includegraphics[width=0.5\textwidth]{figures/OpenRAM}
+  \caption{The OpenRAM memory as visualized in KLayout.}
+  \label{fig:OpenRAM}
+\end{figure}
 
-
-
+Figure~\ref{fig:OpenRAM} shows the final GDSII for the OpenRAM memory in KLayout after a successful run of the flow. We can see a lot of unused space around the memory array, which could be optimized by a better placement of the control logic.
 The 1~KiB OpenRAM memory, organized as 256 x 32-bit, uses 490\;{\textmu}m x 420\;{\textmu}m (0.2 mm$^2$).
 
 \section{DFFRAM}

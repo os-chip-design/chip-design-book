@@ -185,7 +185,7 @@ cell (sky130_sram_1kbyte_1rw1r_32x256_8){
         bus_type  : addr; 
         direction  : input; 
         capacitance : 0.006889999999999999;  
-        max_transition       : 0.04;
+        max_transition       : 0.045;
         pin(addr0[7:0]){
         timing(){ 
             timing_type : setup_rising; 
@@ -222,7 +222,7 @@ cell (sky130_sram_1kbyte_1rw1r_32x256_8){
         bus_type  : wmask; 
         direction  : input; 
         capacitance : 0.006889999999999999;  
-        max_transition       : 0.04;
+        max_transition       : 0.045;
         pin(wmask0[3:0]){
         timing(){ 
             timing_type : setup_rising; 
@@ -424,7 +424,7 @@ cell (sky130_sram_1kbyte_1rw1r_32x256_8){
         bus_type  : addr; 
         direction  : input; 
         capacitance : 0.006889999999999999;  
-        max_transition       : 0.04;
+        max_transition       : 0.045;
         pin(addr1[7:0]){
         timing(){ 
             timing_type : setup_rising; 
