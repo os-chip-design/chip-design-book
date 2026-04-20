@@ -1174,7 +1174,7 @@ This wrapper includes the user project as a hard macro. Similar to the user proj
 
 \subsubsection{GPIO Configuration}
 
-Finally, before we can run a precheck, we need to update the default configuration for the GPIO pins in \code{verilog/rtl/user_defines.v}. GPIO[0] to GPIO[4] are used by the management core and cannot be changed. The example design uses 16 output pins. Therefore, we set them to OUTPUT and all other pins, which are not used as an INPUT, as follows:
+Finally, before we can run a precheck, we need to update the default configuration for the GPIO pins in \code{verilog/rtl/user_defines.v}. GPIO[0] to GPIO[4] are used by the management core and cannot be changed. GPIO[5] and GPIO[6] are used by the serial port of the management core. The example design uses 16 output pins. Therefore, we set them to OUTPUT and all other pins, which are not used as an INPUT, as follows:
 
 
 \begin{verbatim}
@@ -1565,9 +1565,25 @@ OpenRAM: 256x32: 500x400
 
 \section{Exploring OpenRAM Memories}
 
-Description is available at \myref{https://openlane.readthedocs.io/en/latest/tutorials/openram.html}{old docu of openLane}.
+\myref{https://openram.org/}{OpenRAM}~\cite{opeRAM:2016} is a Python library to create memories. It creates the layout (GDSII), netlists, timing models, and power models. For Sky130, prehardened memories are available in the PDK.
 
-The process of including those macros is not straightforward. First errors occur in nn-magic-writelef. To ignore those errors, we can add the following line to our .yaml file:
+An \myref{https://openlane.readthedocs.io/en/latest/tutorials/openram.html}{old documentation of OpenLane} contains a description on how to use OpenRAM memories with Sky130.
+
+\lstinputlisting[float, caption={BlackBox to wrap the OpenRAM memory (\myref{https://github.com/os-chip-design/chip-design-book/blob/main/src/main/scala/SramMacro.scala}{\code{SramMacro.scala}}).}, label={lst:sram:macro}, frame=tb, captionpos=b]{src/main/scala/SramMacro.scala}
+
+We will show an example of how to instantiate a memory with Chisel code. Using Verilog instead of Chisel should be straightforward. We will use the smallest macro, organized as 256 32-bit words, with byte-wise write enable, one read/write port, and another read port. First, we define a Chisel BlackBox to represent the macro (see Listing~\ref{lst:sram:macro}). The generated Verilog module will be replaced by the hard macro during synthesis.
+
+
+\lstinputlisting[float, caption={Using the OpenRAM memory (\myref{https://github.com/os-chip-design/chip-design-book/blob/main/src/main/scala/OpenRAMMemory.scala}{\code{OpenRAMMemory.scala}}).}, label={lst:sram:usage}, frame=tb, captionpos=b]{src/main/scala/OpenRAMMemory.scala}
+
+Listing~\ref{lst:sram:usage} shows a Chisel module that instantiates that memory macro.
+We are using only one port for read or write operations and hard-code the byte enables.
+To generate the Verilog code, we run:
+\begin{verbatim}
+sbt "runMain OpenRAMMemory"
+\end{verbatim}
+
+The process of including those macros is not straightforward. First errors occur in nn-magic-writelef. To ignore those errors (and others), we add the following lines to our .yaml file:
 
 \begin{verbatim}
 MAGIC_CAPTURE_ERRORS: false
@@ -1576,6 +1592,19 @@ RUN_KLAYOUT_DRC: true
 RUN_MAGIC_DRC: false
 RUN_KLAYOUT_XOR: false
 \end{verbatim}
+
+\lstinputlisting[float, caption={LibreLane configuration for the memory example (\myref{https://github.com/os-chip-design/chip-design-book/blob/main/code/srammem.yaml}{\code{srammem.yaml}}).}, label={lst:sram:config}, frame=tb, captionpos=b]{code/srammem.yaml}
+
+
+Listing~\ref{lst:sram:config} shows the configuration to use the memory macro. We need to add the GDS, LEF, Verilog netlist, and LIB file to the configuration and define one instance (\code{mem}) that will be substituted by the macro. Note that with the provided LIB file, the flow will quit with the following error:
+\begin{verbatim}
+ERROR    [RSZ-0090] Max transition time from SDC is 0.040ns.
+Best achievable transition time is 0.043ns with a load of 0.01p
+\end{verbatim}
+
+
+
+
 
 The 1~KiB OpenRAM memory, organized as 256 x 32-bit, uses 490\;{\textmu}m x 420\;{\textmu}m (0.2 mm$^2$).
 
