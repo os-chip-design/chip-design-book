@@ -1,0 +1,4 @@
+DESIGN_NAME: MulDiv
+VERILOG_FILES: dir::../generated/MulDiv.sv
+CLOCK_PERIOD: 20
+CLOCK_PORT: clock
