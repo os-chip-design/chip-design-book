@@ -1105,7 +1105,7 @@ The management core is built with the \myref{https://github.com/enjoy-digital/li
 
 The RISC-V core in the management runs firmware out of the Flash to configure the user project GPIOs, interact with the user area via the Wishbone bus, and interact with the logic analyzer.
 
-The user project is connected to the GPIO pins, the Wishbone bus of the RISC-V CPU, the logic analyzer, and interrupt pins to the RISC-V CPU. The example components are split into a wrapper and the \emph{real} component. For example, the user project is split into a \code{user_project_wrapper} and a \code{user_proj_example}.
+The user project is connected to the GPIO pins, the Wishbone bus of the RISC-V CPU, the logic analyzer, and the interrupt pins to the RISC-V CPU. The example components are split into a wrapper and the \emph{real} component. For example, the user project is split into a \code{user_project_wrapper} and a \code{user_proj_example}.
 
 The chipIgnite project includes a \myref{https://github.com/fossi-foundation/caravel_board}{board} containing the Caravel chip, a power supply, a serial Flash for the firmware, and an FTDI FT232 for communication between a PC via USB. 
 
@@ -1463,7 +1463,12 @@ Clock period 20 ns, look at nom tt 25C 1.8V
 32 x 32, with >> 16, 32 bits: fmax = 103.46 MHz, 300 x 300 93469 (= 0.09 mm2)
 32 / 32: fmax = fmax = 15.06 MHz, 275 x 275 76075 (= 0.076 mm2)
 
+\section{Synth Settings}
+
+If routing gets congested, one can set the placement density. E.g., TT uses a conservative: PL\_TARGET\_DENSITY\_PCT = 60
+
 \chapter{Testing and Verification}
+
 
 As chip production is very expensive, we want to make sure that our design works at the first tapeout.
 To ensure a working design, we need to test (or verify) our design at the RTL level.
@@ -1631,6 +1636,8 @@ to
 
 Figure~\ref{fig:OpenRAM} shows the final GDSII for the OpenRAM memory in KLayout after a successful run of the flow. We can see a lot of unused space around the memory array, which could be optimized by a better placement of the control logic.
 The 1~KiB OpenRAM memory, organized as 256 x 32-bit, uses 490\;{\textmu}m x 420\;{\textmu}m (0.2 mm$^2$).
+
+The version of OpenRAM that is part of the Sky130 PDK does not pass the Sky130 DRC. Maybe the follwoing repository includes fixed memories: \url{https://github.com/VLSIDA/sky130_sram_macros}
 
 \section{DFFRAM}
 
