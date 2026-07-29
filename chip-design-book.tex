@@ -145,8 +145,6 @@
 \renewcommand{\myref}[2]{{#2}{\footnote{\url{#1}}}}
 \fi
 
-% uncomment following for final submission
-%\renewcommand{\todo}[1]{}
 
 
 \ifbook
@@ -154,8 +152,8 @@
 \fi
 
 % uncomment following for final submission
-\renewcommand{\todo}[1]{}
-\renewcommand{\martin}[1]{}
+%\renewcommand{\todo}[1]{}
+%\renewcommand{\martin}[1]{}
 
 \makeindex
 
@@ -1708,9 +1706,7 @@ New SRAM compiler from Staf with TT silicon proven: \url{https://wiki.f-si.org/i
 
 Intro to OpenLane: \url{https://openlane2.readthedocs.io/en/latest/getting_started/newcomers/index.html}
 
-\url{https://vlsi.ethz.ch/wiki/VLSI_Lectures} ETHZ notes
 
-\url{https://github.com/OS-EDA/Course} IHP course
 
 \url{https://github.com/open-source-eda-birds-of-a-feather/open-source-eda-birds-of-a-feather.github.io/blob/main/doc/slides_2025/BOF25_PULP_mbertuletti.pdf} ETH presenation
 
@@ -1719,7 +1715,7 @@ Intro to OpenLane: \url{https://openlane2.readthedocs.io/en/latest/getting_start
 On STA: \url{https://www.zerotoasiccourse.com/terminology/sta/}
 
 
-Chip design book: \url{https://link.springer.com/book/10.1007/978-90-481-9591-6}
+
 
 Local TT hardening: \url{https://tinytapeout.com/guides/local-hardening/}
 
@@ -1733,9 +1729,6 @@ klayout -l ../../dependencies/pdks/sky130A/libs.tech/klayout/tech/sky130A.lyp ru
 
 \subsection{Matt Venn Links}
 
-List of efabless projects: \url{https://github.com/mattvenn/efabless\_project\_tool} clone and efabless\_tool.py
-
-\code{./efabless\_tool.py --fields id,sumary,giturl --list | grep -i sram}
 
 New summary tool from Matt: \url{https://github.com/mattvenn/librelane_summary}
 
@@ -1819,16 +1812,72 @@ The core was implemented in the IHP's 130 nm BiCMOS technology with the open-sou
 
 \chapter{Resources}
 
+This Chapter contains links to further reading and resources.
+
+\section{Tool Flows}
 \begin{itemize}
-\item \myref{https://github.com/librelane/librelane}{LibreLane} is the current collection of tools for open-source chip design
-\item The \myref{https://github.com/chipfoundry/caravel_user_project}{Caravel User Project} is the starting point for a chip designed for the Caravel platform produced by 
-\item \myref{https://chipfoundry.io/}{ChipFoundry} can produce you prototyping chip 
-\item \myref{https://github.com/chipfoundry/caravel}{Caravel} the harness for the ChipFoundry MPW run
-\item The \myref{https://caravel-harness.readthedocs.io/en/latest/}{Caravel documentation} is a bit outdated
-\item \myref{https://caravel-sim-infrastructure.readthedocs.io/en/latest/usage.html}{Caravel Simulation}
-\item \myref{https://caravel-mgmt-soc-litex.readthedocs.io/en/latest/}{Management core documentation}
-\item The \myref{https://github.com/fossi-foundation/caravel_board}{PCB} containing the Caravel chip
+\item The LibreLane \myref{https://librelane.readthedocs.io/en/stable/}{Documentation}.
+\item \myref{https://theopenroadproject.org/}{OpenROAD} is another collection of tools for open-source chip design. OpenROAD is included in LibreLane.
+\item \myref{https://github.com/The-OpenROAD-Project/OpenROAD-flow-scripts}{OpenROAD Flow Scripts} is an RTL-GDSII flow on top of OpenROAD, consisting of Tcl and Python scripts.
+\item \myref{https://armleo-openlane.readthedocs.io/en/merge-window-4/}{OpenLane} documentation. It might still be relevant.
+
 \end{itemize}
+
+
+\section{Caravel}
+
+\begin{itemize}
+\item The \myref{https://github.com/chipfoundry/caravel_user_project}{Caravel User Project} is the starting point for a chip designed for the Caravel platform produced by ChipFoundry.
+\item \myref{https://chipfoundry.io/}{ChipFoundry} can produce you prototyping chip.
+\item \myref{https://github.com/chipfoundry/caravel}{Caravel} the harness for the ChipFoundry MPW run.
+\item The \myref{https://caravel-harness.readthedocs.io/en/latest/}{Caravel documentation} is a bit outdated.
+\item \myref{https://caravel-sim-infrastructure.readthedocs.io/en/latest/usage.html}{Caravel Simulation} documentation.
+\item \myref{https://caravel-mgmt-soc-litex.readthedocs.io/en/latest/}{Management core} documentation.
+\item The \myref{https://github.com/fossi-foundation/caravel_board}{PCB} containing the Caravel chip.
+\end{itemize}
+
+\section{Caravel Projects}
+
+During the Google free shuttle, several projects have been developed in open source.
+
+\begin{itemize}
+\item Matt Van has collected the \myref{https://github.com/mattvenn/efabless_project_tool}{projects} from the free shuttles: Clone the \code{efabless\_tool.py} and execute \code{./efabless\_tool.py --fields id,sumary,giturl --list | grep -i sram} for the list of projects.
+\item For the preparations of the course on chip design, we submitted a \myref{https://github.com/os-chip-design/caravel_leros_2025}{multicore Leros} test chip consisting of four Leros processors with four different memory solutions.
+\item In spring 2026, we executed the course on chip design that included the \myref{https://github.com/os-chip-design/dtu-soc-2026}{first tapeout course} at DTU.
+\end{itemize}
+
+\section{Chip Design Courses}
+
+\begin{itemize}
+\item \myref{https://github.com/os-chip-design/chip-design-intro}{Introduction to Chip Design} at DTU, including slides.
+\item \myref{https://vlsi.ethz.ch/wiki/Main_Page}{Open Source VLSI Design} from ETHZ, including the \myref{https://vlsi.ethz.ch/wiki/VLSI_Lectures}{slides} and \myref{https://vlsi.ethz.ch/wiki/VLSI_Exercises}{exercises}. 
+
+\item \myref{https://github.com/OS-EDA/Course}{Open-Source EDA Digital Course} funded by the BMFTR. Uses OpenROAD and focuses on the IHP PDK.
+
+\end{itemize}
+
+\section{Books}
+ 
+\begin{itemize}
+\item \myref{https://www.amazon.com/CMOS-VLSI-Design-Circuits-Perspective/dp/0321547748}{CMOS VLSI Design, A Circuits and Systems Perspective} by Neil H. E. Weste and David Harris
+\item \myref{https://link.springer.com/book/10.1007/978-90-481-9591-6}{VLSI Physical Design: From Graph Partitioning to Timing Closure} by  Andrew B. Kahng, Jens Lienig, Igor L. Markov, and Jin Hu
+
+
+\item \myref{https://www.imm.dtu.dk/~masca/chisel-book.html}{Digital Design with Chisel} by  Martin Schoeberl.
+
+\item \myref{https://link.springer.com/book/10.1007/978-90-481-9591-6}{VLSI Physical Design: From Graph Partitioning to Timing Closure} by  Andrew B. Kahng, Jens Lienig, Igor L. Markov, and Jin Hu
+\end{itemize}
+
+\section{xxx}
+
+\begin{itemize}
+\item \myref{https://github.com/librelane/librelane}{XXX} is 
+\end{itemize}
+
+
+\section{xxx}
+\section{xxx}
+
 
 \chapter{Acronyms}
 
