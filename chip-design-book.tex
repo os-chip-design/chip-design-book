@@ -146,7 +146,7 @@
 \fi
 
 % uncomment following for final submission
-\renewcommand{\todo}[1]{}
+%\renewcommand{\todo}[1]{}
 
 
 \ifbook
@@ -1071,7 +1071,7 @@ Efabless, the original developer of OpenLane and OpenLane2, exited the business 
 \section{Caravel}
 
 \myref{https://caravel-harness.readthedocs.io/}{Caravel} is a SoC framework developed by Efabless for the Google/Skywater 130nm Open PDK. It is the basis for the \myref{https://chipfoundry.io/chipignite}{chipIgnite} MPW shuttles.
-It contains a padframe, a houskeeping block, a management area including a RISC-V core, and a user project wrapper.
+It contains a padframe, a housekeeping block, a management area including a RISC-V core, and a user project wrapper.
 The user area is 3000\,{\textmu}m x 3600\,{\textmu}m (10 mm$^2$). To put this into perspective, a simple 3-stage RISC-V pipeline, such as Wildcat~\cite{wildcat:arcs2025}, fits into a 0.2\,mm$^2$ area. A 4~KiB memory from eFabless has a 0.18\,mm$^2$ area.
 
 ChipFoundry now maintains Caravel. Note that the transition to ChipFoundry is still in progress; therefore, some documentation still contains the eFabless name. Additionally, some datasheets are outdated (e.g., referring to the PicoRV as the management processor, which is now the \myref{https://github.com/SpinalHDL/VexRiscv}{VexRiscv}).
@@ -1637,11 +1637,13 @@ to
 Figure~\ref{fig:OpenRAM} shows the final GDSII for the OpenRAM memory in KLayout after a successful run of the flow. We can see a lot of unused space around the memory array, which could be optimized by a better placement of the control logic.
 The 1~KiB OpenRAM memory, organized as 256 x 32-bit, uses 490\;{\textmu}m x 420\;{\textmu}m (0.2 mm$^2$).
 
-The version of OpenRAM that is part of the Sky130 PDK does not pass the Sky130 DRC. Maybe the follwoing repository includes fixed memories: \url{https://github.com/VLSIDA/sky130_sram_macros}
+The version of OpenRAM that is part of the Sky130 PDK does \emph{not} pass the Sky130 DRC. The following repository includes fixed memories: \url{https://github.com/VLSIDA/sky130_sram_macros}, which we have used on our second tapeout.
 
 \section{DFFRAM}
 
-\myref{https://github.com/AUCOHL/DFFRAM}{DFFRAM} is a memory generator using FFs or latches. The GitHub releases contain ready-to-use GDS macros. A 1 KiB memory, latch-based, uses 430\;{\textmu}m x 440\;{\textmu}m (0.19 mm$^2$). \todo{Check what we use, it looks larger on our design.}
+\myref{https://github.com/AUCOHL/DFFRAM}{DFFRAM} is a memory generator using FFs or latches. The GitHub releases contain ready-to-use GDS macros. A 1 KiB memory, latch-based,  uses $\mathrm{0.62\;mm^2}$.
+
+\todo{update: 430\;{\textmu}m x 440\;{\textmu}m (0.19 mm$^2$).}
 
 \section{CF RAM}
 
@@ -1659,11 +1661,28 @@ Note that on a Linux machine \code{ipm} is installed at \code{.loca/bin}, which 
 
 4 KiB (1024 x 32) 0.17 mm2
 
+\begin{table*}
+    \caption{Overview of explored memories}
+    \centering
+    \begin{tabular}{lrrrl}
+        \toprule
+Memory type & Capacity & Approx. area & Area per bit & Notes \\
+        \midrule
+FF-based synthesized memory & 1 KiB & $\mathrm{0.66\;mm^2}$ & $\mathrm{80.6\;um^2/bit}$ & large muxes \\
+DFFRAM & 1 KiB & $\mathrm{0.62\;mm^2}$ & $\mathrm{75.4\;um^2/bit}$ & latch-based \\
+OpenRAM macro & 1 KiB & $\mathrm{0.20\;mm^2}$ & $\mathrm{24.4\;um^2/bit}$ & official PDK macro, DRC issues \\
+ChipFoundry SRAM & 4 KiB & $\mathrm{0.17\;mm^2}$ & $\mathrm{5.2\;um^2/bit}$ & commercial macro, wrapper needed \\
+Experimental Tiny Tapeout RF & 1/8 KiB & $\mathrm{0.016\;mm^2}$ & $\mathrm{15.6\;um^2/bit}$ & silicon-proven \\
+        \bottomrule
+    \end{tabular}
+    \label{tab:memory}
+\end{table*}
+
 \subsection{SRAM links}
 
 SRAM on TT09: \url{https://github.com/FriedrichWu/tt09-sram/tree/main}
 
-Uri's IHP SRAM test on TT:m\url{https://tinytapeout.com/chips/ttihp0p2/tt_um_urish_sram_test}
+Uri's IHP SRAM test on TT: \url{https://tinytapeout.com/chips/ttihp0p2/tt_um_urish_sram_test}
 
 Another SRAM compiler: \url{https://github.com/rahulk29/sram22} including precompiled memories: \url{https://github.com/rahulk29/sram22_sky130_macros}
 
@@ -1678,6 +1697,8 @@ DFFRAM: \url{https://github.com/AUCOHL/DFFRAM}
 Tutorial: \url{https://armleo-openlane.readthedocs.io/en/merge-window-4/tutorials/openram.html}
 
 and at \url{https://openlane.readthedocs.io/en/latest/tutorials/openram.html}
+
+New SRAM compiler from Staf with TT silicon proven: \url{https://wiki.f-si.org/index.php?title=A_SRAM_generator_for_blocks_that_do_not_get_upset_(easily)}
 
 \chapter{List of Chapters}
 
@@ -1858,7 +1879,7 @@ related to digital design and computer architecture.
 \item [OO] object oriented
 \item [OOO] out-of-order
 \item [OS] operating system
-\item [PDK] Process Development Kit
+\item [PDK] process development kit
 \item [RAM] random access memory
 \item [RISC] reduced instruction set computer
 \item [SDRAM] synchronous DRAM
