@@ -56,6 +56,8 @@
 \usetikzlibrary{arrows,bending}
 \usetikzlibrary{positioning}
 
+\usepackage{svg}
+
 % fatter TT font
 \renewcommand*\ttdefault{txtt}
 % another TT, suggested by Alex
@@ -1533,7 +1535,7 @@ A cocotb test is marked with \code{@cocotb.test()}.
 Listing~\ref{lst:test:cocotb} shows the cocotb testbench.
 In addition to the test, we define a function to generate the 50\,MHz clock, as we have defined in our LibreLane configuration.
 
-The testing code is in \code{test_adder(dut)}. That code is running sequentially from the beginning of the function till the end. With \code{await} we suspend the execution and wait for an event, e.g., that the simulator returns the control back to cocotb.
+The testing code is in \code{test_adder(dut)}. That code is running sequentially from the beginning of the function till the end. With \code{await} we suspend the execution and wait for an event, e.g., that the simulator returns control back to cocotb.
 
 With \code{cocotb.start()} we start the clock to run in the background, waiting for the start of the clock.
 We wait for the falling edge of the clock with
@@ -1575,6 +1577,28 @@ SPICE, which stands for simulation program with integrated circuit emphasis, is 
 Simulating integrated circuits with SPICE at the transistor level is a standard way to verify integrated circuits before production. SPICS is useful for analog circuits, but can also be used to verify small digital circuits. A circuit can be simulated under different operating conditions, such as voltage and temperature variations.
 
 Circuits are described in plain text and may contain resistors, capacitors, inductors, MOSFETs, and other devices. SPICE translates the text netlist into nonlinear differential equations to be solved. 
+
+Listing~\ref{lst:rc} shows a SPICE description of an RC low-pass circuit with an input signal rising between 100\,{\textmu}s and 150\,{\textmu}s from 0\,V to 1\,V. We can run the simulation with ngspice as follows:
+
+
+\lstinputlisting[float, caption={Simple RC circuit (\myref{https://github.com/os-chip-design/chip-design-book/blob/main/code/rc.cir}{\code{rc.cir}}).}, label={lst:rc}, frame=tb, captionpos=b]{code/rc.cir}
+
+
+\begin{verbatim}
+ngspice rc.cir
+listing
+run
+plot v(in) v(out)
+\end{verbatim}
+
+The simulation results in the expected load curve of a capacitor as shown in Figure~\ref{fig:rc}
+
+\begin{figure}
+  \centering
+  \includegraphics[width=0.7\textwidth]{figures/rc}
+  \caption{Loading a capacity.}
+  \label{fig:rc}
+\end{figure}
 
 
 \subsection{Exercise}
