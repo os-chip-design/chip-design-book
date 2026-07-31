@@ -36,7 +36,7 @@
 
 \usepackage{pslatex} % -- times instead of computer modern, especially for the plain article class
 \usepackage[pdftex,
-            pdfauthor={Martin et al.},
+            pdfauthor={Martin Schoeberl},
             pdftitle={Introduction to Chip Design\\Using Open-Source Tools},
             colorlinks=true,bookmarks=true]{hyperref}
 
@@ -197,7 +197,7 @@
 \bigskip
 %{\large\itshape Beta Edition}\\
 \bigskip
-{\usekomafont{title}\huge Martin et al.}
+{\usekomafont{title}\huge Martin Schoeberl}
 \medskip\\
 %{\large\itshape martin@jopdesign.com}
 
@@ -212,7 +212,7 @@
 {\small
 
 %\lowertitleback{
-Copyright \copyright{} 2026 Martin...
+Copyright \copyright{} 2026 Martin Schoeberl
   \medskip\\
   \begin{tabular}{lp{.8\textwidth}}
     \raisebox{-12pt}{\includegraphics[height=18pt]{figures/cc_by_sa}} &
@@ -284,7 +284,7 @@ This booklet~\cite{chip:design:book} is part of the course at DTU on introductio
 This book is an introduction to chip design with a focus on using open-source tools and open-source PDKs.
 
 
-I have not used any large language model (LLM) to write even a single sentence. All mistakes are mine, not a halizunisation by an LLM. I used Grammarly for grammar checking and Copilot for writing code.
+I have not used any large language model (LLM) to write even a single sentence. All mistakes are mine, not a hallucination by an LLM. I used Grammarly for grammar checking and Copilot for writing code.
 
 
 
@@ -296,6 +296,8 @@ I am thankful to the whole open-source EDA community, which is so welcoming and 
 
 I would like to thank Matt Venn for creating the \myref{https://tinytapeout.com/}{Tiny Tapeout} project, which enables chip tapeout at a relatively low cost and therefore democratizes chip design.
 Furthermore, I very much enjoyed Matt's Zero2ASIC course, and several exercises in this book are inspired by Matt's course. I hope Matt is fine with this ;-)
+
+I would like to thank the Zero2ASIC and the Tiny Tapeout community on Discord for some interesting discussions. Furthermore, I enjoyed the help of Tjark Petersen on our first two ChipIgnite tapeouts in fall 2025 and spring 2026.
 
 
 
@@ -339,6 +341,7 @@ The magic of open-source tools is that we can install them on a personal compute
 
 
 \subsection{Nix Based}
+\index{Nix}
 
 From OpenLane2 (now LibreLane) on, the preferred installation is \myref{https://en.wikipedia.org/wiki/Nix_(package_manager)}{Nix}-based. Nix is a cross-platform package manager that also provides native binaries for x86 and ARM-based systems (e.g., Mac laptops). The LibreLane 
 \myref{https://librelane.readthedocs.io/en/latest/installation/index.html}{installation} documentation explains how to install Nix, and also how to set up the Nix cache for the LibreLane tools.
@@ -371,6 +374,8 @@ As the tools are open-source, it is always a (theoretical) option to compile the
 
 
 \subsection{Installing LibreLane}
+
+\index{LibreLane!Installation}
 
 When you use the \code{nix}-based setup, you need to install \myref{https://github.com/librelane/librelane}{LibreLane}. Install LibreLane by cloning it:
 
@@ -461,13 +466,15 @@ The name of the folder will be \code{RUN\_year\_month\_day\_hh-mm-ss}.
 
 \subsection{Exploring the Design}
 
+\index{LibreLane!Show the design}
+
 A first step to explore the design is to view the GDS in KLayout with:
 
 \begin{verbatim}
 librelane --last-run --flow openinklayout adder.yaml
 \end{verbatim}
 
-In Klayout, you can explore the design. Use the rulers to measure your design. How large is it?
+In KLayout, you can explore the design. Use the rulers to measure your design. How large is it?
 Would it fit into a Tiny Tapeout Tile? How large is a Tiny Tapeout tile?
 When you expand the adder in Cells, you can see which cells have been used.
 By double-clicking on a cell type, it is removed from the display. This is an indirect way to show the cells in the GDS. The flip-flop standard cells in Sky130 have names that include ``dfxtp'' in their name. Double-click that cell to see how many flip-flops are used. How many should there be?
@@ -548,6 +555,7 @@ design__max_fanout_violation__count :                    2
 
 \subsubsection{Linting and a First Area Estimate}
 
+\index{Area estimate}
 The first four steps perform linting of the design, and any Verilog syntax errors are identified during this process. An initial estimate of the used cells can be found in the report \code{nn-yosys-synthesis/reports/stat.rpt}. For our pipelined adder, we can identify the 24 flip-flops as \code{dfxtp_2} cells in that report:
 
 \begin{verbatim}
@@ -614,6 +622,9 @@ using run runs/RUN_2026-04-03_12-05-14
 
 \subsubsection{Static Timing Analysis}
 
+\index{STA}
+\index{Static timing analysis}
+
 In folder \code{nn-openroad-stapostpnr}, the static timing analysis (STA) reports are found.
 The results are reported for different timing corners: process variations, temperature, and voltage.
 STA does not report a maximum clock frequency, but slack times. We have set our desired clock
@@ -647,6 +658,8 @@ summary.py --timing
 
 \subsubsection{Size}
 
+\index{Chip size}
+
 When not constraining the chip's size, LibreLane will choose the size for the design. We can measure the chip size when exploring it with KLayout or read the results in the final report, e.g., in \code{final/metrics.json}. The following numbers are from our example design:
 
 \begin{verbatim}
@@ -662,6 +675,8 @@ In our small example design, the core, the adders, and the registers fit into 16
 The size of the dies is clearly dominated by the IO pads for our very simple example.
 
 \subsubsection{Design Rule Checks}
+
+\index{DRC}
 
 \subsubsection{The Final Design}
 
@@ -720,6 +735,8 @@ Then explore the size and which flip-flop types have been used.
 
 
 \section{Manual Flow with Python}
+
+\index{LibreLane!Python flow}
 
 However, we can also run the individual steps from Python. We will reuse the pipelined adder for this exploration from Section~\ref{sec:hello}. The following example is inspired by running \myref{https://colab.research.google.com/github/librelane/librelane/blob/main/notebook.ipynb}{LibreLane on Google Colab}, a nice way to explore LibreLane just from your browser.
 
@@ -1012,6 +1029,8 @@ Chip design consists of several steps from synthesis down to GDSII files. Script
 
 \section{OpenROAD}
 
+\index{OpenROAD}
+
 \myref{https://github.com/The-OpenROAD-Project}{OpenROAD}~\cite{OpenROAD} started as a DARPA-sponsored project to enable an end-to-end design flow of chips from RTL to the final chips without human intervention, within a maximum of 24 hours. The documentation is published on \myref{https://openroad.readthedocs.io/en/latest/}{Read the Docs}.
 OpenROAD includes the following open-source \myref{https://openlane.readthedocs.io/en/latest/flow_overview.html}{tools}:
 
@@ -1057,6 +1076,8 @@ Figure~\ref{fig:flow} shows the design flow of OpenLane.
 
 \subsection{OpenLane2 and LibreLane}
 
+\index{LibreLane}
+
 \myref{https://github.com/efabless/openlane2}{OpenLane2} is a new, partly rewritten,\footnote{OpenLane2 started out of OpenLane and OpenROAD scripts} framework for chip design with a focus on substituting TCL scripts with Python scripts. The documentation is published on \myref{https://openlane2.readthedocs.io/}{Read the Docs}.
 However, the original OpenLane \myref{https://openlane.readthedocs.io/en/latest/}{documentation} is richer than the OpenLane2 documentation. Therefore, consider reading that one as a basis.
 
@@ -1067,6 +1088,8 @@ Efabless, the original developer of OpenLane and OpenLane2, exited the business 
 
 
 \section{Caravel}
+
+\index{Caravel}
 
 \myref{https://caravel-harness.readthedocs.io/}{Caravel} is a SoC framework developed by Efabless for the Google/Skywater 130nm Open PDK. It is the basis for the \myref{https://chipfoundry.io/chipignite}{chipIgnite} MPW shuttles.
 It contains a padframe, a housekeeping block, a management area including a RISC-V core, and a user project wrapper.
@@ -1279,6 +1302,8 @@ Before uploading your design for manufacturing, you need to register for an \myr
 
 \subsection{A Wishbone Peripheral}
 
+\index{Wishbone}
+
 \begin{figure}
   \centering
   \includegraphics[width=0.6\textwidth]{figures/Wishbone_Interface}
@@ -1421,6 +1446,8 @@ register an account at: \url{https://chipfoundry.io/sftp-registration}
 
 \section{Tiny Tapeout}
 
+\index{Tiny Tapeout}
+
 \myref{https://tinytapeout.com/}{Tiny Tapeout} is a project that takes the idea of a multi-project wafer to the next level. Tiny Tapeout uses one tile of an MPW shuttle on Skywater130 or IHP and divides that tile into 512 smaller tiles. Therefore, the production cost can be further split, allowing for the sale of one tile for less than 100 USD.
 
 Tiny Tapeout uses GitHub actions to harden user designs. Therefore, this is the easiest way to produce a chip. No tools need to be installed locally. The project is configured within two files: \code{config.json} and \code{info.yaml}.
@@ -1448,7 +1475,6 @@ librelane config_merged.json
 \myref{https://wafer.space/}{wafer.space} is a new MPW service started by Tim Ansell and Leo Moser. It uses GF130 and offers 1000 dies with a user space of 20\;mm$^2$.
 The \myref{https://github.com/wafer-space/gf180mcu-project-template}{project template} is just the pad ring and a counter as an example design.
 
-\section{Maybe something from Edu4Chip?}
 
 \chapter{Collection of Stuff}
 
@@ -1467,6 +1493,8 @@ If routing gets congested, one can set the placement density. E.g., TT uses a co
 
 \chapter{Testing and Verification}
 
+\index{Testing}
+\index{Verification}
 
 As chip production is very expensive, we want to make sure that our design works at the first tapeout.
 To ensure a working design, we need to test (or verify) our design at the RTL level.
@@ -1486,8 +1514,10 @@ Although ChiselTest is intended for designs written in Chisel, any design in Ver
 
 \section{Cocotb Testing}
 
+\index{Cocotb}
+
 Cocotb, as a Python library, needs Python installed and Cocotb itself (e.g., with \code{pip install cocotb}, or with \code{brew} on a Mac).
-We will explain Cocotb by an example testbench for our pipelined adder design that we can use to test the original Verilog code and the gate-level netlist. For further information on Cocotb, read the \myref{https://docs.cocotb.org/en/stable/quickstart.html}{Cocotb Quickstart Guide}.
+We will explain Cocotb with an example testbench for our pipelined adder design that we can use to test the original Verilog code and the gate-level netlist. For further information on Cocotb, read the \myref{https://docs.cocotb.org/en/stable/quickstart.html}{Cocotb Quickstart Guide}.
 
 A cocotb test does not need any extra top-level Verilog component. The Python cocotb code is the top-level that drives the DUT signals and asserts the expected outputs.
 A minimal cocotb test consists of: (1) the DUT Verilog file, (2) test code written in Python, and (3) a Makefile to compile and run the test.
@@ -1536,12 +1566,27 @@ We can see that it takes two clock cycles from providing the inputs until the ou
   \label{fig:adder-wave}
 \end{figure}
 
-
+\section{Netlist Simulation}
 
 \section{Spice Simulation}
 
+SPICE, which stands for simulation program with integrated circuit emphasis, is an analog electronic circuit simulator. SPICE was originally developed by Laurence W. Nagel with direction from Prof. Donald Pederson at the Electronics Research Laboratory of UC Berkeley. The initial version of \myref{https://bwrcs.eecs.berkeley.edu/Classes/IcBook/SPICE/}{SPICE} was released in 1973 in the public domain~\cite{Nagel:M382}.
+
+Simulating integrated circuits with SPICE at the transistor level is a standard way to verify integrated circuits before production. SPICS is useful for analog circuits, but can also be used to verify small digital circuits. A circuit can be simulated under different operating conditions, such as voltage and temperature variations.
+
+Circuits are described in plain text and may contain resistors, capacitors, inductors, MOSFETs, and other devices. SPICE translates the text netlist into nonlinear differential equations to be solved. 
+
+
+\subsection{Exercise}
+
+\subsubsection{SPICE in the Web App SiliWiz}
+
+The simplest way to explore a SPICE simulation of an integrated circuit is to use Tiny Tapeout's \myref{https://app.siliwiz.com/}{SiliWiz}. SiliWiz is a web application to draw CMOS circuits and run a SPICE simulation. Explore the exercises from the web page: \myref{https://tinytapeout.com/siliwiz/}{How do semiconductors work?}
+
 
 \chapter{Memories}
+
+\index{Memories}
 
 When describing memories in an HDL, the synthesis tool will not generate on-chip memories, as we are used to in an FPGA. It will use generated storage out of DFF and multiplexers, which is very expensive. As an example, a 1024-bit memory is needed to implement the register file for an RISC-V processor. Implementing an RV-32I version in a 3-stage pipeline, the register file needs 320\;{\textmu}m x 320\;{\textmu}m or about 55\% of the processor area~\cite{wildcat:2024}.
 
@@ -1946,7 +1991,7 @@ related to digital design and computer architecture.
 
 
 \bibliographystyle{plain}
-\bibliography{msbib}
+\bibliography{msbib, chip-book}
 
 \phantomsection
 \hypertarget{index}{}
