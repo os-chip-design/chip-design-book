@@ -1023,6 +1023,26 @@ LibreLane has several variables that can be set to tweak the flow. \todo{Link to
   "GRT_RESIZER_HOLD_SLACK_MARGIN": 0.05,
 \end{verbatim}
 
+\chapter{Standard Cells}
+
+We can explore the standard cells contained in the Sky130 PDK with KLayout:
+
+\begin{verbatim}
+klayout $HOME/.ciel/sky130A/libs.ref/sky130_fd_sc_hd/gds/sky130_fd_sc_hd.gds
+\end{verbatim}
+ However, with Matt's summary tool, the invocation is easier and the layers have names and better colors:
+\begin{verbatim}
+summary.py --show-sky130
+\end{verbatim}
+
+Right-click on any cell in the \emph{Cells} window to select a new one with \emph{Show as New Top}.
+
+
+\section{FABs}
+
+\section{PDK}
+
+We have three PDKs available in open source. Therefore, we can compare them as an exercise.
 
 
 \chapter{Open-Source Production Frameworks}
@@ -1600,7 +1620,13 @@ The simulation results in the expected load curve of a capacitor as shown in Fig
   \label{fig:rc}
 \end{figure}
 
+\subsection{Simulation of a Standard Cell}
 
+\lstinputlisting[float, caption={Simulation of a standard cell (\myref{https://github.com/os-chip-design/chip-design-book/blob/main/code/rc.cir}{\code{sim.spice}}). The example is adapted from Matt Venn's \myref{https://github.com/mattvenn/simulate-gate-2025}{Simulate a Gate example} from his \myref{https://zerotoasiccourse.com/}{Zero to ASIC course}. Matt's example is licensed with Apache 2.}, label={lst:sim:spice}, frame=tb, captionpos=b]{code/sim.spice}
+
+We can simulate standard cells from the PDK. Listing~\ref{lst:sim:spice} shows the SPICE configuration for a NAND gate and an inverter as the output load. Note that SPICE does not understand shell variables like \code{$HOME}, as it is an independent program and not a shell script. Therefore, the example contains an absolute path to the SPICE models from the Sky130 PDK. Adapt the SPICE script to your installation of the PDK.
+
+\subsection{Simulation of a Full Circuit}
 \subsection{Exercise}
 
 \subsubsection{SPICE in the Web App SiliWiz}
@@ -1807,26 +1833,6 @@ TT config.json has hints what to do on hold time violation (also change cycle ti
 
 \section{The MOSFET and CMOS Technology}
 
-\section{Standard Cells}
-
-We can explore the standard cells contained in the Sky130 PDK with KLayout:
-
-\begin{verbatim}
-klayout $HOME/.ciel/sky130A/libs.ref/sky130_fd_sc_hd/gds/sky130_fd_sc_hd.gds
-\end{verbatim}
- However, with Matt's summary tool, the invocation is easier and the layers have names and better colors:
-\begin{verbatim}
-summary.py --show-sky130
-\end{verbatim}
-
-Right-click on any cell in the \emph{Cells} window to select a new one with \emph{Show as New Top}.
-
-
-\subsection{FABs}
-
-\subsection{PDK}
-
-We have three PDKs available in open source. Therefore, we can compare them as an exercise.
 
 \section{The Design Flow}
 
