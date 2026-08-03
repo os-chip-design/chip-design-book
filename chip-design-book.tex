@@ -768,7 +768,7 @@ If you have downloaded the code from the book, you can execute the script from w
 exec(open("pdk.py").read())
 \end{verbatim}
 
-\lstinputlisting[float, caption={Setting up the PDK (\myref{https://github.com/os-chip-design/chip-design-book/blob/main/code/pdk.py}{\code{pdk.py}}).}, label={lst:pdk}, frame=tb, captionpos=b]{code/pdk.py}
+\lstinputlisting[float, basicstyle=\footnotesize\ttfamily, caption={Setting up the PDK (\myref{https://github.com/os-chip-design/chip-design-book/blob/main/code/pdk.py}{\code{pdk.py}}).}, label={lst:pdk}, frame=tb, captionpos=b]{code/pdk.py}
 
 \lstinputlisting[float, caption={Configure the project (\myref{https://github.com/os-chip-design/chip-design-book/blob/main/code/config.py}{\code{config.py}}).}, label={lst:config}, frame=tb, captionpos=b]{code/config.py}
 
@@ -1548,7 +1548,7 @@ We will add our cocotb test in the subfolder \code{test}.
 
 \lstinputlisting[float, caption={A simple Python cocotb test bench (\myref{https://github.com/os-chip-design/chip-design-book/blob/main/code/test/test_adder.py}{\code{test_adder.py}}).}, label={lst:test:cocotb}, frame=tb, captionpos=b]{code/test/test_adder.py}
 
-\lstinputlisting[float, caption={The Makefile for the Python cocotb test bench (\myref{https://github.com/os-chip-design/chip-design-book/blob/main/code/test/Makefile}{\code{Makefile}}).}, label={lst:test:Makefile}, frame=tb, captionpos=b]{code/test/Makefile}
+\lstinputlisting[float, basicstyle=\footnotesize\ttfamily, caption={The Makefile for the Python cocotb test bench (\myref{https://github.com/os-chip-design/chip-design-book/blob/main/code/test/Makefile}{\code{Makefile}}).}, label={lst:test:Makefile}, frame=tb, captionpos=b]{code/test/Makefile}
 
 In cocotb, you can access the ports and also internal signals through an object that is passed to each test.
 A cocotb test is marked with \code{@cocotb.test()}.
@@ -1598,7 +1598,7 @@ The SPICE project has been taken up by many commercial and open-source projects.
 \myref{https://ngspice.sourceforge.io/}{Ngspice} is a popular open-source version of the SPICE simulator. Specifically, extending the latest stable release of Berkeley SPICE, version 3f.5, which was released in 1993
 The web site contains \myref{https://ngspice.sourceforge.io/tutorials.html}{tutorials} and the \myref{https://ngspice.sourceforge.io/docs/ngspice-46-manual.pdf}{user manual}.
 
-Simulating integrated circuits with SPICE at the transistor level is a standard way to verify integrated circuits before production. SPICS is useful for analog circuits, but can also be used to verify small digital circuits. A circuit can be simulated under different operating conditions, such as voltage and temperature variations.
+Simulating integrated circuits with SPICE at the transistor level is a standard way to verify integrated circuits before production. SPICE is useful for analog circuits, but can also be used to verify small digital circuits. A circuit can be simulated under different operating conditions, such as voltage and temperature variations.
 
 Circuits are described in plain text and may contain resistors, capacitors, inductors, MOSFETs, and other devices. SPICE translates the text netlist into nonlinear differential equations to be solved. 
 
@@ -1617,14 +1617,14 @@ The simulation results in the expected load curve of a capacitor as shown in Fig
 \begin{figure}
   \centering
   \includegraphics[width=0.7\textwidth]{figures/spice-rc}
-  \caption{Loading a capacity.}
+  \caption{Impulse response of a simple RC low-pass circuit.}
   \label{fig:rc}
 \end{figure}
 
-As a next example, let us simulate an inverter:
 
-\lstinputlisting[float, caption={An in verter. (\myref{https://github.com/os-chip-design/chip-design-book/blob/main/code/inverter.spice}{\code{inverter.spice}}).}, label={lst:spice:inverter:}, frame=tb, captionpos=b]{code/inverter.spice}
+\lstinputlisting[float, caption={An in verter. (\myref{https://github.com/os-chip-design/chip-design-book/blob/main/code/inverter.spice}{\code{inverter.spice}}).}, label={lst:spice:inverter}, frame=tb, captionpos=b]{code/inverter.spice}
 
+As a next example, let us simulate an inverter. Listing~\ref{lst:spice:inverter} shows a CMOS inverter built out of an NMOS and a PMOS transistor.
 The simulation results are shown in Figure~\ref{fig:spice:inverter}. Note that the transistors use only default model parameters, which are good for demonstration. It would be best to use the transistor models from a real PDK, e.g., from the Sky130 PDK.
 
 \begin{figure}
@@ -1636,22 +1636,28 @@ The simulation results are shown in Figure~\ref{fig:spice:inverter}. Note that t
 
 \subsection{Simulation of a Standard Cell}
 
-\lstinputlisting[float, caption={Simulation of a standard cell (\myref{https://github.com/os-chip-design/chip-design-book/blob/main/code/rc.cir}{\code{sim.spice}}). The example is adapted from Matt Venn's \myref{https://github.com/mattvenn/simulate-gate-2025}{Simulate a Gate example} from his \myref{https://zerotoasiccourse.com/}{Zero to ASIC course}. Matt's example is licensed with Apache 2.}, label={lst:sim:spice}, frame=tb, captionpos=b]{code/sim.spice}
+\lstinputlisting[float, basicstyle=\footnotesize\ttfamily, caption={Simulation of a standard cell (\myref{https://github.com/os-chip-design/chip-design-book/blob/main/code/rc.cir}{\code{sim.spice}}). The example is adapted from Matt Venn's \myref{https://github.com/mattvenn/simulate-gate-2025}{Simulate a Gate example} from his \myref{https://zerotoasiccourse.com/}{Zero to ASIC course}. Matt's example is licensed with Apache 2.}, label={lst:sim:spice}, frame=tb, captionpos=b]{code/sim.spice}
 
-We can simulate standard cells from the PDK. Listing~\ref{lst:sim:spice} shows the SPICE configuration for a NAND gate and an inverter as the output load. Note that SPICE does not understand shell variables like \code{$HOME}, as it is an independent program and not a shell script. Therefore, the example contains an absolute path to the SPICE models from the Sky130 PDK. Adapt the SPICE script to your installation of the PDK.
+We can simulate standard cells from the PDK. Listing~\ref{lst:sim:spice} shows the SPICE configuration for a NAND gate and an inverter as the output load. Note that SPICE does not understand shell variables like \code{$HOME}, as it is an independent program and not a shell script. Therefore, the example contains a tilde (\code{\~}) to reference the home folder. If needed, adapt the SPICE script to point to your installation of the PDK.
 
 \begin{figure}
   \centering
   \includegraphics[width=0.7\textwidth]{figures/spice-nand}
-  \caption{Text missing.}
+  \caption{Simulation of a NAND gate.}
   \label{fig:nand}
 \end{figure}
 
-Figure~\ref{fig:nand} shows...
-
+Figure~\ref{fig:nand} shows the simulation of the NAND gate. We start with both inputs (a, b) low and then switch one after the other to high and then back to low. We see the correct logical behavior, but also electrical behavior, such as rise and fall times or some overshooting.
 
 \subsection{Simulation of a Full Circuit}
-\subsection{Exercise}
+
+LibreLane produces a SPICE model of a synthesized circuit. For example, a SPICE model of our adder example from the introduction can be found in
+
+\code{runs/.../final/spic/adder.spice}.
+
+This model uses the PDK models for the standard cells. However, it does not contain parasitic extraction for accurate timing modeling. We can use Magic for the use for real transistor models and extracted resistances and capacitances.
+
+\subsection{Exercises}
 
 \subsubsection{SPICE in the Web App SiliWiz}
 
@@ -1664,6 +1670,9 @@ Install Ngspice locally and run the two examples (rc.spice and inverter.spice). 
 
 We have shown you how to model an inverter with built-in transistors and default parameters. For a more realistic simulation, change that SPICE simulation to use the transistors from the Sky130 PDK.
 
+\subsubsection{Simulate the Adder}
+
+Use the SPICE model generated by LibreLane and write a SPICE simulation to simulate it. If the code becomes too long, use a script (Scala or Python) to generate the SPICE code.
 
 \chapter{Memories}
 
