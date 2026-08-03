@@ -1,4 +1,4 @@
-* Standard cell Simulation
+Standard cell Simulation
 .lib "/Users/martin/.ciel/sky130A/libs.tech/ngspice/sky130.lib.spice" tt
 
 * include the standard cells

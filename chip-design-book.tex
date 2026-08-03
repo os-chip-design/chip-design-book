@@ -1594,6 +1594,10 @@ We can see that it takes two clock cycles from providing the inputs until the ou
 
 SPICE, which stands for simulation program with integrated circuit emphasis, is an analog electronic circuit simulator. SPICE was originally developed by Laurence W. Nagel with direction from Prof. Donald Pederson at the Electronics Research Laboratory of UC Berkeley. The initial version of \myref{https://bwrcs.eecs.berkeley.edu/Classes/IcBook/SPICE/}{SPICE} was released in 1973 in the public domain~\cite{Nagel:M382}.
 
+The SPICE project has been taken up by many commercial and open-source projects. 
+\myref{https://ngspice.sourceforge.io/}{Ngspice} is a popular open-source version of the SPICE simulator. Specifically, extending the latest stable release of Berkeley SPICE, version 3f.5, which was released in 1993
+The web site contains \myref{https://ngspice.sourceforge.io/tutorials.html}{tutorials} and the \myref{https://ngspice.sourceforge.io/docs/ngspice-46-manual.pdf}{user manual}.
+
 Simulating integrated circuits with SPICE at the transistor level is a standard way to verify integrated circuits before production. SPICS is useful for analog circuits, but can also be used to verify small digital circuits. A circuit can be simulated under different operating conditions, such as voltage and temperature variations.
 
 Circuits are described in plain text and may contain resistors, capacitors, inductors, MOSFETs, and other devices. SPICE translates the text netlist into nonlinear differential equations to be solved. 
@@ -1608,13 +1612,26 @@ Listing~\ref{lst:rc} shows a SPICE description of an RC low-pass circuit with an
 ngspice rc.spice
 \end{verbatim}
 
-The simulation results in the expected load curve of a capacitor as shown in Figure~\ref{fig:rc}
+The simulation results in the expected load curve of a capacitor as shown in Figure~\ref{fig:rc}.
 
 \begin{figure}
   \centering
   \includegraphics[width=0.7\textwidth]{figures/spice-rc}
   \caption{Loading a capacity.}
   \label{fig:rc}
+\end{figure}
+
+As a next example, let us simulate an inverter:
+
+\lstinputlisting[float, caption={An in verter. (\myref{https://github.com/os-chip-design/chip-design-book/blob/main/code/inverter.spice}{\code{inverter.spice}}).}, label={lst:spice:inverter:}, frame=tb, captionpos=b]{code/inverter.spice}
+
+The simulation results are shown in Figure~\ref{fig:spice:inverter}. Note that the transistors use only default model parameters, which are good for demonstration. It would be best to use the transistor models from a real PDK, e.g., from the Sky130 PDK.
+
+\begin{figure}
+  \centering
+  \includegraphics[width=0.7\textwidth]{figures/spice-inverter}
+  \caption{A simple two-transistor inverter.}
+  \label{fig:spice:inverter}
 \end{figure}
 
 \subsection{Simulation of a Standard Cell}
@@ -1638,7 +1655,14 @@ Figure~\ref{fig:nand} shows...
 
 \subsubsection{SPICE in the Web App SiliWiz}
 
-The simplest way to explore a SPICE simulation of an integrated circuit is to use Tiny Tapeout's \myref{https://app.siliwiz.com/}{SiliWiz}. SiliWiz is a web application to draw CMOS circuits and run a SPICE simulation. Explore the exercises from the web page: \myref{https://tinytapeout.com/siliwiz/}{How do semiconductors work?}
+The simplest way to explore a SPICE simulation of an integrated circuit is to use Tiny Tapeout's \myref{https://app.siliwiz.com/}{SiliWiz}. SiliWiz is a web application to draw CMOS circuits and run a SPICE simulation. Explore the exercises from the web page: \myref{https://tinytapeout.com/siliwiz/}{How do semiconductors work?}.
+
+\subsubsection{Inverter with PDK Models}
+
+Install Ngspice locally and run the two examples (rc.spice and inverter.spice). Note that the links in the listings point you to the source code for the examples on GitHub.
+
+
+We have shown you how to model an inverter with built-in transistors and default parameters. For a more realistic simulation, change that SPICE simulation to use the transistors from the Sky130 PDK.
 
 
 \chapter{Memories}

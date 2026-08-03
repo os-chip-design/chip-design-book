@@ -1,4 +1,4 @@
-* Simple RC example
+Simple RC example
 .option post
 Vin in gnd pwl 0ps 0 100us 0 150us 1.0 1ms 1.0
 R1 in out 1k

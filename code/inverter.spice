@@ -1,0 +1,23 @@
+* Minimal CMOS inverter
+
+VDD vdd 0 1.8
+VIN in 0 PULSE(0 1.8 10n 1n 1n 20n 40n)
+
+MN out in 0   0   NM
+MP out in vdd vdd PM
+
+.model NM NMOS LEVEL=1
+.model PM PMOS LEVEL=1
+
+Cload out 0 20f
+
+.tran 0.1n 40n
+
+.control
+run
+set color0 = white
+set color1 = black
+plot v(in) v(out)
+.endc
+
+.end
