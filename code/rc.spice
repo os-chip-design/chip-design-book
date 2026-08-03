@@ -4,5 +4,11 @@ Vin in gnd pwl 0ps 0 100us 0 150us 1.0 1ms 1.0
 R1 in out 1k
 C1 out gnd 1u
 .tran 20us 5ms
-.plot v(in) v(out)
+.control
+run
+set color0 = white
+set color1 = black
+plot v(in) v(out)
+.endc
+
 .end

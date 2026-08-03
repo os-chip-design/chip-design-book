@@ -1601,21 +1601,18 @@ Circuits are described in plain text and may contain resistors, capacitors, indu
 Listing~\ref{lst:rc} shows a SPICE description of an RC low-pass circuit with an input signal rising between 100\,{\textmu}s and 150\,{\textmu}s from 0\,V to 1\,V. We can run the simulation with ngspice as follows:
 
 
-\lstinputlisting[float, caption={Simple RC circuit (\myref{https://github.com/os-chip-design/chip-design-book/blob/main/code/rc.cir}{\code{rc.cir}}).}, label={lst:rc}, frame=tb, captionpos=b]{code/rc.cir}
+\lstinputlisting[float, caption={Simple RC circuit (\myref{https://github.com/os-chip-design/chip-design-book/blob/main/code/rc.spice}{\code{rc.spice}}).}, label={lst:rc}, frame=tb, captionpos=b]{code/rc.spice}
 
 
 \begin{verbatim}
-ngspice rc.cir
-listing
-run
-plot v(in) v(out)
+ngspice rc.spice
 \end{verbatim}
 
 The simulation results in the expected load curve of a capacitor as shown in Figure~\ref{fig:rc}
 
 \begin{figure}
   \centering
-  \includegraphics[width=0.7\textwidth]{figures/rc}
+  \includegraphics[width=0.7\textwidth]{figures/spice-rc}
   \caption{Loading a capacity.}
   \label{fig:rc}
 \end{figure}
@@ -1625,6 +1622,16 @@ The simulation results in the expected load curve of a capacitor as shown in Fig
 \lstinputlisting[float, caption={Simulation of a standard cell (\myref{https://github.com/os-chip-design/chip-design-book/blob/main/code/rc.cir}{\code{sim.spice}}). The example is adapted from Matt Venn's \myref{https://github.com/mattvenn/simulate-gate-2025}{Simulate a Gate example} from his \myref{https://zerotoasiccourse.com/}{Zero to ASIC course}. Matt's example is licensed with Apache 2.}, label={lst:sim:spice}, frame=tb, captionpos=b]{code/sim.spice}
 
 We can simulate standard cells from the PDK. Listing~\ref{lst:sim:spice} shows the SPICE configuration for a NAND gate and an inverter as the output load. Note that SPICE does not understand shell variables like \code{$HOME}, as it is an independent program and not a shell script. Therefore, the example contains an absolute path to the SPICE models from the Sky130 PDK. Adapt the SPICE script to your installation of the PDK.
+
+\begin{figure}
+  \centering
+  \includegraphics[width=0.7\textwidth]{figures/spice-nand}
+  \caption{Text missing.}
+  \label{fig:nand}
+\end{figure}
+
+Figure~\ref{fig:nand} shows...
+
 
 \subsection{Simulation of a Full Circuit}
 \subsection{Exercise}
