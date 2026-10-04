@@ -389,7 +389,9 @@ cd librelane
 nix-shell
 \end{verbatim}
 
-\noindent The frontend command is \code{librelane}. Check the version you have installed with:
+\noindent On the first run, this will take quite some time, as all the packages are downloaded. You should end up in a Nix shell (shown in the prompt in your terminal).
+
+The frontend command is \code{librelane}. Check the version you have installed with:
 
 \begin{verbatim}
 librelane --version
@@ -427,33 +429,36 @@ on the code shown in Listing~\ref{lst:version}.
 \lstinputlisting[float, caption={A pipelined adder as a Hello World example for LibreLane (\myref{https://github.com/os-chip-design/chip-design-book/blob/main/code/adder.v}{\code{adder.v}}).}, label={lst:adder}, frame=tb, captionpos=b]{code/adder.v}
 
 
-\lstinputlisting[float, caption={The YAML configuration file (\myref{https://github.com/os-chip-design/chip-design-book/blob/main/code/adder.yaml}{\code{adder.yaml}}).}, label={lst:adder}, frame=tb, captionpos=b]{code/adder.yaml}
+\lstinputlisting[float, caption={The YAML configuration file (\myref{https://github.com/os-chip-design/chip-design-book/blob/main/code/adder.yaml}{\code{adder.yaml}}).}, label={lst:adder:yaml}, frame=tb, captionpos=b]{code/adder.yaml}
 
 Then, switch to a working directory and create the following small Verilog design ({\code{adder.v}), as shown in Listing~\ref{lst:adder}.
 This example is an adder, including registers at the input and output ports, so we can use static timing analysis (STA) to explore the maximum clocking frequency.
 
 
 Furthermore, you need a configuration for your flow. You can find all possible configuration parameters at the
-\myref{https://librelane.readthedocs.io/en/latest/reference/common_flow_vars.html}{Universal Flow Configuration Variables} section of the LibreLane documentation. However, most variables can be left at their default values.
+\myref{https://librelane.readthedocs.io/en/latest/reference/common_flow_vars.html}{Universal Flow Configuration Variables} section of the LibreLane documentation. However, most variables can be left at their default values. Config files can support more than one PDK, see the \myref{https://github.com/librelane/librelane/blob/main/librelane/examples/spm/config.yaml}{LibreLane example}.
 
-Config files can support more than one PDK, see the \myref{https://github.com/librelane/librelane/blob/main/librelane/examples/spm/config.yaml}{LibreLane example}. Configuration can be in YAML or JSON format.
-We will use the \code{adder.yaml} file with a minimal configuration, as shown in Listing~\ref{lst:config}.
+The configuration can be in YAML or JSON format.
+We will use the \code{adder.yaml} file with a minimal configuration, as shown in Listing~\ref{lst:adder:yaml}.
+The \code{DESIGN_NAME} specifies the top-level module, in our case \code{adder}. \code{VERILOG_FILES} lists all files that belong to the project. This can be a list of files or use wildcards, such as  \code{dir::folder/*.v}. The \code{CLOCK_PORT} names the port that is connected to the clock, and the \code{CLOCK_PERIOD} specifies the intended clock period in nanoseconds. In our case, the 20~ns specifies a 50~MHz clock.
 
-For a fully automatic run of the full flow, you can execute:
+For an automatic run of the full flow, you can execute:
 
 \begin{verbatim}
 librelane adder.yaml
 \end{verbatim}
 
 This single command runs the complete synthesis flow from RTL to GDSII.
-As the design is very simple, the flow will run in about a minute.
+As the design is very simple, the flow will run in less than a minute.
+At the end, LibreLane will report potential errors related to antenna violations, LVS, and DRC errors. As the design is very simple, all three categories shall be reported with green check marks.
+
 Figure~\ref{fig:adder} shows the final GDSII file for the adder in KLayout.
 
 
-A flow takes, at the time of this writing, with LibreLane v2.4.8, 74 steps, each reporting in its folder.
+A flow takes, at the time of this writing, with LibreLane v3.0.3, 76 steps, each reporting in its folder.
 During the flow, a lot of information is printed out.
 Scrolling back in the terminal, you can see reports of design checks and resource usage.
-Every time you run the flow, it will create a new folder under folder \code{runs}.
+Every time you run the flow, it will create a new folder under the \code{runs} folder.
 The name of the folder will be \code{RUN\_year\_month\_day\_hh-mm-ss}.
 
 \begin{figure}
@@ -473,17 +478,25 @@ A first step to explore the design is to view the GDS in KLayout with:
 librelane --last-run --flow openinklayout adder.yaml
 \end{verbatim}
 
+KLayout will load a LEF/DEF or a GDS file with all geometric information.
 In KLayout, you can explore the design. Use the rulers to measure your design. How large is it?
 Would it fit into a Tiny Tapeout Tile? How large is a Tiny Tapeout tile?
 When you expand the adder in Cells, you can see which cells have been used.
 By double-clicking on a cell type, it is removed from the display. This is an indirect way to show the cells in the GDS. The flip-flop standard cells in Sky130 have names that include ``dfxtp'' in their name. Double-click that cell to see how many flip-flops are used. How many should there be?
+
+
 
 Another option is to open the design with the OpenROAD viewer:
 \begin{verbatim}
 librelane --last-run --flow openinopenroad adder.yaml
 \end{verbatim}
 
-The OpenROAD viewer lets you explore your design in a graphical way. For example, we can visualize the generated clock tree. To see only the signals belonging to the clock tree, disable the following Nets: Signal, Power, and Ground. And disable Instances.
+The OpenROAD GUI lets you explore your design in a graphical way. 
+The OpenROAD GUI loads the ODB (OpenDB) file of the design, which contains more information than the GDS file.
+For example, we can visualize the generated clock tree. To see only the signals belonging to the clock tree, disable the following Nets: Signal, Power, and Ground. And disable Instances.
+
+We can also view the timing paths of the design. Open the timing report with \emph{Windows} - \emph{Timing Report} and click on \emph{Update} to see all timings, including the detailed path. When selecting a path, it will be displayed in the layout.
+
 
 Matt Venn has a good selection of layers and color assignments at \myref{https://github.com/mattvenn/librelane_summary/blob/librelane/klayout_gds.xml}{klayout\_gds.xml}. You can use it with klayout as follows:
 \begin{verbatim}
@@ -515,7 +528,7 @@ using run runs/RUN_2026-04-03_12-05-14
 summary.py --gds
 \end{verbatim}
 
-At the time of this writing, the flow generates 74 folders containing the results and reports for each individual step. You can find those subfolders in the folder \code{runs/RUN\_DATE\_TIME}.
+At the time of this writing, the flow generates 76 folders containing the results and reports for each individual step. You can find those subfolders in the folder \code{runs/RUN\_DATE\_TIME}.
 \begin{verbatim}
 01-verilator-lint
 02-checker-linttimingconstructs
@@ -524,8 +537,8 @@ At the time of this writing, the flow generates 74 folders containing the result
 05-yosys-jsonheader
 06-yosys-synthesis
 ...
-73-checker-maxcapviolations
-74-misc-reportmanufacturability
+75-checker-maxcapviolations
+76-misc-reportmanufacturability
 error.log
 final
 flow.log
@@ -1424,7 +1437,7 @@ Having this combinational loop from the master to the device and back to the mas
 The latest Wishbone specification (B4) adds a pipelined definition.
 Note that the specification now includes two different, not necessarily compatible, specifications.
 The non-pipelined access is then called Wishbone \emph{classic}.
-The pipelined mode has the following Issue: the slave does not know if the master will issue a pipelined request. It would need to observe changing addresses, which is not practical. To be on the safe side, a synchronous slave would need to assert \code{STALL\_O}. However, as the Wishbone interface of the Caravel user project does not include a \code{STALL\_I} input, we assume that there will be no pipelined Wishbone transaction.
+The pipelined mode has the following issue: the slave does not know if the master will issue a pipelined request. It would need to observe changing addresses, which is not practical. To be on the safe side, a synchronous slave would need to assert \code{STALL\_O}. However, as the Wishbone interface of the Caravel user project does not include a \code{STALL\_I} input, we assume that there will be no pipelined Wishbone transaction.
 
 \subsubsection{A Simple Wishbone Device}
 
