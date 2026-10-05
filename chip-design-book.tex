@@ -273,7 +273,7 @@ It is an exciting time to be in the world of chip design....
 
 This booklet~\cite{chip:design:book} is part of the course at DTU on introduction into chip design\footnote{\url{https://github.com/os-chip-design/chip-design-intro}} that uses open-source tools only and where all teaching material is available in open source. In the spring semester of 2026, we design an open-source chip that will be taped out with the MPW schedule on SkyWater 130 nm.\footnote{\url{https://github.com/os-chip-design/dtu-soc-2026}}
 
-\todo{Could this be written by someone else?}
+\todo{Could this be written by someone else? Matt?}
 
 \chapter{Preface}
 
@@ -291,7 +291,7 @@ I want to thank everyone who has worked on LibreLane and all the open-source too
 Using those tools is so joyful and, therefore, a big motivation to write a book about them.
 I am thankful to the whole open-source EDA community, which is so welcoming and friendly and never tired of answering questions.
 
-I would like to thank Matt Venn for creating the \myref{https://tinytapeout.com/}{Tiny Tapeout} project, which enables chip tapeout at a relatively low cost and therefore democratizes chip design.
+I would like to thank Matt Venn for creating the \myref{https://tinytapeout.com/}{Tiny Tapeout} project, which enables chip tapeout at a very low cost and therefore democratizes chip design.
 Furthermore, I very much enjoyed Matt's Zero2ASIC course, and several exercises in this book are inspired by Matt's course. I hope Matt is fine with this ;-)
 
 I would like to thank the Zero2ASIC and the Tiny Tapeout community on Discord for some interesting discussions. Furthermore, I enjoyed the help of Tjark Petersen on our first two ChipIgnite tapeouts in fall 2025 and spring 2026.
@@ -1123,7 +1123,7 @@ Efabless, the original developer of OpenLane and OpenLane2, exited the business 
 
 \index{Caravel}
 
-\myref{https://caravel-harness.readthedocs.io/}{Caravel} is a SoC framework developed by Efabless for the Google/Skywater 130nm Open PDK. It is the basis for the \myref{https://chipfoundry.io/chipignite}{chipIgnite} MPW shuttles.
+\myref{https://caravel-harness.readthedocs.io/}{Caravel} is a SoC framework developed by Efabless for the Google/Skywater 130~nm Open PDK. It is the basis for the \myref{https://chipfoundry.io/chipignite}{chipIgnite} MPW shuttles.
 It contains a padframe, a housekeeping block, a management area including a RISC-V core, and a user project wrapper.
 The user area is 3000\,{\textmu}m x 3600\,{\textmu}m (10 mm$^2$). To put this into perspective, a simple 3-stage RISC-V pipeline, such as Wildcat~\cite{wildcat:arcs2025}, fits into a 0.2\,mm$^2$ area. A 4~KiB memory from eFabless has a 0.18\,mm$^2$ area.
 
@@ -1157,6 +1157,7 @@ The management core contains a \myref{https://github.com/SpinalHDL/VexRiscv}{Vex
 The management core is built with the \myref{https://github.com/enjoy-digital/litex}{LiteX} framework, which itself uses \myref{https://github.com/m-labs/migen}{Migen}, a Python project to build digital hardware.
 
 The RISC-V core in the management runs firmware out of the Flash to configure the user project GPIOs, interact with the user area via the Wishbone bus, and interact with the logic analyzer.
+Note that the management core only understands the synchronous Wishbone specification, not the asynchronous one.
 
 The user project is connected to the GPIO pins, the Wishbone bus of the RISC-V CPU, the logic analyzer, and the interrupt pins to the RISC-V CPU. The example components are split into a wrapper and the \emph{real} component. For example, the user project is split into a \code{user_project_wrapper} and a \code{user_proj_example}.
 
@@ -1175,7 +1176,11 @@ Following \myref{https://www.youtube.com/watch?v=YWj4HhRU36U&t=302s}{video} from
 
 \subsection{Setup}
 
-Start by cloning the \myref{https://github.com/chipfoundry/caravel_user_project}{user project} by selecting \emph{Use this template}. Install the prerequisites and clone your repository. Note that the project requires several GB of space on your hard disc. The initial clone is 1/4 GB. The needed tools are installed with:
+Start by cloning the \myref{https://github.com/chipfoundry/caravel_user_project}{user project} by selecting \emph{Use this template}. Install the prerequisites and clone your repository. Note that the project requires several GB of space on your hard disk. The initial clone is 1/4 GB.
+
+The following description is based on the Caravel Make-based flow as it was in 2025. In 2026, ChipFoundry added a Python-based flow: \code{chipfoundry-cli}. However, the Make-based flow is still valid.
+
+The needed tools are installed with:
 
 \begin{verbatim}
 make setup
@@ -1241,8 +1246,8 @@ Finally, before we can run a precheck, we need to update the default configurati
 ...
 \end{verbatim}
 
-\todo{The example user project wrapper connects the user project output (the counter) to the lowest eight pins and to the highest eight pins (\code{.io\_out({io\_out[37:30],io\_out[7:0]})}). However, the documentation states that the management core uses the lowest five pins. This is a contradiction.}
-\todo{Write about it. Here some text from Matt: I am recommending avoiding the use of GPIO pins 0 to 7, 36 and 37 (see Z2A)}
+Note, that the example user project wrapper connects the user project output (the counter) to the lowest eight pins and to the highest eight pins. However, the documentation states that the management core uses the lowest five pins. This is a contradiction.
+Matt Venn recommends avoiding the use of GPIO pins 0 to 7, 36 and 37.
 
 Tim Edwards wrote on the FOSSI chat:
 \begin{quotation}
@@ -1345,8 +1350,11 @@ Before uploading your design for manufacturing, you need to register for an \myr
 
 Caravel uses the \myref{https://en.wikipedia.org/wiki/Wishbone_(computer_bus)}{Wishbone}~\cite{soc:wishbone} bus to interface the processor core with the user design.
 Wishbone is an open-source bus definition intended to be used on-chip.
-The Wishbone specification defines a point-to-point communication.
+The Wishbone specification defines point-to-point communication.
 Wishbone is a public domain standard used by several open-source IP cores.
+
+Note that the management core only understands the synchronous Wishbone specification, not the asynchronous one. Therefore, we present a synchronous device example in this section.
+
 
 \subsubsection{The Wishbone Bus}
 
@@ -1449,9 +1457,9 @@ We will design a very simple user device example with an 8-bit output port and a
 
  Listing~\ref{lst:wb:chisel} shows our very simple Wishbone device, coded in Chisel.
  It contains a \code{Bundle} definition for the interface and the main module \code{WishboneExample}.
- That module has two IO interfaces: (1) \code{wb} to the Wishbone bus from Caravel, and (2) \code{io} to 8 input and output pins. Note that we do not use the original, a bit dated, names for the Wishbine bus.
+ That module has two IO interfaces: (1) \code{wb} to the Wishbone bus from Caravel, and (2) \code{io} to 8 input and output pins. Note that we do not use the original, a bit dated, names for the Wishbone bus.
  
-To keep the device simple, we use a combination acknowledgment for Wishbone. On a write, the output register \code{outReg} is written. It is directly connected to the 8-bit output pins. The input is connected to two levels of FFs to contain metastability. Otherwise, that input is directly connected to the Wishbone data input ports.
+ We implement a synchronous Wishbone device. Therefore, we need to delay the \code{ack} signal by one clock cycle. On a write, the output register \code{outReg} is written. It is directly connected to the 8-bit output pins. The input is connected to two levels of FFs to contain metastability. Otherwise, that input is directly connected to the Wishbone data input ports.
 
 \lstinputlisting[float, caption={A simple Wishbone device in Verilog (\myref{https://github.com/os-chip-design/chip-design-book/blob/main/code/WishboneExample.v}{\code{WishboneExample.v}}).}, label={lst:wb:verilog}, frame=tb, captionpos=b]{code/WishboneExample.v}
 
@@ -1502,19 +1510,22 @@ librelane config_merged.json
 \end{verbatim}
 
 \section{wafer.space}
+\index{wafer.space}
 
 With the help of Google, \myref{https://gf.com/}{GlobalFoundries} (GF) open-sourced its 180 nm PDK (\myref{https://gf180mcu-pdk.readthedocs.io/en/latest/}{gf180mcu PDK}). Initially, Google organized and sponsored MPWs for GF (2022). However, Google stopped this process.
 
 \myref{https://wafer.space/}{wafer.space} is a new MPW service started in 2025 by Tim Ansell and Leo Moser.
 The chips are manufactured at \myref{https://gf.com/manufacturing/singapore/}{GF Singapore}.
-The PDK for these tapeouts is GlobalFoundries' 180nm MCU bulk process technology (GF180MCU).
-The MCU version of the PDK is the low-cost (slow) process intended for 8-bit microcontrollers (see also \url{https://wafer.space/gf180}). The open-source standard cells use 5V transistors, which are slow. Running them at 3.3 V might lower the frequency \todo{(needs to be checked)}.
+The PDK for these tapeouts is GlobalFoundries' 180~nm MCU bulk process technology (GF180MCU).
+The MCU version of the PDK is the low-cost (slow) process intended for 8-bit microcontrollers (see also \myref{https://wafer.space/gf180}{GF 180~nm Technologies}). The open-source standard cells use 5V transistors, which are slow. Running them at 3.3 V will even lower the maximum frequency. However, a \myref{https://www.crowdsupply.com/wafer-space/gf180mcu-run-3/updates/a-need-for-speed-tholins-own-standard-cell-library}{new standard cell library} targeting 3.3~V is in development.
 
-It uses GlobalFoundries' 180 nm PDK (gf180mcu PDK) and offers 1000 dies with a user space of 20\;mm$^2$.
+
+
+wafer.space uses GlobalFoundries' 180 nm PDK (gf180mcu PDK) and offers 1000 dies with a user space of 20\;mm$^2$.
 The \myref{https://github.com/wafer-space/gf180mcu-project-template}{project template} is just the pad ring, two SRAM macros, and a counter as an example design.
 
 To start a project, clone the \myref{https://github.com/wafer-space/gf180mcu-project-template}{project template}.
-The flow uses LibreLane with Nix, and the template contains the Nix configuration. Therefore, the Nix shell is activated by simply running code{nix-shell} in the root folder of the template (or a clone of it).
+The flow uses LibreLane with Nix, and the template contains the Nix configuration. Therefore, the Nix shell is activated by simply running \code{nix-shell} in the root folder of the template (or a clone of it).
 
 The flow is based on a simple \code{Makefile}. The project template includes a pointer to the GF PDK, which is locally installed with \code{make clone-pdk}.
 The template contains a counter and two placed SRAM macros.
@@ -1996,6 +2007,16 @@ During the Google free shuttle, several projects have been developed in open sou
 \item \myref{https://github.com/OS-EDA/Course}{Open-Source EDA Digital Course} funded by the BMFTR. Uses OpenROAD and focuses on the IHP PDK.
 
 \end{itemize}
+
+\section{Tutorials}
+
+\begin{itemize}
+\item \myref{https://github.com/HeiChips/heichips26-digital-workshop}{HeiChips 2026 LibreLane Workshop} by Leo Moser.
+\item \myref{https://github.com/ThorbenMoos/FOSSi_Tutorial}{FOSSi Tutorial} by Thorben Moos.
+
+\end{itemize}
+
+
 
 \section{Books}
  
