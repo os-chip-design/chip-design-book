@@ -14,7 +14,7 @@ Cite this book as:
 @Book{chip:design:book,
   author       = {Martin Schoeberl},
   title        = {Introduction to Chip Design Using Open-Source Tools},
-  year         = {2025},
+  year         = {2026},
   howpublished = {\url{https://www.imm.dtu.dk/~masca/chip-design-book.html}},
 }
 ```

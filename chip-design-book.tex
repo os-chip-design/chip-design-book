@@ -311,6 +311,8 @@ This book is an introduction to chip design using open-source tools. It covers t
 
 This book does not cover digital design, such as basic Boolean equations and sequential circuits. For this topic, we refer to other textbooks, such as \cite{dally:vhdl:2016} and \cite{chisel:book}. When we need to describe some circuits, we will describe them in \myref{https://www.chisel-lang.org/}{Chisel}~\cite{chisel:dac2012} and in Verilog.
 
+This book focuses on the practical aspects of chip design. For an in-depth introduction to CMOS VLSI design, we refer to the classic Weste and Harris textbook~\cite{weste2010cmos}.
+
 This book is optimized for reading on a tablet (e.g., an iPad) or a laptop.
 We include links to further reading in the running text, primarily to
 \myref{https://en.wikipedia.org/}{Wikipedia} articles.
@@ -1487,7 +1489,7 @@ Register an account at: \url{https://chipfoundry.io/sftp-registration}
 
 \index{Tiny Tapeout}
 
-\myref{https://tinytapeout.com/}{Tiny Tapeout} is a project that takes the idea of a multi-project wafer to the next level. Tiny Tapeout uses one tile of an MPW shuttle on Skywater130 or IHP and divides that tile into 512 smaller tiles. Therefore, the production cost can be further split, allowing for the sale of one tile for less than 100 USD.
+\myref{https://tinytapeout.com/}{Tiny Tapeout}~\cite{TinyTapeout} is a project that takes the idea of a multi-project wafer to the next level. Tiny Tapeout uses one tile of an MPW shuttle on Skywater130 or IHP and divides that tile into 512 smaller tiles. Therefore, the production cost can be further split, allowing for the sale of one tile for less than 100 USD.
 
 Tiny Tapeout uses GitHub actions to harden user designs. Therefore, this is the easiest way to produce a chip. No tools need to be installed locally. The project is configured within two files: \code{config.json} and \code{info.yaml}.
 

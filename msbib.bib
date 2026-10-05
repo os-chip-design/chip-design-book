@@ -44,10 +44,16 @@
   no-urldate = {2020-09-25}
 }
 
-@MISC{ghdl,
-  author = {Tristan Gingold},
-  title = {GHDL},
-  howpublished = {\url{https://github.com/ghdl/ghdl}}
+@Article{patterson2025embench,
+  author  = {Patterson, David A. and Bennett, Jeremy and Bennett, Mary and Chelin, Helene and Harris, David M. and Hellar, Jennifer and Jones, William and Moron, Konrad and Savini, Paolo and Shepherd, Roger and Simar, Ray and Susskind, Zachary and Wallentowitz, Stefan},
+  title   = {{Embench IOT 2.0 and DSP 1.0: Modern Embedded Computing Benchmarks}},
+  doi     = {10.1109/MC.2024.3511352},
+  number  = {5},
+  pages   = {37--47},
+  volume  = {58},
+  journal = {Computer},
+  month   = may,
+  year    = {2025},
 }
 
 @MISC{ghdl-yosys-plugin,
@@ -702,15 +708,16 @@
   no-url = {http://www.cs.ucsb.edu/~arch/cs254/papers/moorepaper.pdf}
 }
 
-@ARTICLE{PULPino,
-  author={Gautschi, Michael and Schiavone, Pasquale Davide and Traber, Andreas and Loi, Igor and Pullini, Antonio and Rossi, Davide and Flamand, Eric and G{\"u}rkaynak, Frank K. and Benini, Luca},
-  journal={IEEE Transactions on Very Large Scale Integration (VLSI) Systems}, 
-  title={Near-Threshold RISC-V Core With DSP Extensions for Scalable IoT Endpoint Devices}, 
-  year={2017},
-  volume={25},
-  number={10},
-  pages={2700-2713},
-  doi={10.1109/TVLSI.2017.2654506}}
+@Article{PULPino,
+  author  = {Gautschi, Michael and Schiavone, Pasquale Davide and Traber, Andreas and Loi, Igor and Pullini, Antonio and Rossi, Davide and Flamand, Eric and G{\"u}rkaynak, Frank K. and Benini, Luca},
+  title   = {Near-Threshold {RISC-V} Core With DSP Extensions for Scalable IoT Endpoint Devices},
+  doi     = {10.1109/TVLSI.2017.2654506},
+  number  = {10},
+  pages   = {2700-2713},
+  volume  = {25},
+  journal = {IEEE Transactions on Very Large Scale Integration (VLSI) Systems},
+  year    = {2017},
+}
 
 @Book{harris2021digital,
   author    = {Harris, S. and Harris, D.},
@@ -745,19 +752,11 @@
   year         = {1982},
 }
 
-@Article{risc:1980,
-  author       = {Patterson, David A. and Ditzel, David R.},
-  date         = {1980},
-  journaltitle = {SIGARCH Comput. Archit. News},
-  title        = {The case for the reduced instruction set computer},
-  owner        = {martin},
-}
-
 @InProceedings{Ibex2017,
   author    = {Davide Schiavone, Pasquale and Conti, Francesco and Rossi, Davide and Gautschi, Michael and Pullini, Antonio and Flamand, Eric and Benini, Luca},
   booktitle = {2017 27th International Symposium on Power and Timing Modeling, Optimization and Simulation (PATMOS)},
   date      = {2017},
-  title     = {Slow and steady wins the race? A comparison of ultra-low-power RISC-V cores for Internet-of-Things applications},
+  title     = {Slow and steady wins the race? A comparison of ultra-low-power {RISC-V} cores for Internet-of-Things applications},
   doi       = {10.1109/PATMOS.2017.8106976},
   pages     = {1-8},
   keywords  = {Multicore processing;Open source software;Program processors;Signal processing algorithms;Sensors;RISC-V;energy efficiency;area optimized;ultra-low-power;open-source;core;microprocessor;internet-of-things},
@@ -775,7 +774,7 @@
 @Book{Patterson20,
   author    = {Patterson, David A. and Hennessy, John L.},
   date      = {2020},
-  title     = {Computer Organization and Design, RISC-V Edition: The Hardware/Software Interface},
+  title     = {Computer Organization and Design, {RISC-V} Edition: The Hardware/Software Interface},
   edition   = {2nd},
   isbn      = {9780128203316},
   publisher = {Morgan Kaufmann Publishers Inc.},
@@ -803,7 +802,7 @@
 @InProceedings{fazyrv2024kissich,
   author    = {Kissich, Meinhard and Baunach, Marcel},
   booktitle = {Proc. of the 21st ACM International Conference on Computing Frontiers (CF 2024)},
-  title     = {{FazyRV: Closing the Gap between 32-Bit and Bit-Serial RISC-V Cores with a Scalable Implementation}},
+  title     = {{FazyRV: Closing the Gap between 32-Bit and Bit-Serial {RISC-V} Cores with a Scalable Implementation}},
   doi       = {10.1145/3649153.3649195},
   pages     = {240--248},
   publisher = {Association for Computing Machinery},
@@ -820,7 +819,7 @@
 
 @Misc{scheffler2024basiliskendtoendopensourcelinuxcapable,
   author        = {Paul Scheffler and Philippe Sauter and Thomas Benz and Frank K. G{\"u}rkaynak and Luca Benini},
-  title         = {Basilisk: An End-to-End Open-Source Linux-Capable RISC-V SoC in 130nm CMOS},
+  title         = {Basilisk: An End-to-End Open-Source Linux-Capable {RISC-V} SoC in 130nm CMOS},
   eprint        = {2406.15107},
   no-url           = {https://arxiv.org/abs/2406.15107},
   archiveprefix = {arXiv},
@@ -834,6 +833,98 @@
   date      = {2013},
   title     = {Yosys-a free Verilog synthesis suite},
   owner     = {martin},
+}
+
+@InProceedings{RVcompare:2022,
+  author    = {Kadomoto, Junichiro and Irie, Hidetsugu and Sakai, Shuichi},
+  booktitle = {2022 IEEE 15th International Symposium on Embedded Multicore/Many-core Systems-on-Chip (MCSoC)},
+  title     = {Evaluation of Different Microarchitectures for Energy-Efficient {RISC-V} Cores},
+  doi       = {10.1109/MCSoC57363.2022.00022},
+  pages     = {78-84},
+  keywords  = {Semiconductor device modeling;Microarchitecture;Power demand;Multicore processing;Pipelines;Organizations;Energy efficiency;Microarchitecture;energy efficiency;RISC-V},
+  year      = {2022},
+}
+
+@TechReport{coremark,
+  author      = {Gal-On, Shay and Levy, Markus},
+  institution = {Embedded Microprocessor Benchmark Consortium (EEMBC)},
+  title       = {Exploring {CoreMark}: A Benchmark Maximizing Simplicity and Efficacy},
+  type        = {White Paper},
+  no-url         = {https://www.eembc.org/techlit/articles/coremark-whitepaper.pdf},
+  no-urldate     = {2026-08-26},
+  year        = {2012},
+}
+
+@Misc{librelane,
+  author       = {{FOSSi Foundation}},
+  title        = {{LibreLane}},
+  howpublished = {\url{https://github.com/librelane/librelane}},
+  year         = {2026},
+}
+
+@Article{patterson2020embench,
+  author    = {Patterson, David and others},
+  title     = {Embench: Recruiting for the long overdue and deserved demise of Dhrystone as a benchmark for embedded computing},
+  number    = {2},
+  pages     = {26--30},
+  volume    = {48},
+  journal   = {ACM SIGARCH Computer Architecture News},
+  publisher = {ACM New York, NY, USA},
+  year      = {2020},
+}
+
+@InProceedings{pipe:compare,
+  author    = {Olivieri, Mauro and Cheikh, Abdallah and Cerutti, Gianmarco and Mastrandrea, Antonio and Menichelli, Francesco},
+  booktitle = {2017 New Generation of CAS (NGCAS)},
+  title     = {Investigation on the Optimal Pipeline Organization in {RISC-V} Multi-threaded Soft Processor Cores},
+  doi       = {10.1109/NGCAS.2017.61},
+  pages     = {45-48},
+  keywords  = {Microarchitecture;Multicore processing;Digital systems;Instruction sets;Pipelines;Organizations;Production;FPGA;Microprocessors;Embedded Systems;RISCV},
+  year      = {2017},
+}
+
+@Article{risc:1980,
+  author       = {Patterson, David A. and Ditzel, David R.},
+  date         = {1980},
+  journaltitle = {SIGARCH Comput. Archit. News},
+  title        = {The case for the reduced instruction set computer},
+  owner        = {martin},
+}
+
+@Misc{ghdl,
+  author       = {Tristan Gingold},
+  title        = {GHDL},
+  howpublished = {\url{https://github.com/ghdl/ghdl}},
+}
+
+@InProceedings{optimum:pipe:2002,
+  author    = {Hartstein, A. and Puzak, T.R.},
+  booktitle = {Proceedings 29th Annual International Symposium on Computer Architecture},
+  title     = {The optimum pipeline depth for a microprocessor},
+  doi       = {10.1109/ISCA.2002.1003557},
+  pages     = {7-13},
+  keywords  = {Pipelines;Microprocessors;Delay;Computer architecture;Logic functions;Time measurement;Hazards;Decoding;Logic design},
+  year      = {2002},
+}
+
+@InProceedings{logiic:depth:2002,
+  author    = {Hrishikesh, M.S. and Jouppi, N.P. and Farkas, K.I. and Burger, D. and Keckler, S.W. and Shivakumar, P.},
+  booktitle = {Proceedings 29th Annual International Symposium on Computer Architecture},
+  title     = {The optimal logic depth per pipeline stage is 6 to 8 FO4 inverter delays},
+  doi       = {10.1109/ISCA.2002.1003558},
+  pages     = {14-24},
+  keywords  = {Pulse inverters;Delay;Clocks;Pipeline processing;Logic;Microprocessors;Frequency conversion;Fabrication;Jitter;Process design},
+  year      = {2002},
+}
+
+@InProceedings{pipe:caches:1992,
+  author    = {Olukotun, K. and Mudge, T. and Brown, R.},
+  booktitle = {[1992] Proceedings the 19th Annual International Symposium on Computer Architecture},
+  title     = {Performance Optimization of Pipelined Primary Caches},
+  doi       = {10.1109/ISCA.1992.753315},
+  pages     = {181-190},
+  keywords  = {Optimization;Delay effects;Permission;Costs;Pipeline processing;Laboratories;Computer science;Gallium arsenide;Design methodology;Application software},
+  year      = {1992},
 }
 
 @Comment{jabref-meta: databaseType:biblatex;}
@@ -1326,15 +1417,6 @@
   year = {2016},
   author = {William J. Dally and R. Curtis Harting and Tor M. Aamodt},
   pages = {664}
-}
-
-@BOOK{Scala,
-  title = {Programming in Scala, 3rd Edition},
-  publisher = {Artima Inc},
-  year = {2016},
-  author = {Bill Venners and Lex Spoon and Martin Odersky},
-  owner = {martin},
-  timestamp = {2017.11.15}
 }
 
 @BOOK{ptolemyII-book,
@@ -2064,11 +2146,11 @@
   pages = {65--386}
 }
 
-@book{UVMPython,
-  author    = {Ray Salemit},
-  title     = {Python for RTL Verification: A complete course in Python, cocotb, and pyuvm},
-  year      = {2022},
-  isbn      = {979-8582338147},
+@Book{UVMPython,
+  author = {Ray Salemi},
+  title  = {Python for RTL Verification: A complete course in Python, cocotb, and pyuvm},
+  isbn   = {979-8582338147},
+  year   = {2022},
 }
 
 @InProceedings{teaching:chisel:2024,
@@ -2103,9 +2185,59 @@
 @InProceedings{OpenLANE,
   author    = {Shalan, Mohamed and Edwards, Tim},
   booktitle = {2020 IEEE/ACM International Conference On Computer Aided Design (ICCAD)},
-  title     = {Building OpenLANE: A 130nm OpenROAD-based Tapeout- Proven Flow : Invited Paper},
+  title     = {Building {OpenLANE}: A 130nm {OpenROAD}-based Tapeout-Proven Flow: Invited Paper},
   pages     = {1-6},
   year      = {2020},
+}
+
+@Misc{uvm2015,
+  author       = {Accellera Systems Initiative (Accellera)},
+  title        = {{Universal Verification Methodology (UVM)} 1.2 User's Guide},
+  howpublished = {\url{https://www.accellera.org/images/downloads/standards/uvm/uvm_users_guide_1.2.pdf}},
+  year         = {2015},
+}
+
+@TechReport{cocotb:2018,
+  author       = {Smith, Andrew Michael and Mayo, Jackson and Armstrong, Robert C. and Schiek, Richard and Sholander, Peter E. and Mei, Ting},
+  institution  = {SandiaNational Laboratories (SNL-CA), Livermore, CA (United States); Sandia National Laboratories, Albuquerque, NM},
+  title        = {Digital/Analog Cosimulation using CocoTB and Xyce.},
+  doi          = {10.2172/1488489},
+  no-url          = {https://www.osti.gov/biblio/1488489},
+  abstractnote = {In this article, we describe a prototype cosimulation framework using Xyce, GHDL and CocoTB that can be used to analyze digital hardware designs in out-of-nominal environments. We demonstrate current software methods and inspire future work via analysis of an open-source encryption core design. Note that this article is meant as a proof-of-concept to motivate integration of general cosimulation techniques with Xyce, an open-source circuit simulator. ------------------------------------------------},
+  month        = {12},
+  place        = {United States},
+  year         = {2018},
+}
+
+@InProceedings{surfer:2025,
+  author    = {Skarman, Frans and Klemmer, Lucas and Gro{\ss}e, Daniel and Gustafsson, Oscar and Laeufer, Kevin},
+  booktitle = {Computer Aided Verification},
+  title     = {Surfer --- An Extensible Waveform Viewer},
+  editor    = {Piskac, Ruzica and Rakamari{\'{c}}, Zvonimir},
+  isbn      = {978-3-031-98685-7},
+  pages     = {392--404},
+  publisher = {Springer Nature Switzerland},
+  abstract  = {The waveform viewer is one of the most important tools in a hardware engineer's toolbox. It is the main interface used to track down design bugs found by simulation or formal verification. In this paper, we present Surfer, a modern waveform viewer designed to integrate with the broader hardware design ecosystem. It supports translation from bit vectors to semantically meaningful values, integration with simulation and verification tools, and lays the groundwork for interactive simulation in the open-source ecosystem.},
+  address   = {Cham},
+  year      = {2025},
+}
+
+@Misc{spinalhdl,
+  author       = {{SpinalHDL}},
+  title        = {{SpinalHDL}: Scala-Based Hardware Description Language},
+  howpublished = {\url{https://github.com/SpinalHDL/SpinalHDL}},
+  note         = {Accessed: 2026-08-11},
+  year         = {2026},
+}
+
+@Book{weste2010cmos,
+  author    = {Weste, Neil H. E. and Harris, David Money},
+  title     = {CMOS VLSI Design: A Circuits and Systems Perspective},
+  edition   = {4th},
+  isbn      = {978-0321547743},
+  publisher = {Addison-Wesley / Pearson},
+  address   = {Boston, MA},
+  year      = {2010},
 }
 
 @Comment{jabref-meta: databaseType:biblatex;}
@@ -6875,7 +7007,7 @@ title = {From Chisel to Chips with Open-Source Tools},
   title     = {A Structured Approach to Verification of Digital Hardware in Scala},
   year      = {2025},
   address   = {United States},
-  note      = {2025 28th Euromicro Conference on Digital System Design (DSD) ; Conference date: 10-09-2025 Through 12-09-2025},
+  note      = {2025 28th Euromicro Conference on Digital System Design (DSD)},
   pages     = {8--15},
   publisher = {IEEE},
   doi       = {10.1109/DSD67783.2025.00014},
@@ -6885,12 +7017,36 @@ title = {From Chisel to Chips with Open-Source Tools},
   no-url       = {https://www.jopdesign.com/doc/Structured_Verification_in_Scala.pdf},
 }
 
-@Misc{chip:design:book,
+@Book{chip:design:book,
   author       = {Martin Schoeberl},
-  howpublished = {\url{https://www.imm.dtu.dk/~masca/chip-design-book.html}},
   title        = {Introduction to Chip Design Using Open-Source Tools},
-  year         = {2025},
+  year         = {2026},
+  howpublished = {\url{https://www.imm.dtu.dk/~masca/chip-design-book.html}},
   owner        = {martin},
+  ranking      = {rank4},
+}
+
+@Article{Liftoff:2026,
+  author   = {Tjark Petersen and Luca Pezzarossa and Martin Schoeberl},
+  journal  = {Microprocessors and Microsystems},
+  title    = {Liftoff: Verification of digital designs in Scala},
+  year     = {2026},
+  issn     = {0141-9331},
+  pages    = {105298},
+  volume   = {123},
+  doi      = {https://doi.org/10.1016/j.micpro.2026.105298},
+  keywords = {Functional verification, UVM, Chisel, Scala},
+  no-url      = {https://www.sciencedirect.com/science/article/pii/S0141933126000554},
+}
+
+@Article{lf:patmos:2026,
+  author   = {Khodadad, Ehsan and Pezzarossa, Luca and Schoeberl, Martin},
+  journal  = {IEEE Embedded Systems Letters},
+  title    = {Lingua Franca on the Patmos Processor},
+  year     = {2026},
+  pages    = {1-1},
+  doi      = {10.1109/LES.2026.3731924},
+  keywords = {Timing;Embedded systems;Inductors;Program processors;Hardware;Codes;Real-time systems;Time-predictable multicore architecture for embedded systems (T-CREST);time-predictable computer architecture;worst-case execution time analysis;coordination language;Lingua Franca (LF);real-time systems},
 }
 
 @Comment{jabref-meta: databaseType:bibtex;}
@@ -12441,6 +12597,21 @@ year = {2004},
 isbn = {9780080497808},
 publisher = {Morgan Kaufmann Publishers Inc.},
 address = {San Francisco, CA, USA},
+}
+
+@Manual{armambaapb,
+  title        = {{AMBA APB Protocol Specification}},
+  author       = {{Arm}},
+  note         = {ARM IHI 0024E},
+  organization = {Arm Ltd.},
+  year         = {2010},
+  no-url          = {https://developer.arm.com/documentation/ihi0024/latest/},
+}
+
+@Misc{dffram,
+  howpublished = {Available: \url{https://github.com/AUCOHL/DFFRAM}},
+  note         = {Online, last accessed July 2026},
+  title        = {{DFFRAM} Compiler},
 }
 
 @Comment{jabref-meta: databaseType:bibtex;}
