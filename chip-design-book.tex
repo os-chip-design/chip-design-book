@@ -721,6 +721,24 @@ Furthermore, it includes all files that are needed to produce the chip or to inc
  \label{tab:files}
 \end{table}
 
+\subsection{Die Size and Density}
+
+In the former run, we did not specify the requested die size, but LibreLane chose it for us. Let us define a size and run the flow again. Add to \code{adder.yaml} the following two lines:
+
+\begin{verbatim}
+FP_SIZING: absolute
+DIE_AREA: [0, 0, 100, 100]
+\end{verbatim}
+
+Run the flow again and explore the layout in KLayout. Die size is only one parameter. We can also set the requested density for the placement of the standard cells. Let us try to request a high density and explore the result again. Add:
+
+\begin{verbatim}
+PL_TARGET_DENSITY_PCT: 80
+\end{verbatim}
+
+The result lumps cells together, but it is also dependent on the IO pins. Let us aim for the highest density possible. Let us change the die size with 80~\% density and see how small we can make our design. Would 100~\% be possible? Remove the die area restrictions and request a density of 100~\%. What happens? How far can we go in this example? Maybe the design is too small to lay out the power distribution network (PDN). In that case, maybe make the design larger (use more bits to add) and repeat the experiment. Or change the PDN layout.
+
+
 \subsection{Controlling the LibreLane Flow}
 
 The LibreLane flow can be controlled by writing \myref{https://librelane.readthedocs.io/en/stable/usage/writing_custom_flows.html}{custom flows} or extended by writing \myref{https://librelane.readthedocs.io/en/stable/usage/writing_custom_steps.html}{custom steps}. However, for simple runs of a subset of LibreLane, we can use command-line arguments. For example, to just run the synthesis flow for an early area estimation, we can run:
@@ -1633,7 +1651,7 @@ We can see that it takes two clock cycles from providing the inputs until the ou
 SPICE, which stands for simulation program with integrated circuit emphasis, is an analog electronic circuit simulator. SPICE was originally developed by Laurence W. Nagel with direction from Prof. Donald Pederson at the Electronics Research Laboratory of UC Berkeley. The initial version of \myref{https://bwrcs.eecs.berkeley.edu/Classes/IcBook/SPICE/}{SPICE} was released in 1973 in the public domain~\cite{Nagel:M382}.
 
 The SPICE project has been taken up by many commercial and open-source projects. 
-\myref{https://ngspice.sourceforge.io/}{Ngspice} is a popular open-source version of the SPICE simulator. Specifically, extending the latest stable release of Berkeley SPICE, version 3f.5, which was released in 1993
+\myref{https://ngspice.sourceforge.io/}{Ngspice} is a popular open-source version of the SPICE simulator. Specifically, extending the latest stable release of Berkeley SPICE, version 3f.5, which was released in 1993.
 The web site contains \myref{https://ngspice.sourceforge.io/tutorials.html}{tutorials} and the \myref{https://ngspice.sourceforge.io/docs/ngspice-46-manual.pdf}{user manual}.
 
 Simulating integrated circuits with SPICE at the transistor level is a standard way to verify integrated circuits before production. SPICE is useful for analog circuits, but can also be used to verify small digital circuits. A circuit can be simulated under different operating conditions, such as voltage and temperature variations.
@@ -1699,7 +1717,7 @@ This model uses the PDK models for the standard cells. However, it does not cont
 
 \subsubsection{SPICE in the Web App SiliWiz}
 
-The simplest way to explore a SPICE simulation of an integrated circuit is to use Tiny Tapeout's \myref{https://app.siliwiz.com/}{SiliWiz}. SiliWiz is a web application to draw CMOS circuits and run a SPICE simulation. Explore the exercises from the web page: \myref{https://tinytapeout.com/siliwiz/}{How do semiconductors work?}.
+The simplest way to explore a SPICE simulation of an integrated circuit is to use Tiny Tapeout's \myref{https://app.siliwiz.com/}{SiliWiz}. SiliWiz is a web application to draw CMOS circuits and run a SPICE simulation. Explore the exercises from the web page: \myref{https://tinytapeout.com/siliwiz/}{How do semiconductors work?}
 
 \subsubsection{Inverter with PDK Models}
 
