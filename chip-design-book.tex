@@ -271,7 +271,7 @@ Typeset by Martin Schoeberl.}
 
 It is an exciting time to be in the world of chip design....
 
-This booklet~\cite{chip:design:book} is part of the course at DTU on introduction into chip design\footnote{\url{https://github.com/os-chip-design/chip-design-intro}} that uses open-source tools only and where all teaching material is available in open source. In the spring semester of 2026, we design an open-source chip that will be taped out with the MPW schedule on SkyWater 130 nm.\footnote{\url{https://github.com/os-chip-design/dtu-soc-2026}}
+This booklet~\cite{chip:design:book} is part of the course at DTU on introduction to chip design\footnote{\url{https://github.com/os-chip-design/chip-design-intro}} that uses open-source tools only and where all teaching material is available in open source. In the spring semester of 2026, we design an open-source chip that will be taped out with the MPW schedule on SkyWater 130 nm.\footnote{\url{https://github.com/os-chip-design/dtu-soc-2026}}
 
 \todo{Could this be written by someone else? Matt?}
 
@@ -307,10 +307,9 @@ This work has received funding from the European Union's Health and Digital Exec
 
 This book is an introduction to chip design using open-source tools. It covers the steps needed to produce a chip for a design described in a hardware description language (HDL), down to the files that are sent to the fab. Those steps are often called the backend design.
 
-\todo{Explain the term fab.}
+A fab is the short form for fabrication plant. A fab is the factory that manufactures chips. It transforms silicon wafers into chips (integrated circuits). Matt Van has a nice video showing part of the workings of the \myref{https://www.youtube.com/watch?v=aBDJQ9NYTEU}{IHP fab in Germany}.
 
 This book does not cover digital design, such as basic Boolean equations and sequential circuits. For this topic, we refer to other textbooks, such as \cite{dally:vhdl:2016} and \cite{chisel:book}. When we need to describe some circuits, we will describe them in \myref{https://www.chisel-lang.org/}{Chisel}~\cite{chisel:dac2012} and in Verilog.
-
 This book focuses on the practical aspects of chip design. For an in-depth introduction to CMOS VLSI design, we refer to the classic Weste and Harris textbook~\cite{weste2010cmos}.
 
 This book is optimized for reading on a tablet (e.g., an iPad) or a laptop.
@@ -685,8 +684,8 @@ When not constraining the chip's size, LibreLane will choose the size for the de
 \end{verbatim}
 
 \noindent We have two sizes: the size of the core area, which contains the logic, and the size of the whole die, which includes the IO pads.
-In our small example design, the core, the adders, and the registers fit into 1689\,{\textmu}mm$^2$, where the whole die, including the IO pads, needs 3330\,{\textmu}mm$^2$.
-The size of the dies is clearly dominated by the IO pads for our very simple example.
+In our small example design, the adder and the registers fit into 1689\,{\textmu}mm$^2$, where the whole die, including the IO pads, needs 3330\,{\textmu}mm$^2$.
+The size of the die is clearly dominated by the IO pads for our simple example.
 
 \subsubsection{Design Rule Checks}
 
@@ -747,7 +746,7 @@ librelane adder.yaml --to Yosys.Synthesis --run-tag synth-only
 summary.py --yosys-report
 \end{verbatim}
 
-\noindent This command runs the steps till and including the Yosys synthesis. The \code{run-tag} option overwrites the default destination folder with \code{synth-estimate}. We can use the \code{summary} tool to explore the result.
+\noindent This command runs the steps up to and including the Yosys synthesis. The \code{--run-tag} option overwrites the default destination folder with \code{synth-only}. We can use the \code{summary} tool to explore the result.
 
 We can also start the flow from an initial state. For example, to explore different optimizations from an already synthesized design. The options are: \code{--from Yosys.Synthesis} for starting from the synthesis step, and we need to provide an initial state with \code{--with-initial-state .../06-yosys-synthesis/state_out.json}. 
 
@@ -755,14 +754,14 @@ We can also start the flow from an initial state. For example, to explore differ
 
 The current example has non-initialized registers after power-up.
 Although those random values will be cleared with valid values after one or two clock cycles,
-it is good practise to reset registers. This is especially useful for verification.
+it is good practice to reset registers. This is especially useful for (formal) verification.
 
 There are two ways flip-flops can be reset: (1) with an asynchronous reset or (2) with a synchronous reset.
 Explain which one is to be preferred and why. Which one needs a larger area? This question is not
-easy to explain by a back-of-the-envelope calculation when we do (yet) not know the available standard cells and their sizes.
+easy to explain by a back-of-the-envelope calculation when we do not (yet) know the available standard cells and their sizes.
 
 However, we can easily decide this question by exploring both versions with SkyWater130.
-Change the design to reset all registers. Run both versions through the flow.
+Change the design to reset all registers. Run both reset versions through the flow.
 Then explore the size and which flip-flop types have been used.
 
 
@@ -1055,22 +1054,40 @@ LibreLane has several variables that can be set to tweak the flow. \todo{Link to
 
 \chapter{Standard Cells}
 
+Current CMOS chips are built out of just transistor types: an NMOS transistor and a PMOS transistor serving as complementary switches. One can build any digital circuit by \emph{just} wiring up circuits with those two transistor types. However, digital circuits are usually described by logical gates and flip-flops. Therefore, we can raise the level of abstraction by providing predesigned small circuits for those basic functions. We call these designs standard cells. A standard cell can be as simple as a two-transistor inverter or as complex as a DFF. Digital designs can treat them as ready-made components. The details such as transistor sizing, cell height, and the trade-offs between power, performance, and area (PPA) are performed by cell designers.
+
+In theory, one needs only a universal gate, such as a NAND gate, to implement any Boolean function or storage elements (latches and FFs). Although this idea has been explored by FPGAs (by Actel) that are just a sea of multiplexers, current practice is to provide a collection of different gates and storage elements in the so-called standard cell library.
+
+\section{A Basic Cell: An Inverter}
+
+\todo{Shematics and Layout of Sky130}
+\section{FABs}
+
+\section{PDK}
+
+ SkyWater's SKY130 [4], GlobalFoundries'
+GF180MCU [5], and IHP's SG13G2 [6].
+
+\url{https://github.com/IHP-GmbH/IHP-Open-PDK}
+
+IHP does not have the right to open-source its proprietary standard cell library. Therefore, they use the standard cell library that was open-sourced by SkyWater. The two processes are similar enough that a requalification was enough to provide a working solution in open source. However, those cells are not a perfect match for the IHP process. Therefore, students from ETH Zurich under the lead of Frank K. G\"urkaynak designed a new standard cell library for IHP as part of a course~\cite{castaneda2026ez130t8}.
+The open-source EZ standard-cell library for IHP SG13G2 is available at \url{https://ez.ethz.ch}.
+
+
+
+\section{Exploring Standard Cells}
+
 We can explore the standard cells contained in the Sky130 PDK with KLayout:
 
 \begin{verbatim}
 klayout $HOME/.ciel/sky130A/libs.ref/sky130_fd_sc_hd/gds/sky130_fd_sc_hd.gds
 \end{verbatim}
- However, with Matt's summary tool, the invocation is easier and the layers have names and better colors:
+ However, with Matt's summary tool, the invocation is easier, and the layers have names and better colors:
 \begin{verbatim}
 summary.py --show-sky130
 \end{verbatim}
 
 Right-click on any cell in the \emph{Cells} window to select a new one with \emph{Show as New Top}.
-
-
-\section{FABs}
-
-\section{PDK}
 
 We have three PDKs available in open source. Therefore, we can compare them as an exercise.
 
