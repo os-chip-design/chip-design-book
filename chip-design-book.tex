@@ -361,7 +361,7 @@ The folder \code{/foss/designs} is the place to access user data on your local m
 DESIGNS=$HOME ./start_x.sh
 \end{verbatim}
 
-Note that, as of the time of writing, the default PDK is the IHP PDK, which is not yet supported in the LibreLane flow from within the container.\footnote{See: \url{https://github.com/iic-jku/IIC-OSIC-TOOLS/issues/147}} Switch to the Sky130 PDK with the following command:
+Note that, as of the time of writing, the default PDK is the IHP PDK, which is not yet supported in the LibreLane flow from within the container.\footnote{See: \url{https://github.com/iic-jku/IIC-OSIC-TOOLS/issues/147}} Switch to the SKY130 PDK with the following command:
 
 \begin{verbatim}
 sak-pdk sky130A
@@ -398,7 +398,7 @@ The frontend command is \code{librelane}. Check the version you have installed w
 librelane --version
 \end{verbatim}
 
-LibreLane also installs the Sky130 PDK using the \code{ciel} tool. The PDKs are stored under \code{$HOME:/.ciel}.
+LibreLane also installs the SKY130 PDK using the \code{ciel} tool. The PDKs are stored under \code{$HOME:/.ciel}.
 
 You can run LibreLane also without cloning it locally with \code{nix run}:
 
@@ -483,7 +483,7 @@ KLayout will load a LEF/DEF or a GDS file with all geometric information.
 In KLayout, you can explore the design. Use the rulers to measure your design. How large is it?
 Would it fit into a Tiny Tapeout Tile? How large is a Tiny Tapeout tile?
 When you expand the adder in Cells, you can see which cells have been used.
-By double-clicking on a cell type, it is removed from the display. This is an indirect way to show the cells in the GDS. The flip-flop standard cells in Sky130 have names that include ``dfxtp'' in their name. Double-click that cell to see how many flip-flops are used. How many should there be?
+By double-clicking on a cell type, it is removed from the display. This is an indirect way to show the cells in the GDS. The flip-flop standard cells in SKY130 have names that include ``dfxtp'' in their name. Double-click that cell to see how many flip-flops are used. How many should there be?
 
 
 
@@ -587,10 +587,10 @@ The first four steps perform linting of the design, and any Verilog syntax error
 Furthermore, Yosys provides an area estimation by summing the sizes of all 60 cells used. The area is given in this example as 863\,{\textmu}mm$^2$.
 Note that this area estimate would result in a utilization of 100\;\%, which is impossible as we need some space for the tap cells and probably some for the routing of the design. The default utilization in LibreLane is 50\;\%, which can be set via \code{FP_CORE_UTIL}.
 
-We use the Sky130 PDK and can find the documentation of each cell \myref{https://skywater-pdk.readthedocs.io/en/main/}{online}.
+We use the SKY130 PDK and can find the documentation of each cell \myref{https://skywater-pdk.readthedocs.io/en/main/}{online}.
 E.g., the DFF is described at \myref{https://skywater-pdk.readthedocs.io/en/main/contents/libraries/sky130_fd_sc_hd/cells/dfxtp/README.html}{dfxtp}.
 The file \code{adder.nl.v} contains the design synthesized to standard cells from the used PDK. As our example is very simple, we can manually inspect the generated Verilog.
-Yosys also generates visualization in the form of DOT graphs.
+Yosys also generates visualizations in the form of DOT graphs.
 With \myref{https://graphviz.org/}{Graphviz} installed, we can convert those files to PDF:
 
 \begin{verbatim}
@@ -1054,13 +1054,31 @@ LibreLane has several variables that can be set to tweak the flow. \todo{Link to
 
 \chapter{Standard Cells}
 
-Current CMOS chips are built out of just transistor types: an NMOS transistor and a PMOS transistor serving as complementary switches. One can build any digital circuit by \emph{just} wiring up circuits with those two transistor types. However, digital circuits are usually described by logical gates and flip-flops. Therefore, we can raise the level of abstraction by providing predesigned small circuits for those basic functions. We call these designs standard cells. A standard cell can be as simple as a two-transistor inverter or as complex as a DFF. Digital designs can treat them as ready-made components. The details such as transistor sizing, cell height, and the trade-offs between power, performance, and area (PPA) are performed by cell designers.
+Current CMOS (Complementary Metal-Oxide-Semiconductor) chips are built out of just two transistor types: an NMOS transistor and a PMOS transistor serving as complementary switches. One can build any digital circuit by \emph{just} wiring up circuits with those two transistor types. However, digital circuits are usually described by logical gates and flip-flops. Therefore, we can raise the level of abstraction by providing predesigned small circuits for those basic functions. We call these designs standard cells. A standard cell can be as simple as a two-transistor inverter or as complex as a DFF. Digital designs can treat them as ready-made components. The details such as transistor sizing, cell height, and the trade-offs between power, performance, and area (PPA) are performed by cell designers.
 
 In theory, one needs only a universal gate, such as a NAND gate, to implement any Boolean function or storage elements (latches and FFs). Although this idea has been explored by FPGAs (by Actel) that are just a sea of multiplexers, current practice is to provide a collection of different gates and storage elements in the so-called standard cell library.
 
+We show the layout of standard cells from the first open-source PDK of SkyWater.
+All cell drawings are from the \myref{https://skywater-pdk.readthedocs.io/en/main/}{SkyWater SKY130 PDK documentation}, Copyright 2020, SkyWater PDK Authors under the Apache-2.0 license.
+
 \section{A Basic Cell: An Inverter}
 
-\todo{Shematics and Layout of Sky130}
+A combinational cell is built out of: (1) a pull-up network consisting of PMOS transistors to deliver the high output and (2) a pull-down network consisting of NMOS transistors delivering the low output. This network forms the complementary function: when the NMOS transistors are on, the PMOS transistors are off, and vice versa.
+
+The simplest gate consists of exactly one PMOS and one NMOS transistor: the inverter.
+Figure~\ref{fig:inverter} shows the schematic of the inverter. The top transistor is the PMOS transistor that is on when the input is 0. The bottom transistor is the NMOS transistor that is on when the input is 1.
+In our discussion of standard gates, we view transistors as simple switches that are either on or off.
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[scale=0.7]{figures/inverter}
+  \caption{The simplest CMOS gate: an inverter}
+  \label{fig:inverter}
+\end{figure}
+
+The SkyWater documentation of the inverter can be found on this \myref{https://skywater-pdk.readthedocs.io/en/main/contents/libraries/sky130_fd_sc_hd/cells/inv/README.html}{page}.
+
+\todo{Shematics and Layout of SKY130}
 \section{FABs}
 
 \section{PDK}
@@ -1077,7 +1095,7 @@ The open-source EZ standard-cell library for IHP SG13G2 is available at \url{htt
 
 \section{Exploring Standard Cells}
 
-We can explore the standard cells contained in the Sky130 PDK with KLayout:
+We can explore the standard cells contained in the SKY130 PDK with KLayout:
 
 \begin{verbatim}
 klayout $HOME/.ciel/sky130A/libs.ref/sky130_fd_sc_hd/gds/sky130_fd_sc_hd.gds
@@ -1203,7 +1221,7 @@ The chipIgnite project includes a \myref{https://github.com/fossi-foundation/car
 
 \subsection{Caravel User Project}
 
-The Caravel framework itself is split into two repositories: the \myref{https://github.com/chipfoundry/caravel_user_project}{user project} (often called \code{user_project_wrapper}, as this is the top-level of the user project) and \myref{https://github.com/chipfoundry/caravel}{Caravel} itself. The example user project contains a tiny example (a counter) to get started. Within that project, all the needed tools are installed, including a lite version of Caravel, the management core for simulation, LibreLane, and the Sky130 PDK.
+The Caravel framework itself is split into two repositories: the \myref{https://github.com/chipfoundry/caravel_user_project}{user project} (often called \code{user_project_wrapper}, as this is the top-level of the user project) and \myref{https://github.com/chipfoundry/caravel}{Caravel} itself. The example user project contains a tiny example (a counter) to get started. Within that project, all the needed tools are installed, including a lite version of Caravel, the management core for simulation, LibreLane, and the SKY130 PDK.
 
 The starting point is the user project. The flow is run within Docker. Follow the instructions in the \myref{https://github.com/chipfoundry/caravel_user_project/blob/main/docs/source/index.md}{Caravel User Project}. The dependencies on Docker and Python are listed there. Missing is the dependency on two Python libraries: \code{python-tk} and \code{Click}.
 
@@ -1223,7 +1241,7 @@ The needed tools are installed with:
 make setup
 \end{verbatim}
 
-During this setup phase, a lightweight version of Caravel (\code{caravel\_lite}), the management core for simulation, the Sky130 PDK, a Docker with LibreLane, and timing scripts are downloaded.
+During this setup phase, a lightweight version of Caravel (\code{caravel\_lite}), the management core for simulation, the SKY130 PDK, a Docker with LibreLane, and timing scripts are downloaded.
 
 The download will take several minutes and needs around 7.5 GB of hard disk space.
 
@@ -1249,7 +1267,7 @@ The user project is hardened with:
 make user_proj_example
 \end{verbatim}
 
-That command starts the hardening of the user project with LibreLane, generating the GDS file and a gate-level netlist with instances of the Sky130 standard cells for gate-level simulation. That GDS can be found in folder \code{gds}. Use e.g., KLayout to explore that hard macro. The gate-level netlist in folder \code{verilog/gl}. The LibreLane reports and generated files can be found in the folder \code{openlane/user_proj_example/runs}.
+That command starts the hardening of the user project with LibreLane, generating the GDS file and a gate-level netlist with instances of the SKY130 standard cells for gate-level simulation. That GDS can be found in folder \code{gds}. Use e.g., KLayout to explore that hard macro. The gate-level netlist in folder \code{verilog/gl}. The LibreLane reports and generated files can be found in the folder \code{openlane/user_proj_example/runs}.
 
 The project now needs 10 GB of disk space. Note that many of the generated files have already been committed to the original git repository, which creates annoying false source changes. Avoid committing those changes after every run.
 
@@ -1698,7 +1716,7 @@ The simulation results in the expected load curve of a capacitor as shown in Fig
 \lstinputlisting[float, caption={An inverter. (\myref{https://github.com/os-chip-design/chip-design-book/blob/main/code/inverter.spice}{\code{inverter.spice}}).}, label={lst:spice:inverter}, frame=tb, captionpos=b]{code/inverter.spice}
 
 As a next example, let us simulate an inverter. Listing~\ref{lst:spice:inverter} shows a CMOS inverter built out of an NMOS and a PMOS transistor.
-The simulation results are shown in Figure~\ref{fig:spice:inverter}. Note that the transistors use only default model parameters, which are good for demonstration. It would be best to use the transistor models from a real PDK, e.g., from the Sky130 PDK.
+The simulation results are shown in Figure~\ref{fig:spice:inverter}. Note that the transistors use only default model parameters, which are good for demonstration. It would be best to use the transistor models from a real PDK, e.g., from the SKY130 PDK.
 
 \begin{figure}
   \centering
@@ -1741,7 +1759,7 @@ The simplest way to explore a SPICE simulation of an integrated circuit is to us
 Install Ngspice locally and run the two examples (rc.spice and inverter.spice). Note that the links in the listings point you to the source code for the examples on GitHub.
 
 
-We have shown you how to model an inverter with built-in transistors and default parameters. For a more realistic simulation, change that SPICE simulation to use the transistors from the Sky130 PDK.
+We have shown you how to model an inverter with built-in transistors and default parameters. For a more realistic simulation, change that SPICE simulation to use the transistors from the SKY130 PDK.
 
 \subsubsection{Simulate the Adder}
 
@@ -1764,7 +1782,7 @@ An efficient memory cell is built out of six-transistor (6T) SRAM cells, as show
   \label{fig:sram:cell}
 \end{figure}
 
-However, standard synthesis tools do not generate memories based on 6T SRAM cells. The tools to generate on-chip memories are called memory compilers. \myref{https://openram.org/}{OpenRAM} is an open-source memory compiler~\cite{opeRAM:2016}. Furthermore, the Sky130 PDK includes a few memories generated with OpenRAM.
+However, standard synthesis tools do not generate memories based on 6T SRAM cells. The tools to generate on-chip memories are called memory compilers. \myref{https://openram.org/}{OpenRAM} is an open-source memory compiler~\cite{opeRAM:2016}. Furthermore, the SKY130 PDK includes a few memories generated with OpenRAM.
 
 \section{Flip-Flop and Latch-based Memories}
 
@@ -1773,7 +1791,7 @@ When describing memories in an HDL, the synthesis tool will usually infer FFs fo
 \lstinputlisting[float, caption={128 Bytes of Flip-Flop based Memory (\myref{https://github.com/os-chip-design/chip-design-book/blob/main/src/main/scala/FlipFlopMemory.scala}{\code{FlipFlopMemory.scala}}).}, label={lst:ffmem}, frame=tb, captionpos=b]{src/main/scala/FlipFlopMemory.scala}
 
 Listing~\ref{lst:ffmem} shows the Chisel code of a flip-flop-based memory. The memory is 128 bytes, which is 1024 bits, the same size as the register file example discussed at the start of the chapter.
-The area for that memory in Sky130 is 290\;{\textmu}m x 290\;{\textmu}m (0.08 mm$^2$), which is similar to that of the register file mentioned at the beginning of the chapter. The 1~KiB register-based memory, organized as 256 x 32-bit, uses 810\;{\textmu}m x 810\;{\textmu}m (0.66 mm$^2$).
+The area for that memory in SKY130 is 290\;{\textmu}m x 290\;{\textmu}m (0.08 mm$^2$), which is similar to that of the register file mentioned at the beginning of the chapter. The 1~KiB register-based memory, organized as 256 x 32-bit, uses 810\;{\textmu}m x 810\;{\textmu}m (0.66 mm$^2$).
 % Running for about 15' for 1 KiB
 \todo{Check synth results in Wildcat comparing Chisel 3.6 and Chisel 6}
 % Chisel 3.6 320\;{\textmu}m x 320\;{\textmu}m, which is the same as for the register file mentioned at the beginning of the chapter.
@@ -1787,9 +1805,9 @@ OpenRAM: 256x32: 500x400
 
 \section{Exploring OpenRAM Memories}
 
-\myref{https://openram.org/}{OpenRAM}~\cite{opeRAM:2016} is a Python library to create memories. It creates the layout (GDSII), netlists, timing models, and power models. For Sky130, prehardened memories are available in the PDK.
+\myref{https://openram.org/}{OpenRAM}~\cite{opeRAM:2016} is a Python library to create memories. It creates the layout (GDSII), netlists, timing models, and power models. For SKY130, prehardened memories are available in the PDK.
 
-An \myref{https://openlane.readthedocs.io/en/latest/tutorials/openram.html}{old documentation of OpenLane} contains a description on how to use OpenRAM memories with Sky130.
+An \myref{https://openlane.readthedocs.io/en/latest/tutorials/openram.html}{old documentation of OpenLane} contains a description on how to use OpenRAM memories with SKY130.
 
 \lstinputlisting[float, caption={BlackBox to wrap the OpenRAM memory (\myref{https://github.com/os-chip-design/chip-design-book/blob/main/src/main/scala/SramMacro.scala}{\code{SramMacro.scala}}).}, label={lst:sram:macro}, frame=tb, captionpos=b]{src/main/scala/SramMacro.scala}
 
@@ -1843,7 +1861,7 @@ to
 Figure~\ref{fig:OpenRAM} shows the final GDSII for the OpenRAM memory in KLayout after a successful run of the flow. We can see a lot of unused space around the memory array, which could be optimized by a better placement of the control logic.
 The 1~KiB OpenRAM memory, organized as 256 x 32-bit, uses 490\;{\textmu}m x 420\;{\textmu}m (0.2 mm$^2$).
 
-The version of OpenRAM that is part of the Sky130 PDK does \emph{not} pass the Sky130 DRC. The following repository includes fixed memories: \url{https://github.com/VLSIDA/sky130_sram_macros}, which we have used on our second tapeout.
+The version of OpenRAM that is part of the SKY130 PDK does \emph{not} pass the SKY130 DRC. The following repository includes fixed memories: \url{https://github.com/VLSIDA/sky130_sram_macros}, which we have used on our second tapeout.
 
 \section{DFFRAM}
 
