@@ -1054,12 +1054,17 @@ LibreLane has several variables that can be set to tweak the flow. \todo{Link to
 
 \chapter{Standard Cells}
 
-Current CMOS (Complementary Metal-Oxide-Semiconductor) chips are built out of just two transistor types: an NMOS transistor and a PMOS transistor serving as complementary switches. One can build any digital circuit by \emph{just} wiring up circuits with those two transistor types. However, digital circuits are usually described by logical gates and flip-flops. Therefore, we can raise the level of abstraction by providing predesigned small circuits for those basic functions. We call these designs standard cells. A standard cell can be as simple as a two-transistor inverter or as complex as a DFF. Digital designs can treat them as ready-made components. The details such as transistor sizing, cell height, and the trade-offs between power, performance, and area (PPA) are performed by cell designers.
+Current \myref{https://en.wikipedia.org/wiki/CMOS}{CMOS} (complementary metal-oxide-semiconductor) chips are built out of \myref{https://en.wikipedia.org/wiki/MOSFET}{MOSFET}s (metal-oxide-semiconductor field-effect transistor).
+We use just two MOSFET types: an NMOS transistor and a PMOS transistor serving as complementary switches.
+
+One can build any digital circuit by \emph{just} wiring up circuits with those two transistor types. However, digital circuits are usually described by logical gates and flip-flops. Therefore, we can raise the level of abstraction by providing predesigned small circuits for those basic functions. We call these designs standard cells. A standard cell can be as simple as a two-transistor inverter or as complex as a DFF. Digital designs can treat them as ready-made components. The details such as transistor sizing, cell height, and the trade-offs between power, performance, and area (PPA) are performed by cell designers.
 
 In theory, one needs only a universal gate, such as a NAND gate, to implement any Boolean function or storage elements (latches and FFs). Although this idea has been explored by FPGAs (by Actel) that are just a sea of multiplexers, current practice is to provide a collection of different gates and storage elements in the so-called standard cell library.
 
 We show the layout of standard cells from the first open-source PDK of SkyWater.
 All cell drawings are from the \myref{https://skywater-pdk.readthedocs.io/en/main/}{SkyWater SKY130 PDK documentation}, Copyright 2020, SkyWater PDK Authors under the Apache-2.0 license.
+
+Standard cells have a common height, but variable width.
 
 \section{A Basic Cell: An Inverter}
 
@@ -1077,9 +1082,39 @@ In our discussion of standard gates, we view transistors as simple switches that
 \end{figure}
 
 The SkyWater documentation of the inverter can be found on this \myref{https://skywater-pdk.readthedocs.io/en/main/contents/libraries/sky130_fd_sc_hd/cells/inv/README.html}{page}.
+Figure~\ref{fig:inv1} shows the GDSII layout of the two-transistor inverter. The top PMOS transistor is connected to the VDD rail (called VPR) and the bottom to the GND rail.
+As SKY130 uses a p-substrate, the PMOS transistor needs an n-well, which is shown as a (partially filled) green rectangle.
 
-\todo{Shematics and Layout of SKY130}
+\begin{figure}
+  \centering
+  \includegraphics[scale=0.2]{figures/sky130_fd_sc_hd__inv_1}
+  \caption{The GDSII layout of an inverter.}
+  \label{fig:inv1}
+\end{figure}
+
+SKY130 contains several inverter cells for different drive strengths. Concrete with 1, 2, 4, 6, 8, 12, and 16 transistor pairs. Figure~\ref{fig:inv6} shows the \code{sky130_fd_sc_hd__inv_6} cell, containing 12 transistors.
+
+
+\begin{figure}
+  \centering
+  \includegraphics[scale=0.2]{figures/sky130_fd_sc_hd__inv_6}
+  \caption{The GDSII layout of an inverter with drive strength of 6.}
+  \label{fig:inv6}
+\end{figure}
+
+
+\section{NAND: a Universal Gate}
+
+With the pull-up and pull-down transistors, we can create AND and OR functionality. Two transistors in series result in an AND function. Two transistors in parallel result in an OR function. The basic pull-up/pull-down setup results in an inverting function. The next interesting function is a 2-input NAND gate. A NAND gate outputs 0 only if both inputs are 1. Or, in other words, the output is 1 if either of the two inputs is 0. That means the pull-down network needs two transistors in series and the pull-up network has both transistors in parallel.
+
+\section{Notes}
+
+Note that the cells are placed tightly so that the top and bottom metals form continuous power strips. Similarly, the n-well is shared between the standard cells. Empty space between cells is filled with so-called filler cells. Furthermore, SKY130 cells do not contain connections between the p-substrate and GND and the n-well to VDD (called a tapeless library to save space). Therefore, tap cells need to be inserted that tie the n-well to power (VDD) and the p-substrate to ground (GND).
+
+
 \section{FABs}
+
+
 
 \section{PDK}
 
@@ -1712,10 +1747,19 @@ The simulation results in the expected load curve of a capacitor as shown in Fig
   \label{fig:rc}
 \end{figure}
 
+\begin{figure}
+  \centering
+  \includegraphics[scale=0.7]{figures/inverter}
+  \caption{A two-transistor inverter.}
+  \label{fig:sim:inv}
+\end{figure}
+
 
 \lstinputlisting[float, caption={An inverter. (\myref{https://github.com/os-chip-design/chip-design-book/blob/main/code/inverter.spice}{\code{inverter.spice}}).}, label={lst:spice:inverter}, frame=tb, captionpos=b]{code/inverter.spice}
 
-As a next example, let us simulate an inverter. Listing~\ref{lst:spice:inverter} shows a CMOS inverter built out of an NMOS and a PMOS transistor.
+
+
+As a next example, let us simulate an inverter. Listing~\ref{lst:spice:inverter} shows a CMOS inverter built out of an NMOS and a PMOS transistor (see Figure~\ref{fig:sim:inv}).
 The simulation results are shown in Figure~\ref{fig:spice:inverter}. Note that the transistors use only default model parameters, which are good for demonstration. It would be best to use the transistor models from a real PDK, e.g., from the SKY130 PDK.
 
 \begin{figure}
@@ -1744,9 +1788,9 @@ Figure~\ref{fig:nand} shows the simulation of the NAND gate. We start with both 
 
 LibreLane produces a SPICE model of a synthesized circuit. For example, a SPICE model of our adder example from the introduction can be found in
 
-\code{runs/.../final/spic/adder.spice}.
+\code{runs/.../final/spice/adder.spice}.
 
-This model uses the PDK models for the standard cells. However, it does not contain parasitic extraction for accurate timing modeling. We can use Magic for the use for real transistor models and extracted resistances and capacitances.
+This model uses the PDK models for the standard cells. However, it does not contain parasitic extraction for accurate timing modeling. We can use Magic to extract resistances and capacitances.
 
 \subsection{Exercises}
 
