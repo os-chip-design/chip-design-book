@@ -1063,8 +1063,10 @@ In theory, one needs only a universal gate, such as a NAND gate, to implement an
 
 We show the layout of standard cells from the first open-source PDK of SkyWater.
 All cell drawings are from the \myref{https://skywater-pdk.readthedocs.io/en/main/}{SkyWater SKY130 PDK documentation}, Copyright 2020, SkyWater PDK Authors under the Apache-2.0 license.
+The SkyWater foundry provides seven \myref{https://skywater-pdk.readthedocs.io/en/main/contents/libraries/foundry-provided.html}{standard cell libraries}.
 
-Standard cells have a common height, but variable width.
+Standard cells have a common height, e.g., the high-density library from SkyWater 2.720\,{\textmu}m. The width is variable, but a multiple of a grid of 0.460\,{\textmu}m. For example, a NAND2 has a width of 3 grids, which is 1.380\,{\textmu}m,
+
 
 \section{A Basic Cell: An Inverter}
 
@@ -1106,11 +1108,45 @@ SKY130 contains several inverter cells for different drive strengths. Concrete w
 \section{NAND: a Universal Gate}
 
 With the pull-up and pull-down transistors, we can create AND and OR functionality. Two transistors in series result in an AND function. Two transistors in parallel result in an OR function. The basic pull-up/pull-down setup results in an inverting function. The next interesting function is a 2-input NAND gate. A NAND gate outputs 0 only if both inputs are 1. Or, in other words, the output is 1 if either of the two inputs is 0. That means the pull-down network needs two transistors in series and the pull-up network has both transistors in parallel.
+Figure~\ref{fig:inverter} shows the schematic of the NAND gate.
 
-\section{Notes}
+\begin{figure}
+  \centering
+  \includegraphics[scale=0.7]{figures/nand}
+  \caption{The NAND gate, a universal gate.}
+  \label{fig:nand}
+\end{figure}
+
+A 2-input NAND gate is a so-called universal gate. Any Boolean function can be built out of 2-input NAND gates only (see \myref{https://en.wikipedia.org/wiki/NAND_logic}{NAND logic}). We can also build latches and flip-flops out of NAND gates only. Other universal gates are a NOR gate and a 2:1 multiplexer. This idea has been explored in the late 1980s by Actel producing an FPGA with a sea of 2:1 MUXes.
+
+2-input NAND gates have also been used to quantify the size of the logic. E.g., SkyWater specifies the routed gate density of 160 kGates/mm$^2$ or better for the high density library. Xilinx also, in the initial days, used the number of gates as a size description of their FPGAs.
+
+The SkyWater documentation of the 2-input NAND gate can be found on this \myref{https://skywater-pdk.readthedocs.io/en/main/contents/libraries/sky130_fd_sc_hd/cells/nand2/README.html}{page}.
+Figure~\ref{fig:nand:layout} shows the GDSII layout of the four-transistor 2-input NAND gate. The top PMOS transistors are connected in parallel to the VDD rail and the two NMOS transistors in series to the GND rail.
+The n-well is shown as a (partially filled) green rectangle. Note that the n-well is the same size for all standard cells, resulting in a continuous n-well after placement.
+
+\begin{figure}
+  \centering
+  \includegraphics[scale=0.2]{figures/sky130_fd_sc_hd__nand2_1}
+  \caption{The GDSII layout of the 2-input NAND gate.}
+  \label{fig:nand:layout}
+\end{figure}
+
+\section{Placement of Standard Cells}
 
 Note that the cells are placed tightly so that the top and bottom metals form continuous power strips. Similarly, the n-well is shared between the standard cells. Empty space between cells is filled with so-called filler cells. Furthermore, SKY130 cells do not contain connections between the p-substrate and GND and the n-well to VDD (called a tapeless library to save space). Therefore, tap cells need to be inserted that tie the n-well to power (VDD) and the p-substrate to ground (GND).
 
+Standard cells can also be mirrored, so that GND is on top and VDD on bottom. In that case, power rails can be shared between rows of standard cells. Figure~\ref{fig:std:cell:rows} shows a screenshot of a GDSII rendered by the Tiny Tapout 3D GDS viewer. Metal 1, which is used for the power supply of the standard cells, is shown in blue. The n-well is shown in grey. Thus, one row has the n-well on top and the other row on the bottom. Two rows share the power lines and the n-wells.
+
+The Tiny Tapeout \myref{https://gds-viewer.tinytapeout.com/}{3D GDS viewer} is a convenient browser-based viewer to explore (small) GDSII files. It can also be used to view locally stored GDSII.
+Tiny Tapout provides a guide on how to \myref{https://tinytapeout.com/guides/laying-standard-cells-with-magic/}{place standard cells with Magic VLSI}.
+
+\begin{figure}
+  \centering
+  \includegraphics[scale=0.5]{figures/std-cell-rows}
+  \caption{Screenshot of two standard cell rows.}
+  \label{fig:std:cell:rows}
+\end{figure}
 
 \section{FABs}
 
