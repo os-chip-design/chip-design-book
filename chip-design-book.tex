@@ -765,292 +765,6 @@ Change the design to reset all registers. Run both reset versions through the fl
 Then explore the size and which flip-flop types have been used.
 
 
-\section{Manual Flow with Python}
-
-\index{LibreLane!Python flow}
-
-However, we can also run the individual steps from Python. We will reuse the pipelined adder for this exploration from Section~\ref{sec:hello}. The following example is inspired by running \myref{https://colab.research.google.com/github/librelane/librelane/blob/main/notebook.ipynb}{LibreLane on Google Colab}, a nice way to explore LibreLane just from your browser.
-
-All code from this book can be found in the GitHub repo of the book: \myref{https://github.com/os-chip-design/chip-design-book/tree/main/code}{code}.
-
-Start Python from within your Nix shell,
-
-\begin{verbatim}
-python
-\end{verbatim}
-
-and run the following commands. Import LibreLane and print its version.
-
-\begin{verbatim}
-import librelane
-print(librelane.__version__)
-\end{verbatim}
-
-\subsection{Configuration}
-
-To run our steps we need to configure the PDK via \code{ciel}\footnote{\code{ciel} is a PDK managemant tool, part of LibreLane.} and configure our project.
-
-Execute the code from Listing~\ref{lst:pdk} to setup the PDK.
-If you have downloaded the code from the book, you can execute the script from within Python with the following command:
-
-\begin{verbatim}
-exec(open("pdk.py").read())
-\end{verbatim}
-
-\lstinputlisting[float, basicstyle=\footnotesize\ttfamily, caption={Setting up the PDK (\myref{https://github.com/os-chip-design/chip-design-book/blob/main/code/pdk.py}{\code{pdk.py}}).}, label={lst:pdk}, frame=tb, captionpos=b]{code/pdk.py}
-
-\lstinputlisting[float, caption={Configure the project (\myref{https://github.com/os-chip-design/chip-design-book/blob/main/code/config.py}{\code{config.py}}).}, label={lst:config}, frame=tb, captionpos=b]{code/config.py}
-
-A LibreLane \code{Flow} needs to be configured. Execute Listing~\ref{lst:config} to configure your project.
-The configuration is similar to the YAML file we used in the initial example.
-
-The results of the following steps will be placed into the folder \code{librelane_run}.
-
-\subsection{Synthesis with Yosys}
-
-\todo{Explore now Yosys results. Including .dot figures. Add them to the paper and slides.}
-
-\lstinputlisting[float, caption={Get started with the steps (\myref{https://github.com/os-chip-design/chip-design-book/blob/main/code/steps.py}{\code{steps.py}}).}, label={lst:steps}, frame=tb, captionpos=b]{code/steps.py}
-
-
-The design is split into so-called \emph{steps}.
-Therefore, we need to import \code{Step} and \code{State}, as shown in Listing~\ref{lst:steps}).
-The last command shows us help with the steps.
-
-\lstinputlisting[float, caption={Running the synthesis (\myref{https://github.com/os-chip-design/chip-design-book/blob/main/code/synth.py}{\code{synth.py}}).}, label={lst:synth}, frame=tb, captionpos=b]{code/synth.py}
-
-\todo{Donn has updated stuff: see \url{https://gist.github.com/donn/ae9571b14432097241fdfcfeea53719e}} %\url{https://element.fossi-chat.org/#/room/#librelane:fossi-chat.org}}
-
-We start with the Yosys synthesis. Yosys converts high-level Verilog to a low-level Verilog that includes instances of standard cells. We pass the Verilog files to \code{Yosys.Synthesis}.
-We can run the synthesis with the code from Listing~\ref{lst:synth}.
-
-Explore the reports and the generated low-level Verilog in folder \code{1-yosys-synthesis}.
-Furthermore, Yosys also generates visualization in the form of DOT graphs.
-Install \myref{https://graphviz.org/}{Graphviz} to convert those files to PDF:
-
-\begin{verbatim}
-dot -Tpdf hierarchy.dot -o hierarchy.pdf
-\end{verbatim}
-
-\subsection{Floorplanning}
-
-The next step is floor planning. It determines the size of the chip and generates a cell placement grid.
-Each cell in the grid is called a \emph{site}. A standard cell usually occupies multiple sites by width (e.g., a D-FF has a larger width than a NAND gate).
-We run the floorplanning with the code from Listing~\ref{lst:floor}.
-Explore the reports in folder \code{2-openroad-floorplan}.
-
-\lstinputlisting[float, caption={Running the floorplanning (\myref{https://github.com/os-chip-design/chip-design-book/blob/main/code/floor.py}{\code{floor.py}}).}, label={lst:floor}, frame=tb, captionpos=b]{code/floor.py}
-
-\subsection{Tap/Endcap Cell Insertion}
-
-This step places endcap cells and tap cells. Endcap cells are placed at the beginning and end of each row. They terminate each power line.
-
-The tap cells connect VDD to the n-well and GND to the p-substrate. To save area, the standard cells do not connect to the tap themself. The maximum distance between tap cells is dependent on the foundry process.
-Run the tap placements with the code from Listing~\ref{lst:tap}.
-
-\lstinputlisting[float, caption={Running the tap cell insertation (\myref{https://github.com/os-chip-design/chip-design-book/blob/main/code/tap.py}{\code{tap.py}}).}, label={lst:tap}, frame=tb, captionpos=b]{code/tap.py}
-
-To view the result, start the OpenRoad GUI with:
-
-\begin{verbatim}
-openroad -gui
-\end{verbatim}
-
-and then open \code{adder.odb} from folder \code{3-openroad-tapendcapinsertion}.
-
-\subsection{I/O Placement}
-
-Metal pins are placed at the edges of the design for the top-level inputs and outputs. The default placement can be overridden by a placement configuration.
-
-Run the tap placements with the code from Listing~\ref{lst:io} and explore the result with the OpenRoad GUI.
-
-\lstinputlisting[float, caption={Running the I/O placement (\myref{https://github.com/os-chip-design/chip-design-book/blob/main/code/io.py}{\code{io.py}}).}, label={lst:io}, frame=tb, captionpos=b]{code/io.py}
-
-\subsection{Power Distribution Network (PDN)}
-
-The next step is to generate the power distribution network (PDN).
-It is a pattern of vertical and horizontal straps.
-The vertical straps are thicker and distribute power to the horizontal straps.
-The horizontal straps are delivering power to the individual standard cells.
-More details of the configuration of the PDN can be found in the LibreLane documentation.
-
-Run the PDN generation with the code from Listing~\ref{lst:pdn} and explore the result with the OpenRoad GUI.
-Figure~\ref{fig:pdn} shows the PDN of our small adder example. 
-
-\lstinputlisting[float, caption={Running PDN generation (\myref{https://github.com/os-chip-design/chip-design-book/blob/main/code/pdn.py}{\code{pdn.py}}).}, label={lst:pdn}, frame=tb, captionpos=b]{code/pdn.py}
-
-\begin{figure}
-  \centering
-  \includegraphics[width=0.5\textwidth]{figures/pdn}
-  \caption{Chip layout with pins and power distribution network.}
-  \label{fig:pdn}
-\end{figure}
-
-\subsection{Global Placement}
-
-Global placement places the standard cells, aiming to minimize the distance between connected cells.
-The cells are not exactly placed, as we can see in Figure~\ref{fig:glp}.
-The placement is even \emph{illegal} as it is not properly aligned with the grid.
-This is fixed in the next step of detailed placement, also called placement legalization.
-
-Run the global placement with the code from Listing~\ref{lst:glp} and explore the result with the OpenRoad GUI.
-
-\lstinputlisting[float, caption={Global placement (\myref{https://github.com/os-chip-design/chip-design-book/blob/main/code/glp.py}{\code{glp.py}}).}, label={lst:glp}, frame=tb, captionpos=b]{code/glp.py}
-
-\begin{figure}
-  \centering
-  \includegraphics[width=0.5\textwidth]{figures/glp}
-  \caption{Global placement.}
-  \label{fig:glp}
-\end{figure}
-
-
-\subsection{Detailed Placement}
-
-Detailed placement aligns the cells with the grid; we call this also \emph{legalizing} it.
-Run the detailed placement with the code from Listing~\ref{lst:dlp} and explore the result with the OpenRoad GUI.
-Figure~\ref{fig:dlp} shows the now well-aligned cells.
-
-\lstinputlisting[float, caption={Local placement (\myref{https://github.com/os-chip-design/chip-design-book/blob/main/code/glp.py}{\code{dlp.py}}).}, label={lst:dlp}, frame=tb, captionpos=b]{code/dlp.py}
-
-\begin{figure}
-  \centering
-  \includegraphics[width=0.5\textwidth]{figures/dlp}
-  \caption{Legalized placement}
-  \label{fig:dlp}
-\end{figure}
-
-\subsection{Clock Tree Synthesis (CTS)}
-
-After placing all cells, we create the clock tree, including buffers for the clock.
-Run the detailed placement with the code from Listing~\ref{lst:cts}.
-
-\lstinputlisting[float, caption={Local placement (\myref{https://github.com/os-chip-design/chip-design-book/blob/main/code/cts.py}{\code{cts.py}}).}, label={lst:cts}, frame=tb, captionpos=b]{code/cts.py}
-
-% The CTS step creates the cells and places the between the gaps in the detailed placement above.
-
-\subsection{Global and Detailed Routing}
-
-%Global ... Local ...
-
-As the result of global routing is stored in an internal data structure, we see no effect on the actual design.
-Therefore, we combine global routing and local routing in a single Python script to be executed (Listing~\ref{lst:route}).
-Figure~\ref{fig:dlp} shows the routed design.
-
-\lstinputlisting[float, caption={Global and local routing (\myref{https://github.com/os-chip-design/chip-design-book/blob/main/code/route.py}{\code{route.py}}).}, label={lst:route}, frame=tb, captionpos=b]{code/route.py}
-
-\begin{figure}
-  \centering
-  \includegraphics[width=0.5\textwidth]{figures/route}
-  \caption{The routed design.}
-  \label{fig:route}
-\end{figure}
-
-%TODO: below is not my text.
-
-%Global routing "plans" the routes the wires between two gates (or gates and I/O pins/the PDN) will take. The results of global routing (which are called "routing guides") are stored in internal data structures and have no effect on the actual design, so there is no display() statement.
-
-%Detailed routing uses the guides from Global Routing to actually create wires on the metal layers and connect the gates, making the connections finally physical.
-
-%This is typically the longest step in the flow.
-
-\subsection{Fill Insertion}
-
-%Finally, as we're done placing all the essential cells, the only thing left to do is fill in the gaps.
-
-%We prioritize the use of decap (decoupling capacitor) cells, which further supports the power distribution network, but when there aren't any small enough cells, we just use regular fill cells.
-
-Execute Listing~\ref{lst:fill} and explore the output with the OpenRoad GUI.
-
-\lstinputlisting[float, caption={Fill insertion (\myref{https://github.com/os-chip-design/chip-design-book/blob/main/code/fill.py}{\code{fill.py}}).}, label={lst:fill}, frame=tb, captionpos=b]{code/fill.py}
-
-\subsection{Resistance/Capacitance Extraction (RCX)}
-
-Extracting resistance and capacitance as preparation for timing analysis.
-
-Execute Listing~\ref{lst:rcx}.
-
-\lstinputlisting[float, caption={Fill insertion (\myref{https://github.com/os-chip-design/chip-design-book/blob/main/code/rcx.py}{\code{rcx.py}}).}, label={lst:rcx}, frame=tb, captionpos=b]{code/rcx.py}
-
-
-
-%This step does not alter the design- rather, it computes the Parasitic elements of the circuit, which have an effect of timing, as we prepare to do the final timing analysis.
-
-%The parasitic elements are saved in the Standard Parasitics Exchange Format, or SPEF. LibreLane creates a SPEF file for each interconnect corner as described in the Corners and STA section of the documentation.
-
-\subsection{Static Timing Analysis (STA)}
-
-Execute Listing~\ref{lst:sta}.
-
-\lstinputlisting[float, caption={Static timing analysis (\myref{https://github.com/os-chip-design/chip-design-book/blob/main/code/sta.py}{\code{sta.py}}).}, label={lst:sta}, frame=tb, captionpos=b]{code/sta.py}
-
-%STA is a process that verifies that a chip meets certain constraints on clock and data timings to run at its rated clock speed. See Corners and STA in the documentation for more info.
-%
-%This step generates two kinds of files:
-%
-%    .lib: Libertyª-compatible Library files. Can be used to do static timing analysis when creating a design with this design as a sub-macro.
-%    .sdf: Standard Delay Format. Can be used with certain simulation software to do dynamic timing analysis.
-%
-%Unfortunately, the .lib files coming out of LibreLane right now are not super reliable for timing purposes and are only provided for completeness.
-%
-%When using LibreLane-created macros withing other designs, it is best to use the macro's final netlist and extracted parasitics instead.
-
-\subsection{Generating the GDSII}
-
-Finally, we can stream out the GDSII of our design to ship for manufacturing.
-
-Execute Listing~\ref{lst:gds}. It is now again time to explore the final result with KLayout
-
-\lstinputlisting[float, caption={Stream out the GDS file (\myref{https://github.com/os-chip-design/chip-design-book/blob/main/code/gds.py}{\code{gds.py}}).}, label={lst:gds}, frame=tb, captionpos=b]{code/gds.py}
-
-\subsection{Design Rule Checks (DRC)}
-
-Execute Listing~\ref{lst:drc} for the design rules check.
-
-\lstinputlisting[float, caption={Design rule checks (\myref{https://github.com/os-chip-design/chip-design-book/blob/main/code/drc.py}{\code{drc.py}}).}, label={lst:drc}, frame=tb, captionpos=b]{code/drc.py}
-
-\subsection{SPICE Extraction}
-
- %for Layout vs. Schematic Check>
-
-%This step tries to reconstruct a SPICE netlist from the GDSII file, so it can later be used for the Layout vs. Schematic (LVS) check.
-
-Execute Listing~\ref{lst:spice} for the spice extraction.
-
-\lstinputlisting[float, caption={Spice extraction (\myref{https://github.com/os-chip-design/chip-design-book/blob/main/code/spice.py}{\code{spice.py}}).}, label={lst:spice}, frame=tb, captionpos=b]{code/spice.py}
-
-\subsection{Layout vs. Schematic (LVS)}
-
-Execute Listing~\ref{lst:lvs} for the layout vs. schematic check.
-
-\lstinputlisting[float, caption={Spice extraction (\myref{https://github.com/os-chip-design/chip-design-book/blob/main/code/lvs.py}{\code{lvs.py}}).}, label={lst:lvs}, frame=tb, captionpos=b]{code/lvs.py}
-
-%A comparison between the final Verilog netlist (from PnR) and the final SPICE netlist (extracted.)
-%
-%This check effectively compares the physically implemented circuit to the final Verilog netlist output by OpenROAD.
-%
-%The idea is, if there are any disconnects, shorts or other mismatches in the physical implementation that do not exist in the logical view of the design, they would be caught at this step.
-%
-%Common issues that result in LVS violations include:
-%
-%    Lack of fill cells or tap cells in the design
-%    Two unrelated signals to be shorted, or a wire to be disconnected (most commonly seen with misconfigured PDN)
-%
-%Chips with LVS errors are typically dead on arrival.
-
-
-\section{Notes}
-
-Collect notes here for the flow.
-
-\subsection{Tuning the Synthesis Flow}
-
-LibreLane has several variables that can be set to tweak the flow. \todo{Link to it}.
-\begin{verbatim}
-  "//": "Hold slack margin - Increase them in case you are getting hold violations.",
-  "PL_RESIZER_HOLD_SLACK_MARGIN": 0.1,
-  "GRT_RESIZER_HOLD_SLACK_MARGIN": 0.05,
-\end{verbatim}
 
 \chapter{Standard Cells}
 
@@ -1123,7 +837,7 @@ A 2-input NAND gate is a so-called universal gate. Any Boolean function can be b
 
 The SkyWater documentation of the 2-input NAND gate can be found on this \myref{https://skywater-pdk.readthedocs.io/en/main/contents/libraries/sky130_fd_sc_hd/cells/nand2/README.html}{page}.
 Figure~\ref{fig:nand:layout} shows the GDSII layout of the four-transistor 2-input NAND gate. The top PMOS transistors are connected in parallel to the VDD rail and the two NMOS transistors in series to the GND rail.
-The n-well is shown as a (partially filled) green rectangle. Note that the n-well is the same size for all standard cells, resulting in a continuous n-well after placement.
+The n-well is shown as a (partially filled) green rectangle. Note that the n-well is the same height for all standard cells, resulting in a continuous n-well after placement.
 
 \begin{figure}
   \centering
@@ -1131,6 +845,10 @@ The n-well is shown as a (partially filled) green rectangle. Note that the n-wel
   \caption{The GDSII layout of the 2-input NAND gate.}
   \label{fig:nand:layout}
 \end{figure}
+
+\section{Further Combinational Cells}
+
+\section{DFF: a Complex Cell}
 
 \section{Placement of Standard Cells}
 
@@ -1180,6 +898,371 @@ Right-click on any cell in the \emph{Cells} window to select a new one with \emp
 
 We have three PDKs available in open source. Therefore, we can compare them as an exercise.
 
+\section{Spice Simulation}
+
+SPICE, which stands for simulation program with integrated circuit emphasis, is an analog electronic circuit simulator. SPICE was originally developed by Laurence W. Nagel with direction from Prof. Donald Pederson at the Electronics Research Laboratory of UC Berkeley. The initial version of \myref{https://bwrcs.eecs.berkeley.edu/Classes/IcBook/SPICE/}{SPICE} was released in 1973 in the public domain~\cite{Nagel:M382}.
+
+The SPICE project has been taken up by many commercial and open-source projects. 
+\myref{https://ngspice.sourceforge.io/}{Ngspice} is a popular open-source version of the SPICE simulator. Specifically, extending the latest stable release of Berkeley SPICE, version 3f.5, which was released in 1993.
+The web site contains \myref{https://ngspice.sourceforge.io/tutorials.html}{tutorials} and the \myref{https://ngspice.sourceforge.io/docs/ngspice-46-manual.pdf}{user manual}.
+
+Simulating integrated circuits with SPICE at the transistor level is a standard way to verify integrated circuits before production. SPICE is useful for analog circuits, but can also be used to verify small digital circuits. A circuit can be simulated under different operating conditions, such as voltage and temperature variations.
+
+Circuits are described in plain text and may contain resistors, capacitors, inductors, MOSFETs, and other devices. SPICE translates the text netlist into nonlinear differential equations to be solved. 
+
+Listing~\ref{lst:rc} shows a SPICE description of an RC low-pass circuit with an input signal rising between 100\,{\textmu}s and 150\,{\textmu}s from 0\,V to 1\,V. We can run the simulation with ngspice as follows:
+
+
+\lstinputlisting[float, caption={Simple RC circuit (\myref{https://github.com/os-chip-design/chip-design-book/blob/main/code/rc.spice}{\code{rc.spice}}).}, label={lst:rc}, frame=tb, captionpos=b]{code/rc.spice}
+
+
+\begin{verbatim}
+ngspice rc.spice
+\end{verbatim}
+
+The simulation results in the expected load curve of a capacitor as shown in Figure~\ref{fig:rc}.
+
+\begin{figure}
+  \centering
+  \includegraphics[width=0.7\textwidth]{figures/spice-rc}
+  \caption{Impulse response of a simple RC low-pass circuit.}
+  \label{fig:rc}
+\end{figure}
+
+\begin{figure}
+  \centering
+  \includegraphics[scale=0.7]{figures/inverter}
+  \caption{A two-transistor inverter.}
+  \label{fig:sim:inv}
+\end{figure}
+
+
+\lstinputlisting[float, caption={An inverter. (\myref{https://github.com/os-chip-design/chip-design-book/blob/main/code/inverter.spice}{\code{inverter.spice}}).}, label={lst:spice:inverter}, frame=tb, captionpos=b]{code/inverter.spice}
+
+
+
+As a next example, let us simulate an inverter. Listing~\ref{lst:spice:inverter} shows a CMOS inverter built out of an NMOS and a PMOS transistor (see Figure~\ref{fig:sim:inv}).
+The simulation results are shown in Figure~\ref{fig:spice:inverter}. Note that the transistors use only default model parameters, which are good for demonstration. It would be best to use the transistor models from a real PDK, e.g., from the SKY130 PDK.
+
+\begin{figure}
+  \centering
+  \includegraphics[width=0.7\textwidth]{figures/spice-inverter}
+  \caption{A simple two-transistor inverter.}
+  \label{fig:spice:inverter}
+\end{figure}
+
+\subsection{Simulation of a Standard Cell}
+
+\lstinputlisting[float, basicstyle=\footnotesize\ttfamily, caption={Simulation of a standard cell (\myref{https://github.com/os-chip-design/chip-design-book/blob/main/code/rc.cir}{\code{sim.spice}}). The example is adapted from Matt Venn's \myref{https://github.com/mattvenn/simulate-gate-2025}{Simulate a Gate example} from his \myref{https://zerotoasiccourse.com/}{Zero to ASIC course}. Matt's example is licensed with Apache 2.}, label={lst:sim:spice}, frame=tb, captionpos=b]{code/sim.spice}
+
+We can simulate standard cells from the PDK. Listing~\ref{lst:sim:spice} shows the SPICE configuration for a NAND gate and an inverter as the output load. Note that SPICE does not understand shell variables like \code{$HOME}, as it is an independent program and not a shell script. Therefore, the example contains a tilde (\code{\~}) to reference the home folder. If needed, adapt the SPICE script to point to your installation of the PDK.
+
+\begin{figure}
+  \centering
+  \includegraphics[width=0.7\textwidth]{figures/spice-nand}
+  \caption{Simulation of a NAND gate.}
+  \label{fig:nand}
+\end{figure}
+
+Figure~\ref{fig:nand} shows the simulation of the NAND gate. We start with both inputs (a, b) low and then switch one after the other to high and then back to low. We see the correct logical behavior, but also electrical behavior, such as rise and fall times or some overshooting.
+
+\section{Exercises}
+
+\subsection{SPICE in the Web App SiliWiz}
+
+The simplest way to explore a SPICE simulation of an integrated circuit is to use Tiny Tapeout's \myref{https://app.siliwiz.com/}{SiliWiz}. SiliWiz is a web application to draw CMOS circuits and run a SPICE simulation. Explore the exercises from the web page: \myref{https://tinytapeout.com/siliwiz/}{How do semiconductors work?}
+
+\subsection{Inverter with PDK Models}
+
+Install Ngspice locally and run the two examples (rc.spice and inverter.spice). Note that the links in the listings point you to the source code for the examples on GitHub.
+
+
+We have shown you how to model an inverter with built-in transistors and default parameters. For a more realistic simulation, change that SPICE simulation to use the transistors from the SKY130 PDK.
+
+\chapter{Driving LibreLane from Python}
+
+\index{LibreLane!Python flow}
+
+We can also run the individual steps in LibreLane from Python. We will reuse the pipelined adder for this exploration from Section~\ref{sec:hello}. The following example is inspired by running \myref{https://colab.research.google.com/github/librelane/librelane/blob/main/notebook.ipynb}{LibreLane on Google Colab}, a nice way to explore LibreLane just from your browser. All code from this book can be found in the GitHub repo of the book: \myref{https://github.com/os-chip-design/chip-design-book/tree/main/code}{code}.
+
+Start Python from within your Nix shell,
+
+\begin{verbatim}
+python
+\end{verbatim}
+
+and run the following commands. Import LibreLane and print its version.
+
+\begin{verbatim}
+import librelane
+print(librelane.__version__)
+\end{verbatim}
+
+\section{Configuration}
+
+To run our steps we need to configure the PDK via \code{ciel}\footnote{\code{ciel} is a PDK managemant tool, part of LibreLane.} and configure our project.
+
+Execute the code from Listing~\ref{lst:pdk} to setup the PDK.
+If you have downloaded the code from the book, you can execute the script from within Python with the following command:
+
+\begin{verbatim}
+exec(open("pdk.py").read())
+\end{verbatim}
+
+\lstinputlisting[float, basicstyle=\footnotesize\ttfamily, caption={Setting up the PDK (\myref{https://github.com/os-chip-design/chip-design-book/blob/main/code/pdk.py}{\code{pdk.py}}).}, label={lst:pdk}, frame=tb, captionpos=b]{code/pdk.py}
+
+\lstinputlisting[float, caption={Configure the project (\myref{https://github.com/os-chip-design/chip-design-book/blob/main/code/config.py}{\code{config.py}}).}, label={lst:config}, frame=tb, captionpos=b]{code/config.py}
+
+A LibreLane \code{Flow} needs to be configured. Execute Listing~\ref{lst:config} to configure your project.
+The configuration is similar to the YAML file we used in the initial example.
+
+The results of the following steps will be placed into the folder \code{librelane_run}.
+
+\section{Synthesis with Yosys}
+
+\todo{Explore Yosys results now. Including .dot figures. Add them to the paper and slides.}
+
+\lstinputlisting[float, caption={Get started with the steps (\myref{https://github.com/os-chip-design/chip-design-book/blob/main/code/steps.py}{\code{steps.py}}).}, label={lst:steps}, frame=tb, captionpos=b]{code/steps.py}
+
+
+The design is split into so-called \emph{steps}.
+Therefore, we need to import \code{Step} and \code{State}, as shown in Listing~\ref{lst:steps}).
+The last command shows us help with the steps.
+
+\lstinputlisting[float, caption={Running the synthesis (\myref{https://github.com/os-chip-design/chip-design-book/blob/main/code/synth.py}{\code{synth.py}}).}, label={lst:synth}, frame=tb, captionpos=b]{code/synth.py}
+
+\todo{Donn has updated stuff: see \url{https://gist.github.com/donn/ae9571b14432097241fdfcfeea53719e}} %\url{https://element.fossi-chat.org/#/room/#librelane:fossi-chat.org}}
+
+We start with the Yosys synthesis. Yosys converts high-level Verilog to a low-level Verilog that includes instances of standard cells. We pass the Verilog files to \code{Yosys.Synthesis}.
+We can run the synthesis with the code from Listing~\ref{lst:synth}.
+
+Explore the reports and the generated low-level Verilog in folder \code{1-yosys-synthesis}.
+Furthermore, Yosys also generates visualization in the form of DOT graphs.
+Install \myref{https://graphviz.org/}{Graphviz} to convert those files to PDF:
+
+\begin{verbatim}
+dot -Tpdf hierarchy.dot -o hierarchy.pdf
+\end{verbatim}
+
+\section{Floorplanning}
+
+The next step is floorplanning. It determines the size of the chip and generates a cell placement grid.
+Each cell in the grid is called a \emph{site}. A standard cell usually occupies multiple sites by width (e.g., a D-FF has a larger width than a NAND gate).
+We run the floorplanning with the code from Listing~\ref{lst:floor}.
+Explore the reports in folder \code{2-openroad-floorplan}.
+
+\lstinputlisting[float, caption={Running the floorplanning (\myref{https://github.com/os-chip-design/chip-design-book/blob/main/code/floor.py}{\code{floor.py}}).}, label={lst:floor}, frame=tb, captionpos=b]{code/floor.py}
+
+\section{Tap/Endcap Cell Insertion}
+
+This step places endcap cells and tap cells. Endcap cells are placed at the beginning and end of each row. They terminate each power line.
+
+The tap cells connect VDD to the n-well and GND to the p-substrate. To save area, the standard cells do not connect to the tap themself. The maximum distance between tap cells is dependent on the foundry process.
+Run the tap placements with the code from Listing~\ref{lst:tap}.
+
+\lstinputlisting[float, caption={Running the tap cell insertation (\myref{https://github.com/os-chip-design/chip-design-book/blob/main/code/tap.py}{\code{tap.py}}).}, label={lst:tap}, frame=tb, captionpos=b]{code/tap.py}
+
+To view the result, start the OpenRoad GUI with:
+
+\begin{verbatim}
+openroad -gui
+\end{verbatim}
+
+and then open \code{adder.odb} from folder \code{3-openroad-tapendcapinsertion}.
+
+\section{I/O Placement}
+
+Metal pins are placed at the edges of the design for the top-level inputs and outputs. The default placement can be overridden by a placement configuration.
+
+Run the tap placements with the code from Listing~\ref{lst:io} and explore the result with the OpenRoad GUI.
+
+\lstinputlisting[float, caption={Running the I/O placement (\myref{https://github.com/os-chip-design/chip-design-book/blob/main/code/io.py}{\code{io.py}}).}, label={lst:io}, frame=tb, captionpos=b]{code/io.py}
+
+\section{Power Distribution Network (PDN)}
+
+The next step is to generate the power distribution network (PDN).
+It is a pattern of vertical and horizontal straps.
+The vertical straps are thicker and distribute power to the horizontal straps.
+The horizontal straps are delivering power to the individual standard cells.
+More details of the configuration of the PDN can be found in the LibreLane documentation.
+
+Run the PDN generation with the code from Listing~\ref{lst:pdn} and explore the result with the OpenRoad GUI.
+Figure~\ref{fig:pdn} shows the PDN of our small adder example. 
+
+\lstinputlisting[float, caption={Running PDN generation (\myref{https://github.com/os-chip-design/chip-design-book/blob/main/code/pdn.py}{\code{pdn.py}}).}, label={lst:pdn}, frame=tb, captionpos=b]{code/pdn.py}
+
+\begin{figure}
+  \centering
+  \includegraphics[width=0.5\textwidth]{figures/pdn}
+  \caption{Chip layout with pins and power distribution network.}
+  \label{fig:pdn}
+\end{figure}
+
+\section{Global Placement}
+
+Global placement places the standard cells, aiming to minimize the distance between connected cells.
+The cells are not exactly placed, as we can see in Figure~\ref{fig:glp}.
+The placement is even \emph{illegal} as it is not properly aligned with the grid.
+This is fixed in the next step of detailed placement, also called placement legalization.
+
+Run the global placement with the code from Listing~\ref{lst:glp} and explore the result with the OpenRoad GUI.
+
+\lstinputlisting[float, caption={Global placement (\myref{https://github.com/os-chip-design/chip-design-book/blob/main/code/glp.py}{\code{glp.py}}).}, label={lst:glp}, frame=tb, captionpos=b]{code/glp.py}
+
+\begin{figure}
+  \centering
+  \includegraphics[width=0.5\textwidth]{figures/glp}
+  \caption{Global placement.}
+  \label{fig:glp}
+\end{figure}
+
+
+\section{Detailed Placement}
+
+Detailed placement aligns the cells with the grid; we call this also \emph{legalizing} it.
+Run the detailed placement with the code from Listing~\ref{lst:dlp} and explore the result with the OpenRoad GUI.
+Figure~\ref{fig:dlp} shows the now well-aligned cells.
+
+\lstinputlisting[float, caption={Local placement (\myref{https://github.com/os-chip-design/chip-design-book/blob/main/code/glp.py}{\code{dlp.py}}).}, label={lst:dlp}, frame=tb, captionpos=b]{code/dlp.py}
+
+\begin{figure}
+  \centering
+  \includegraphics[width=0.5\textwidth]{figures/dlp}
+  \caption{Legalized placement}
+  \label{fig:dlp}
+\end{figure}
+
+\section{Clock Tree Synthesis (CTS)}
+
+After placing all cells, we create the clock tree, including buffers for the clock.
+Run the detailed placement with the code from Listing~\ref{lst:cts}.
+
+\lstinputlisting[float, caption={Local placement (\myref{https://github.com/os-chip-design/chip-design-book/blob/main/code/cts.py}{\code{cts.py}}).}, label={lst:cts}, frame=tb, captionpos=b]{code/cts.py}
+
+% The CTS step creates the cells and places the between the gaps in the detailed placement above.
+
+\section{Global and Detailed Routing}
+
+%Global ... Local ...
+
+As the result of global routing is stored in an internal data structure, we see no effect on the actual design.
+Therefore, we combine global routing and local routing in a single Python script to be executed (Listing~\ref{lst:route}).
+Figure~\ref{fig:dlp} shows the routed design.
+
+\lstinputlisting[float, caption={Global and local routing (\myref{https://github.com/os-chip-design/chip-design-book/blob/main/code/route.py}{\code{route.py}}).}, label={lst:route}, frame=tb, captionpos=b]{code/route.py}
+
+\begin{figure}
+  \centering
+  \includegraphics[width=0.5\textwidth]{figures/route}
+  \caption{The routed design.}
+  \label{fig:route}
+\end{figure}
+
+%TODO: below is not my text.
+
+%Global routing "plans" the routes the wires between two gates (or gates and I/O pins/the PDN) will take. The results of global routing (which are called "routing guides") are stored in internal data structures and have no effect on the actual design, so there is no display() statement.
+
+%Detailed routing uses the guides from Global Routing to actually create wires on the metal layers and connect the gates, making the connections finally physical.
+
+%This is typically the longest step in the flow.
+
+\section{Fill Insertion}
+
+%Finally, as we're done placing all the essential cells, the only thing left to do is fill in the gaps.
+
+%We prioritize the use of decap (decoupling capacitor) cells, which further supports the power distribution network, but when there aren't any small enough cells, we just use regular fill cells.
+
+Execute Listing~\ref{lst:fill} and explore the output with the OpenRoad GUI.
+
+\lstinputlisting[float, caption={Fill insertion (\myref{https://github.com/os-chip-design/chip-design-book/blob/main/code/fill.py}{\code{fill.py}}).}, label={lst:fill}, frame=tb, captionpos=b]{code/fill.py}
+
+\subsection{Resistance/Capacitance Extraction (RCX)}
+
+Extracting resistance and capacitance as preparation for timing analysis.
+
+Execute Listing~\ref{lst:rcx}.
+
+\lstinputlisting[float, caption={Fill insertion (\myref{https://github.com/os-chip-design/chip-design-book/blob/main/code/rcx.py}{\code{rcx.py}}).}, label={lst:rcx}, frame=tb, captionpos=b]{code/rcx.py}
+
+
+
+%This step does not alter the design- rather, it computes the Parasitic elements of the circuit, which have an effect of timing, as we prepare to do the final timing analysis.
+
+%The parasitic elements are saved in the Standard Parasitics Exchange Format, or SPEF. LibreLane creates a SPEF file for each interconnect corner as described in the Corners and STA section of the documentation.
+
+\section{Static Timing Analysis (STA)}
+
+Execute Listing~\ref{lst:sta}.
+
+\lstinputlisting[float, caption={Static timing analysis (\myref{https://github.com/os-chip-design/chip-design-book/blob/main/code/sta.py}{\code{sta.py}}).}, label={lst:sta}, frame=tb, captionpos=b]{code/sta.py}
+
+%STA is a process that verifies that a chip meets certain constraints on clock and data timings to run at its rated clock speed. See Corners and STA in the documentation for more info.
+%
+%This step generates two kinds of files:
+%
+%    .lib: Libertyª-compatible Library files. Can be used to do static timing analysis when creating a design with this design as a sub-macro.
+%    .sdf: Standard Delay Format. Can be used with certain simulation software to do dynamic timing analysis.
+%
+%Unfortunately, the .lib files coming out of LibreLane right now are not super reliable for timing purposes and are only provided for completeness.
+%
+%When using LibreLane-created macros withing other designs, it is best to use the macro's final netlist and extracted parasitics instead.
+
+\section{Generating the GDSII File}
+
+Finally, we can stream out the GDSII of our design to ship for manufacturing.
+
+Execute Listing~\ref{lst:gds}. It is now again time to explore the final result with KLayout
+
+\lstinputlisting[float, caption={Stream out the GDS file (\myref{https://github.com/os-chip-design/chip-design-book/blob/main/code/gds.py}{\code{gds.py}}).}, label={lst:gds}, frame=tb, captionpos=b]{code/gds.py}
+
+\subsection{Design Rule Checks (DRC)}
+
+Execute Listing~\ref{lst:drc} for the design rules check.
+
+\lstinputlisting[float, caption={Design rule checks (\myref{https://github.com/os-chip-design/chip-design-book/blob/main/code/drc.py}{\code{drc.py}}).}, label={lst:drc}, frame=tb, captionpos=b]{code/drc.py}
+
+\section{SPICE Extraction}
+
+ %for Layout vs. Schematic Check>
+
+%This step tries to reconstruct a SPICE netlist from the GDSII file, so it can later be used for the Layout vs. Schematic (LVS) check.
+
+Execute Listing~\ref{lst:spice} for the spice extraction.
+
+\lstinputlisting[float, caption={Spice extraction (\myref{https://github.com/os-chip-design/chip-design-book/blob/main/code/spice.py}{\code{spice.py}}).}, label={lst:spice}, frame=tb, captionpos=b]{code/spice.py}
+
+\section{Layout vs. Schematic (LVS)}
+
+Execute Listing~\ref{lst:lvs} for the layout vs. schematic check.
+
+\lstinputlisting[float, caption={Spice extraction (\myref{https://github.com/os-chip-design/chip-design-book/blob/main/code/lvs.py}{\code{lvs.py}}).}, label={lst:lvs}, frame=tb, captionpos=b]{code/lvs.py}
+
+%A comparison between the final Verilog netlist (from PnR) and the final SPICE netlist (extracted.)
+%
+%This check effectively compares the physically implemented circuit to the final Verilog netlist output by OpenROAD.
+%
+%The idea is, if there are any disconnects, shorts or other mismatches in the physical implementation that do not exist in the logical view of the design, they would be caught at this step.
+%
+%Common issues that result in LVS violations include:
+%
+%    Lack of fill cells or tap cells in the design
+%    Two unrelated signals to be shorted, or a wire to be disconnected (most commonly seen with misconfigured PDN)
+%
+%Chips with LVS errors are typically dead on arrival.
+
+
+\section{Notes}
+
+Collect notes here for the flow.
+
+\section{Tuning the Synthesis Flow}
+
+LibreLane has several variables that can be set to tweak the flow. \todo{Link to it}.
+\begin{verbatim}
+  "//": "Hold slack margin - Increase them in case you are getting hold violations.",
+  "PL_RESIZER_HOLD_SLACK_MARGIN": 0.1,
+  "GRT_RESIZER_HOLD_SLACK_MARGIN": 0.05,
+\end{verbatim}
 
 \chapter{Open-Source Production Frameworks}
 
@@ -1752,75 +1835,8 @@ We can see that it takes two clock cycles from providing the inputs until the ou
 
 \section{Netlist Simulation}
 
-\section{Spice Simulation}
 
-SPICE, which stands for simulation program with integrated circuit emphasis, is an analog electronic circuit simulator. SPICE was originally developed by Laurence W. Nagel with direction from Prof. Donald Pederson at the Electronics Research Laboratory of UC Berkeley. The initial version of \myref{https://bwrcs.eecs.berkeley.edu/Classes/IcBook/SPICE/}{SPICE} was released in 1973 in the public domain~\cite{Nagel:M382}.
-
-The SPICE project has been taken up by many commercial and open-source projects. 
-\myref{https://ngspice.sourceforge.io/}{Ngspice} is a popular open-source version of the SPICE simulator. Specifically, extending the latest stable release of Berkeley SPICE, version 3f.5, which was released in 1993.
-The web site contains \myref{https://ngspice.sourceforge.io/tutorials.html}{tutorials} and the \myref{https://ngspice.sourceforge.io/docs/ngspice-46-manual.pdf}{user manual}.
-
-Simulating integrated circuits with SPICE at the transistor level is a standard way to verify integrated circuits before production. SPICE is useful for analog circuits, but can also be used to verify small digital circuits. A circuit can be simulated under different operating conditions, such as voltage and temperature variations.
-
-Circuits are described in plain text and may contain resistors, capacitors, inductors, MOSFETs, and other devices. SPICE translates the text netlist into nonlinear differential equations to be solved. 
-
-Listing~\ref{lst:rc} shows a SPICE description of an RC low-pass circuit with an input signal rising between 100\,{\textmu}s and 150\,{\textmu}s from 0\,V to 1\,V. We can run the simulation with ngspice as follows:
-
-
-\lstinputlisting[float, caption={Simple RC circuit (\myref{https://github.com/os-chip-design/chip-design-book/blob/main/code/rc.spice}{\code{rc.spice}}).}, label={lst:rc}, frame=tb, captionpos=b]{code/rc.spice}
-
-
-\begin{verbatim}
-ngspice rc.spice
-\end{verbatim}
-
-The simulation results in the expected load curve of a capacitor as shown in Figure~\ref{fig:rc}.
-
-\begin{figure}
-  \centering
-  \includegraphics[width=0.7\textwidth]{figures/spice-rc}
-  \caption{Impulse response of a simple RC low-pass circuit.}
-  \label{fig:rc}
-\end{figure}
-
-\begin{figure}
-  \centering
-  \includegraphics[scale=0.7]{figures/inverter}
-  \caption{A two-transistor inverter.}
-  \label{fig:sim:inv}
-\end{figure}
-
-
-\lstinputlisting[float, caption={An inverter. (\myref{https://github.com/os-chip-design/chip-design-book/blob/main/code/inverter.spice}{\code{inverter.spice}}).}, label={lst:spice:inverter}, frame=tb, captionpos=b]{code/inverter.spice}
-
-
-
-As a next example, let us simulate an inverter. Listing~\ref{lst:spice:inverter} shows a CMOS inverter built out of an NMOS and a PMOS transistor (see Figure~\ref{fig:sim:inv}).
-The simulation results are shown in Figure~\ref{fig:spice:inverter}. Note that the transistors use only default model parameters, which are good for demonstration. It would be best to use the transistor models from a real PDK, e.g., from the SKY130 PDK.
-
-\begin{figure}
-  \centering
-  \includegraphics[width=0.7\textwidth]{figures/spice-inverter}
-  \caption{A simple two-transistor inverter.}
-  \label{fig:spice:inverter}
-\end{figure}
-
-\subsection{Simulation of a Standard Cell}
-
-\lstinputlisting[float, basicstyle=\footnotesize\ttfamily, caption={Simulation of a standard cell (\myref{https://github.com/os-chip-design/chip-design-book/blob/main/code/rc.cir}{\code{sim.spice}}). The example is adapted from Matt Venn's \myref{https://github.com/mattvenn/simulate-gate-2025}{Simulate a Gate example} from his \myref{https://zerotoasiccourse.com/}{Zero to ASIC course}. Matt's example is licensed with Apache 2.}, label={lst:sim:spice}, frame=tb, captionpos=b]{code/sim.spice}
-
-We can simulate standard cells from the PDK. Listing~\ref{lst:sim:spice} shows the SPICE configuration for a NAND gate and an inverter as the output load. Note that SPICE does not understand shell variables like \code{$HOME}, as it is an independent program and not a shell script. Therefore, the example contains a tilde (\code{\~}) to reference the home folder. If needed, adapt the SPICE script to point to your installation of the PDK.
-
-\begin{figure}
-  \centering
-  \includegraphics[width=0.7\textwidth]{figures/spice-nand}
-  \caption{Simulation of a NAND gate.}
-  \label{fig:nand}
-\end{figure}
-
-Figure~\ref{fig:nand} shows the simulation of the NAND gate. We start with both inputs (a, b) low and then switch one after the other to high and then back to low. We see the correct logical behavior, but also electrical behavior, such as rise and fall times or some overshooting.
-
-\subsection{Simulation of a Full Circuit}
+\section{Spice Simulation of a Full Circuit}
 
 LibreLane produces a SPICE model of a synthesized circuit. For example, a SPICE model of our adder example from the introduction can be found in
 
@@ -1829,17 +1845,6 @@ LibreLane produces a SPICE model of a synthesized circuit. For example, a SPICE 
 This model uses the PDK models for the standard cells. However, it does not contain parasitic extraction for accurate timing modeling. We can use Magic to extract resistances and capacitances.
 
 \subsection{Exercises}
-
-\subsubsection{SPICE in the Web App SiliWiz}
-
-The simplest way to explore a SPICE simulation of an integrated circuit is to use Tiny Tapeout's \myref{https://app.siliwiz.com/}{SiliWiz}. SiliWiz is a web application to draw CMOS circuits and run a SPICE simulation. Explore the exercises from the web page: \myref{https://tinytapeout.com/siliwiz/}{How do semiconductors work?}
-
-\subsubsection{Inverter with PDK Models}
-
-Install Ngspice locally and run the two examples (rc.spice and inverter.spice). Note that the links in the listings point you to the source code for the examples on GitHub.
-
-
-We have shown you how to model an inverter with built-in transistors and default parameters. For a more realistic simulation, change that SPICE simulation to use the transistors from the SKY130 PDK.
 
 \subsubsection{Simulate the Adder}
 
