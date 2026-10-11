@@ -779,7 +779,7 @@ We show the layout of standard cells from the first open-source PDK of SkyWater.
 All cell drawings are from the \myref{https://skywater-pdk.readthedocs.io/en/main/}{SkyWater SKY130 PDK documentation}, Copyright 2020, SkyWater PDK Authors under the Apache-2.0 license.
 The SkyWater foundry provides seven \myref{https://skywater-pdk.readthedocs.io/en/main/contents/libraries/foundry-provided.html}{standard cell libraries}.
 
-Standard cells have a common height, e.g., the high-density library from SkyWater 2.720\,{\textmu}m. The width is variable, but a multiple of a grid of 0.460\,{\textmu}m. For example, a NAND2 has a width of 3 grids, which is 1.380\,{\textmu}m,
+Standard cells have a common height, e.g., the high-density library from SkyWater 2.720\,{\textmu}m. The width is variable, but a multiple of a grid of 0.460\,{\textmu}m. For example, a NAND2 has a width of 3 grids, which is 1.380\,{\textmu}m.
 
 
 \section{A Basic Cell: An Inverter}
@@ -848,11 +848,34 @@ The n-well is shown as a (partially filled) green rectangle. Note that the n-wel
 
 \section{Further Combinational Cells}
 
+Although a NAND gate is a universal gate, standard cell libraries contain many more cells. E.g., the SKY130 high-density library contains 153 AND, OR, NAND, or NOR cells and 8 XOR or XNOR cells. Furthermore, libraries contain so-called compound gates. Those are gates that combine AND and OR functions. E.g., an AO21 is a two-input AND followed by an OR with one additional input. Some of those gates also include inversion. These gates are efficient as they are directly implemented with the pull-up and pull-down networks. For example, an \myref{https://sky130-unofficial.readthedocs.io/en/latest/contents/libraries/sky130_fd_sc_hd/cells/a21oi/README.html}{AOI21} gate is an AND gate feeding into a NOR gate. This cell can be implemented directly by just 6 transistors, instead of 10 transistors (4 for a NAND, 2 for an inverter, and 4 for the NOR gate).
+Figure~\ref{fig:a21oi} shows the circuit of such an AOI21 gate.
+
+\begin{figure}
+  \centering
+  \includegraphics[scale=0.7]{figures/a21oi}
+  \caption{The AND-NOR gate as an example of a compound gate.}
+  \label{fig:a21oi}
+\end{figure}
+
+The SKY130 high-density library contains 115 AND-OR-INV and OR-AND-INV gates and 132 AND-OR and OR-AND gates. Furthermore, SKY130 contains 31 adders, comparators, and multiplexers.
+
+
 \section{DFF: a Complex Cell}
+
+The most complex cells are storage cells. The SKY130 high-density library contains 60 latches and flip-flops. One DFF (a positive edge-triggered flip-flop) that we saw in the introduction section is the \myref{https://skywater-pdk.readthedocs.io/en/main/contents/libraries/sky130_fd_sc_hd/cells/dfxtp/README.html}{dfxtp} standard cell. Figure~\ref{fig:dfxtp:layout} shows the layout of that DFF. The \code{dfxtp} cell contains 24 transistors and has a width of 7.36\,{\textmu}m, which is more than 5 times larger than a NAND2 cell. This makes the basic DFF one of the largest cells in the library. Several more complex flip-flops exist, including an (asynchronous) reset and scan chain logic. For example, a scan DFF with set, reset, complementary outputs needs 48 transistors and is almost double the size of a simple DFF.
+
+\begin{figure}
+  \centering
+  \includegraphics[scale=0.2]{figures/sky130_fd_sc_hd__dfxtp_1}
+  \caption{The GDSII layout of one of the most complex gates, a DFF.}
+  \label{fig:dfxtp:layout}
+\end{figure}
+
 
 \section{Placement of Standard Cells}
 
-Note that the cells are placed tightly so that the top and bottom metals form continuous power strips. Similarly, the n-well is shared between the standard cells. Empty space between cells is filled with so-called filler cells. Furthermore, SKY130 cells do not contain connections between the p-substrate and GND and the n-well to VDD (called a tapeless library to save space). Therefore, tap cells need to be inserted that tie the n-well to power (VDD) and the p-substrate to ground (GND).
+The cells are placed tightly so that the top and bottom metals form continuous power strips. Similarly, the n-well is shared between the standard cells. Empty space between cells is filled with so-called filler cells. Furthermore, SKY130 cells do not contain connections between the p-substrate and GND and the n-well to VDD (called a tapeless library to save space). Therefore, tap cells need to be inserted that tie the n-well to power (VDD) and the p-substrate to ground (GND).
 
 Standard cells can also be mirrored, so that GND is on top and VDD on bottom. In that case, power rails can be shared between rows of standard cells. Figure~\ref{fig:std:cell:rows} shows a screenshot of a GDSII rendered by the Tiny Tapout 3D GDS viewer. Metal 1, which is used for the power supply of the standard cells, is shown in blue. The n-well is shown in grey. Thus, one row has the n-well on top and the other row on the bottom. Two rows share the power lines and the n-wells.
 
@@ -868,14 +891,19 @@ Tiny Tapout provides a guide on how to \myref{https://tinytapeout.com/guides/lay
 
 \section{FABs}
 
+Fab is the short form of fabrication facility, the fabrication plants that produce our chips. At the time of writing, there are three fabs that have their PDKs in open source. The open-sourcing of PDKs started with Google and \myref{https://en.wikipedia.org/wiki/SkyWater_Technology}{SkyWater Technology} by open-sourcing their SKY130 PDK in 2020.
+
+The next fab that opened up their PDK with Google was \myref{https://gf.com/}{GlobalFoundries} opening their GF180MCU PDK. After Google stopped supporting shuttles with GF180, \myref{https://wafer.space/}{wafer.space} is now managing MPWs with GF180.
+
+In 2023, the Leibniz Institute for High Performance Microelectronics (\myref{https://en.wikipedia.org/wiki/Innovations_for_High_Performance_Microelectronics}{IHP}) open-sourced their \myref{https://github.com/IHP-GmbH/IHP-Open-PDK}{SG13G2 PDK}. Note that there have not been any Google-sponsored shuttles at IHP. Germany funded \myref{https://wiki.f-si.org/images/d/d6/FSIC_2024_update_on_IHP_open_PDK_submit_free_open_source_designs.pdf}{free IHP MPW shuttles} through the Federal Ministry of Education and Research for non-commercial open-source chip designs, including university education and research in 2024.
 
 
-\section{PDK}
+\section{PDKs}
 
- SkyWater's SKY130 [4], GlobalFoundries'
+SkyWater's SKY130 [4], GlobalFoundries'
 GF180MCU [5], and IHP's SG13G2 [6].
 
-\url{https://github.com/IHP-GmbH/IHP-Open-PDK}
+\todo{What is the content of a PDK and which are available?}
 
 IHP does not have the right to open-source its proprietary standard cell library. Therefore, they use the standard cell library that was open-sourced by SkyWater. The two processes are similar enough that a requalification was enough to provide a working solution in open source. However, those cells are not a perfect match for the IHP process. Therefore, students from ETH Zurich under the lead of Frank K. G\"urkaynak designed a new standard cell library for IHP as part of a course~\cite{castaneda2026ez130t8}.
 The open-source EZ standard-cell library for IHP SG13G2 is available at \url{https://ez.ethz.ch}.
@@ -925,7 +953,7 @@ The simulation results in the expected load curve of a capacitor as shown in Fig
 \begin{figure}
   \centering
   \includegraphics[width=0.7\textwidth]{figures/spice-rc}
-  \caption{Impulse response of a simple RC low-pass circuit.}
+  \caption{Response to a rising input, approximating a step response, of a simple RC low-pass circuit.}
   \label{fig:rc}
 \end{figure}
 
@@ -978,6 +1006,10 @@ Install Ngspice locally and run the two examples (rc.spice and inverter.spice). 
 
 
 We have shown you how to model an inverter with built-in transistors and default parameters. For a more realistic simulation, change that SPICE simulation to use the transistors from the SKY130 PDK.
+
+\subsection{Simulate a Standard Cell}
+
+Pick a standard cell from the SKY130 PDK and simulate it in SPICE.
 
 \chapter{Driving LibreLane from Python}
 
@@ -1616,7 +1648,7 @@ timing/e/background/.style={fill=lightgray}
 \label{fig:async:timing}
 \end{figure}
 
-Figure~\ref{fig:async:timing} shows a read and write transaction with an so-called \emph{asynchronous} device. The terminology of asynchronous devices is from the Wishbone spec. It just means that for a single clock cycle bus transaction, the \code{ACK} signals need to be generated combinationally from \code{CYC} and \code{STB}. 
+Figure~\ref{fig:async:timing} shows a read and write transaction with a so-called \emph{asynchronous} device. The terminology of asynchronous devices is from the Wishbone spec. It just means that for a single clock cycle bus transaction, the \code{ACK} signals need to be generated combinationally from \code{CYC} and \code{STB}. 
 
 \begin{figure}
 \centering
