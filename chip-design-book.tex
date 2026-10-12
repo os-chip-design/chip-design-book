@@ -798,7 +798,7 @@ In our discussion of standard gates, we view transistors as simple switches that
 \end{figure}
 
 The SkyWater documentation of the inverter can be found on this \myref{https://skywater-pdk.readthedocs.io/en/main/contents/libraries/sky130_fd_sc_hd/cells/inv/README.html}{page}.
-Figure~\ref{fig:inv1} shows the GDSII layout of the two-transistor inverter. The top PMOS transistor is connected to the VDD rail (called VPR) and the bottom to the GND rail.
+Figure~\ref{fig:inv1} shows the GDSII layout of the two-transistor inverter. The top PMOS transistor is connected to the VDD rail (called VPWR) and the bottom to the GND rail.
 As SKY130 uses a p-substrate, the PMOS transistor needs an n-well, which is shown as a (partially filled) green rectangle.
 
 \begin{figure}
@@ -822,7 +822,7 @@ SKY130 contains several inverter cells for different drive strengths. Concrete w
 \section{NAND: a Universal Gate}
 
 With the pull-up and pull-down transistors, we can create AND and OR functionality. Two transistors in series result in an AND function. Two transistors in parallel result in an OR function. The basic pull-up/pull-down setup results in an inverting function. The next interesting function is a 2-input NAND gate. A NAND gate outputs 0 only if both inputs are 1. Or, in other words, the output is 1 if either of the two inputs is 0. That means the pull-down network needs two transistors in series and the pull-up network has both transistors in parallel.
-Figure~\ref{fig:inverter} shows the schematic of the NAND gate.
+Figure~\ref{fig:nand} shows the schematic of the NAND gate.
 
 \begin{figure}
   \centering
@@ -848,7 +848,7 @@ The n-well is shown as a (partially filled) green rectangle. Note that the n-wel
 
 \section{Further Combinational Cells}
 
-Although a NAND gate is a universal gate, standard cell libraries contain many more cells. E.g., the SKY130 high-density library contains 153 AND, OR, NAND, or NOR cells and 8 XOR or XNOR cells. Furthermore, libraries contain so-called compound gates. Those are gates that combine AND and OR functions. E.g., an AO21 is a two-input AND followed by an OR with one additional input. Some of those gates also include inversion. These gates are efficient as they are directly implemented with the pull-up and pull-down networks. For example, an \myref{https://sky130-unofficial.readthedocs.io/en/latest/contents/libraries/sky130_fd_sc_hd/cells/a21oi/README.html}{AOI21} gate is an AND gate feeding into a NOR gate. This cell can be implemented directly by just 6 transistors, instead of 10 transistors (4 for a NAND, 2 for an inverter, and 4 for the NOR gate).
+Although a NAND gate is a universal gate, standard cell libraries contain many more cells. E.g., the SKY130 high-density library contains 153 AND, OR, NAND, or NOR cells and 8 XOR or XNOR cells. Note that those numbers also include different drive-strength versions of the gates. Furthermore, libraries contain so-called compound gates. Those are gates that combine AND and OR functions. E.g., an AO21 is a two-input AND followed by an OR with one additional input. Some of those gates also include inversion. These gates are efficient as they are directly implemented with the pull-up and pull-down networks. For example, an \myref{https://sky130-unofficial.readthedocs.io/en/latest/contents/libraries/sky130_fd_sc_hd/cells/a21oi/README.html}{AOI21} gate is an AND gate feeding into a NOR gate. This cell can be implemented directly by just 6 transistors, instead of 10 transistors (4 for a NAND, 2 for an inverter, and 4 for the NOR gate).
 Figure~\ref{fig:a21oi} shows the circuit of such an AOI21 gate.
 
 \begin{figure}
@@ -863,15 +863,47 @@ The SKY130 high-density library contains 115 AND-OR-INV and OR-AND-INV gates and
 
 \section{DFF: a Complex Cell}
 
-The most complex cells are storage cells. The SKY130 high-density library contains 60 latches and flip-flops. One DFF (a positive edge-triggered flip-flop) that we saw in the introduction section is the \myref{https://skywater-pdk.readthedocs.io/en/main/contents/libraries/sky130_fd_sc_hd/cells/dfxtp/README.html}{dfxtp} standard cell. Figure~\ref{fig:dfxtp:layout} shows the layout of that DFF. The \code{dfxtp} cell contains 24 transistors and has a width of 7.36\,{\textmu}m, which is more than 5 times larger than a NAND2 cell. This makes the basic DFF one of the largest cells in the library. Several more complex flip-flops exist, including an (asynchronous) reset and scan chain logic. For example, a scan DFF with set, reset, complementary outputs needs 48 transistors and is almost double the size of a simple DFF.
+The most complex standard cells are storage cells. The SKY130 high-density library contains 60 latches and flip-flops. One DFF (a positive edge-triggered flip-flop) that we saw in the introduction section is the \myref{https://skywater-pdk.readthedocs.io/en/main/contents/libraries/sky130_fd_sc_hd/cells/dfxtp/README.html}{dfxtp} standard cell. Figure~\ref{fig:dfxtp:layout} shows the layout of that DFF. The \code{dfxtp} cell contains 24 transistors and has a width of 7.36\,{\textmu}m, which is more than 5 times larger than a NAND2 cell. This makes the basic DFF one of the largest cells in the library. Several more complex flip-flops exist, including an (asynchronous) reset and scan chain logic. For example, a scan DFF with set and reset needs 48 transistors and is almost double the size of a simple DFF.
 
 \begin{figure}
   \centering
   \includegraphics[scale=0.2]{figures/sky130_fd_sc_hd__dfxtp_1}
-  \caption{The GDSII layout of one of the most complex gates, a DFF.}
+  \caption{The GDSII layout of one of the most complex standard cells, a DFF.}
   \label{fig:dfxtp:layout}
 \end{figure}
 
+\section{Description of Standard Cells}
+
+We have seen two representations of standard cells so far: a schematic with the transistors and the chip layout. The tools for chip design need different files for the standard cells: (1) a GDSII file to describe the physical layout, (2) a LEF file describing the physical dimensions, pin locations, and possible routing obstructions, (3) a Liberty file for the timing information, (4) a Verilog model that can be used in simulation, and (5) a SPICE file describing the transistor-level circuit for electrical simulation.
+
+These files can be found in the PDK under the folder \code{libs.ref} and subfolders. For example, all the standard cells of the high-density library for SKY130 can be found in a single GDS file:
+\begin{verbatim}
+~/.ciel/sky130A/libs.ref/sky130_fd_sc_hd/gds/sky130_fd_sc_hd.gds
+\end{verbatim}
+
+\subsection{GDSII File}
+
+\myref{http://en.wikipedia.org/wiki/GDSII}{GDSII}, which stands for graphic design system II, is a file format originally defined by the Calma company, a vendor for graphic systems. Today, GDSII is the de facto standard representing integrated circuits. It is a binary format representing the geometric shapes, text labels, and other information. GDSII is used to represent standard cell layouts, but also to represent complete chip designs. It is the file that is sent to a fab for the tapeout of a chip.
+
+
+GDSII was originally a proprietary file format, which was unintentionally open-sourced by circulating the \myref{http://bitsavers.informatik.uni-stuttgart.de/pdf/calma/GDS_II_Stream_Format_Manual_6.0_Feb87.pdf}{GDSII Stream Format Manual} with customers.
+As GDSII predates the IEEE standard for floating-point formats, it uses its own floating-point representation.
+
+\subsection{LEF File}
+
+LEF stands for library exchange format and is a text-based format to represent a standard cell to be used by place and route tools. The \myref{https://www.ispd.cc/contests/18/lefdefref.pdf}{file format} was originally developed by Cadence. The LEF file is an abstract view of a component representing its size, individual shapes, and pins. The feature of a LEF file is that it represents a standard cell without exposing proprietary transistor-level details of the cell.
+
+The LEF file omits information on timing or individual transistors. It provides the information needed to place cells and wire them up. Besides size and pin information, it also contains obstruction information, e.g., layer li1 rectangles. Layer li1 is used in SKY130 for local connection within the standard cell.
+
+All standard cells are described in a single LEF file. Listing~\ref{lst:lef} shows the heading for the NAND2 gate.
+
+
+\lstinputlisting[float, caption={Start of NAND2 section in the LEF file.}, label={lst:lef}, frame=tb, captionpos=b]{code/nand.lef}
+
+
+\subsection{Liberty File}
+\subsection{Verilog Model}
+\subsection{SPICE Model}
 
 \section{Placement of Standard Cells}
 
@@ -989,10 +1021,10 @@ We can simulate standard cells from the PDK. Listing~\ref{lst:sim:spice} shows t
   \centering
   \includegraphics[width=0.7\textwidth]{figures/spice-nand}
   \caption{Simulation of a NAND gate.}
-  \label{fig:nand}
+  \label{fig:nand:sim}
 \end{figure}
 
-Figure~\ref{fig:nand} shows the simulation of the NAND gate. We start with both inputs (a, b) low and then switch one after the other to high and then back to low. We see the correct logical behavior, but also electrical behavior, such as rise and fall times or some overshooting.
+Figure~\ref{fig:nand:sim} shows the simulation of the NAND gate. We start with both inputs (a, b) low and then switch one after the other to high and then back to low. We see the correct logical behavior, but also electrical behavior, such as rise and fall times or some overshooting.
 
 \section{Exercises}
 
