@@ -1,0 +1,34 @@
+
+    cell ("sky130_fd_sc_hd__nand2_1") {
+        leakage_power () {
+            value : 0.0002796000;
+            when : "!A&B";
+        }
+        leakage_power () {
+            value : 0.0000300588;
+            when : "!A&!B";
+        }
+...
+        area : 3.7536000000;
+        cell_footprint : "sky130_fd_sc_hd__nand2";
+        cell_leakage_power : 0.0021179600;
+...
+        pin ("A") {
+            capacitance : 0.0023150000;
+            clock : "false";
+            direction : "input";
+            fall_capacitance : 0.0022540000;
+            internal_power () {
+                fall_power ("power_inputs_1") {
+                    index_1("0.0100000000, 0.0230506000, 0.0531329000, 0.1224740000, 0.2823110000, 0.6507430000, 1.5000000000");
+                    values("0.0047914000, 0.0048016000, 0.0048250000, 0.0048257000, 0.0048275000, 0.0048316000, 0.0048409000");
+                }
+                rise_power ("power_inputs_1") {
+...
+                }
+            }
+            max_transition : 1.5000000000;
+            related_ground_pin : "VGND";
+            related_power_pin : "VPWR";
+            rise_capacitance : 0.0023750000;
+        }
