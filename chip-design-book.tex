@@ -911,9 +911,17 @@ The TT corner is used for baseline evaluations; the SS corner for checking setup
 The Liberty file format was originally developed by Synopsys. It represents cell data to allow static timing analysis tools (e.g., OpenSTA in LibreLane) to perform the timing analysis.
 The file contains power and timing information. All values are represented by a lookup table. For power, it contains leakage power and dynamic power consumption. For timing, propagation delay, transition time, and timing constraints are represented.
 
+\subsection{Verilog Models}
 
-\subsection{Verilog Model}
-\subsection{SPICE Model}
+The standard cell library also contains Verilog models of the cells. The models are distributed over two files: \code{primitives.v} and \code{sky130_fd_sc_hd.v}. Those models can be used for a netlist simulation.
+
+The storing cells (latches and DFFs) are described by a special Verilog syntax that is called user-defined primitives (in \code{primitives.v}). Instead of a \code{module}, the definition starts with the keyword \code{primitive}. The primitive is described by a table, listing all input conditions and output values.
+
+The combinational cells are described in \code{sky130_fd_sc_hd.v}. Listing~\ref{lst:nand:v} shows the definition of NAND2. Note that \code{nand} is already a Verilog built-in primitive.
+
+\lstinputlisting[float, caption={Part of the NAND2 section in the Verilog file.}, label={lst:nand:v}, frame=tb, captionpos=b]{code/nand.v}
+
+\subsection{SPICE Models}
 
 \section{Placement of Standard Cells}
 
