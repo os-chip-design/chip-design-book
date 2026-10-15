@@ -876,10 +876,32 @@ The most complex standard cells are storage cells. The SKY130 high-density libra
 
 We have seen two representations of standard cells so far: a schematic with the transistors and the chip layout. The tools for chip design need different files for the standard cells: (1) a GDSII file to describe the physical layout, (2) a LEF file describing the physical dimensions, pin locations, and possible routing obstructions, (3) a Liberty file for the timing information, (4) a Verilog model that can be used in simulation, and (5) a SPICE file describing the transistor-level circuit for electrical simulation.
 
+\begin{table*}
+    \caption{File formats and tool usage/operation}
+    \centering
+    \begin{tabular}{ll}
+        \toprule
+File format & Relevant tool or operation \\
+        \midrule
+GDSII & KLayout, Magic, DRC, LVS, stream-out \\
+LEF & OpenROAD floorplanning, placement, routing \\
+Liberty & Yosys technology mapping, OpenSTA timing analysis \\
+Verilog & Icarus Verilog, Verilator, gate-level simulation \\
+SPICE & ngspice electrical simulation, LVS reference netlists \\
+        \bottomrule
+    \end{tabular}
+    \label{tab:std:cell:files}
+\end{table*}
+
+Table~\ref{tab:std:cell:files} shows the relation between the different file formats and the tools using them or the operation. 
+
 These files can be found in the PDK under the folder \code{libs.ref} and subfolders. For example, all the standard cells of the high-density library for SKY130 can be found in a single GDS file:
 \begin{verbatim}
 ~/.ciel/sky130A/libs.ref/sky130_fd_sc_hd/gds/sky130_fd_sc_hd.gds
 \end{verbatim}
+
+Note that those file formats are also used to represent a hard macro and the final chip (found in the run folder under the sub-folder \code{final}.
+
 
 \subsection{GDSII File}
 
@@ -909,7 +931,7 @@ The TT corner is used for baseline evaluations; the SS corner for checking setup
 \lstinputlisting[float, caption={Part of the NAND2 section in the Liberty file.}, label={lst:lib}, frame=tb, captionpos=b]{code/nand.lib}
 
 The Liberty file format was originally developed by Synopsys. It represents cell data to allow static timing analysis tools (e.g., OpenSTA in LibreLane) to perform the timing analysis.
-The file contains power and timing information. All values are represented by a lookup table. For power, it contains leakage power and dynamic power consumption. For timing, propagation delay, transition time, and timing constraints are represented.
+The file contains power and timing information. Several values are represented by a lookup table. For power, it contains leakage power and dynamic power consumption. For timing, propagation delay, transition time, and timing constraints are represented.
 
 \subsection{Verilog Models}
 
@@ -922,6 +944,10 @@ The combinational cells are described in \code{sky130_fd_sc_hd.v}. Listing~\ref{
 \lstinputlisting[float, caption={Part of the NAND2 section in the Verilog file.}, label={lst:nand:v}, frame=tb, captionpos=b]{code/nand.v}
 
 \subsection{SPICE Models}
+
+Finally, the cell library also contains SPICE models for the cells. Listing~\ref{lst:nand:spice} shows the SPICE model of the NAND2 standard cell. WE can see the two PMOS (pfet) and two NMOS (nfet) transistors instantiated. We can see that the two PMOS transistors are connected in parallel between VPWR and the output Y, and the two NMOS transistors are connected in series between the output Y and VGND.
+
+\lstinputlisting[float, caption={The SPICE model for the NAND2 standard cell.}, label={lst:nand:spice}, frame=tb, captionpos=b]{code/nand.spice}
 
 \section{Placement of Standard Cells}
 
@@ -978,7 +1004,7 @@ We have three PDKs available in open source. Therefore, we can compare them as a
 
 \section{Spice Simulation}
 
-SPICE, which stands for simulation program with integrated circuit emphasis, is an analog electronic circuit simulator. SPICE was originally developed by Laurence W. Nagel with direction from Prof. Donald Pederson at the Electronics Research Laboratory of UC Berkeley. The initial version of \myref{https://bwrcs.eecs.berkeley.edu/Classes/IcBook/SPICE/}{SPICE} was released in 1973 in the public domain~\cite{Nagel:M382}.
+SPICE, which stands for simulation program with integrated circuit emphasis, is an analog electronic circuit simulator. SPICE was originally developed by Laurence W. Nagel with direction from Prof.~Donald Pederson at the Electronics Research Laboratory of UC Berkeley. The initial version of \myref{https://bwrcs.eecs.berkeley.edu/Classes/IcBook/SPICE/}{SPICE} was released in 1973 in the public domain~\cite{Nagel:M382}.
 
 The SPICE project has been taken up by many commercial and open-source projects. 
 \myref{https://ngspice.sourceforge.io/}{Ngspice} is a popular open-source version of the SPICE simulator. Specifically, extending the latest stable release of Berkeley SPICE, version 3f.5, which was released in 1993.
@@ -991,7 +1017,7 @@ Circuits are described in plain text and may contain resistors, capacitors, indu
 Listing~\ref{lst:rc} shows a SPICE description of an RC low-pass circuit with an input signal rising between 100\,{\textmu}s and 150\,{\textmu}s from 0\,V to 1\,V. We can run the simulation with ngspice as follows:
 
 
-\lstinputlisting[float, caption={Simple RC circuit (\myref{https://github.com/os-chip-design/chip-design-book/blob/main/code/rc.spice}{\code{rc.spice}}).}, label={lst:rc}, frame=tb, captionpos=b]{code/rc.spice}
+\lstinputlisting[float, caption={A simple RC circuit (\myref{https://github.com/os-chip-design/chip-design-book/blob/main/code/rc.spice}{\code{rc.spice}}).}, label={lst:rc}, frame=tb, captionpos=b]{code/rc.spice}
 
 
 \begin{verbatim}
@@ -1015,7 +1041,7 @@ The simulation results in the expected load curve of a capacitor as shown in Fig
 \end{figure}
 
 
-\lstinputlisting[float, caption={An inverter. (\myref{https://github.com/os-chip-design/chip-design-book/blob/main/code/inverter.spice}{\code{inverter.spice}}).}, label={lst:spice:inverter}, frame=tb, captionpos=b]{code/inverter.spice}
+\lstinputlisting[float, caption={An inverter (\myref{https://github.com/os-chip-design/chip-design-book/blob/main/code/inverter.spice}{\code{inverter.spice}}).}, label={lst:spice:inverter}, frame=tb, captionpos=b]{code/inverter.spice}
 
 
 
