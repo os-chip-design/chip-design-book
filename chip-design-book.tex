@@ -437,7 +437,7 @@ This example is an adder, including registers at the input and output ports, so 
 
 
 Furthermore, you need a configuration for your flow. You can find all possible configuration parameters at the
-\myref{https://librelane.readthedocs.io/en/latest/reference/common_flow_vars.html}{Universal Flow Configuration Variables} section of the LibreLane documentation. However, most variables can be left at their default values. Config files can support more than one PDK, see the \myref{https://github.com/librelane/librelane/blob/main/librelane/examples/spm/config.yaml}{LibreLane example}.
+\myref{https://librelane.readthedocs.io/en/latest/reference/common_flow_vars.html}{Universal Flow Configuration Variables} section of the LibreLane documentation. However, most variables can be left at their default values. Config files can support more than one PDK; see the \myref{https://github.com/librelane/librelane/blob/main/librelane/examples/spm/config.yaml}{LibreLane example}.
 
 The configuration can be in YAML or JSON format.
 We will use the \code{adder.yaml} file with a minimal configuration, as shown in Listing~\ref{lst:adder:yaml}.
@@ -777,7 +777,7 @@ In theory, one needs only a universal gate, such as a NAND gate, to implement an
 
 We show the layout of standard cells from the first open-source PDK of SkyWater.
 All cell drawings are from the \myref{https://skywater-pdk.readthedocs.io/en/main/}{SkyWater SKY130 PDK documentation}, Copyright 2020, SkyWater PDK Authors under the Apache-2.0 license.
-The SkyWater foundry provides seven \myref{https://skywater-pdk.readthedocs.io/en/main/contents/libraries/foundry-provided.html}{standard cell libraries}.
+The SkyWater foundry provides seven \myref{https://skywater-pdk.readthedocs.io/en/main/contents/libraries/foundry-provided.html}{standard cell libraries}. The list of available cells, e.g., for the high-density version,  can be found as \myref{https://sky130-unofficial.readthedocs.io/en/latest/contents/libraries/sky130_fd_sc_hd/README.html}{part of the documentation}.
 
 Standard cells have a common height, e.g., the high-density library from SkyWater 2.720\,{\textmu}m. The width is variable, but a multiple of a grid of 0.460\,{\textmu}m. For example, a NAND2 has a width of 3 grids, which is 1.380\,{\textmu}m.
 
@@ -900,6 +900,8 @@ These files can be found in the PDK under the folder \code{libs.ref} and subfold
 ~/.ciel/sky130A/libs.ref/sky130_fd_sc_hd/gds/sky130_fd_sc_hd.gds
 \end{verbatim}
 
+The list of available cells can be found as \myref{https://sky130-unofficial.readthedocs.io/en/latest/contents/libraries/sky130_fd_sc_hd/README.html}{part of the documentation.}
+
 Note that those file formats are also used to represent a hard macro and the final chip (found in the run folder under the sub-folder \code{final}.
 
 
@@ -965,26 +967,20 @@ Tiny Tapout provides a guide on how to \myref{https://tinytapeout.com/guides/lay
   \label{fig:std:cell:rows}
 \end{figure}
 
-\section{FABs}
+\section{FABs and Open PDKs}
 
-Fab is the short form of fabrication facility, the fabrication plants that produce our chips. At the time of writing, there are three fabs that have their PDKs in open source. The open-sourcing of PDKs started with Google and \myref{https://en.wikipedia.org/wiki/SkyWater_Technology}{SkyWater Technology} by open-sourcing their SKY130 PDK in 2020.
+Fab is the short form of fabrication facility, the fabrication plants that produce our chips. To produce the chips, we need access to the foundry's process design kit (PDK) and standard cells. At the time of writing, there are three fabs that have their PDKs in open source.
 
-The next fab that opened up their PDK with Google was \myref{https://gf.com/}{GlobalFoundries} opening their GF180MCU PDK. After Google stopped supporting shuttles with GF180, \myref{https://wafer.space/}{wafer.space} is now managing MPWs with GF180.
+The open-sourcing of PDKs started with Google and \myref{https://en.wikipedia.org/wiki/SkyWater_Technology}{SkyWater Technology} by open-sourcing their SKY130 PDK in June 2020.
+The standard cells and technology underlying the SKY130 process come from SkyWater Technology Foundry. The open-source PDK and cell libraries were released in collaboration with Google and Efabless.
 
-In 2023, the Leibniz Institute for High Performance Microelectronics (\myref{https://en.wikipedia.org/wiki/Innovations_for_High_Performance_Microelectronics}{IHP}) open-sourced their \myref{https://github.com/IHP-GmbH/IHP-Open-PDK}{SG13G2 PDK}. Note that there have not been any Google-sponsored shuttles at IHP. Germany funded \myref{https://wiki.f-si.org/images/d/d6/FSIC_2024_update_on_IHP_open_PDK_submit_free_open_source_designs.pdf}{free IHP MPW shuttles} through the Federal Ministry of Education and Research for non-commercial open-source chip designs, including university education and research in 2024.
+The next fab that opened up its PDK with Google was \myref{https://gf.com/}{GlobalFoundries}, which opened its GF180MCU PDK. The PDK is GlobalFoundries' 180~nm MCU bulk process technology (GF180MCU). It was released in August 2022 through a partnership between Google and GlobalFoundries.
+The MCU version of the PDK is the low-cost (slow) process intended for 8-bit microcontrollers (see also \myref{https://wafer.space/gf180}{GF 180~nm Technologies}). The open-source standard cells use 5V transistors, which are slow. Running them at 3.3 V will even lower the maximum frequency. However, a \myref{https://www.crowdsupply.com/wafer-space/gf180mcu-run-3/updates/a-need-for-speed-tholins-own-standard-cell-library}{new standard cell library} targeting 3.3~V is in development.
+After Google stopped supporting shuttles with GF180, \myref{https://wafer.space/}{wafer.space} is now managing MPWs with GF180.
 
-
-\section{PDKs}
-
-SkyWater's SKY130 [4], GlobalFoundries'
-GF180MCU [5], and IHP's SG13G2 [6].
-
-\todo{What is the content of a PDK and which are available?}
-
+In February 2023, the Leibniz Institute for High Performance Microelectronics (\myref{https://en.wikipedia.org/wiki/Innovations_for_High_Performance_Microelectronics}{IHP}) open-sourced their \myref{https://github.com/IHP-GmbH/IHP-Open-PDK}{SG13G2 PDK}. Note that there have not been any Google-sponsored shuttles at IHP. Germany funded \myref{https://wiki.f-si.org/images/d/d6/FSIC_2024_update_on_IHP_open_PDK_submit_free_open_source_designs.pdf}{free IHP MPW shuttles} through the Federal Ministry of Education and Research for non-commercial open-source chip designs, including university education and research in 2024.
 IHP does not have the right to open-source its proprietary standard cell library. Therefore, they use the standard cell library that was open-sourced by SkyWater. The two processes are similar enough that a requalification was enough to provide a working solution in open source. However, those cells are not a perfect match for the IHP process. Therefore, students from ETH Zurich under the lead of Frank K. G\"urkaynak designed a new standard cell library for IHP as part of a course~\cite{castaneda2026ez130t8}.
 The open-source EZ standard-cell library for IHP SG13G2 is available at \url{https://ez.ethz.ch}.
-
-
 
 \section{Exploring Standard Cells}
 
@@ -1086,6 +1082,38 @@ We have shown you how to model an inverter with built-in transistors and default
 \subsection{Simulate a Standard Cell}
 
 Pick a standard cell from the SKY130 PDK and simulate it in SPICE.
+
+\chapter{Static Timing Analysis}
+
+The maximum clock frequency of a design is one of the three interesting results (PPA: power, performance, and area). We cannot use simulation to find out what the maximum clock frequency of our design can achieve. This approach would not scale, and we would never be sure if we found the critical path. Therefore, we need to perform static timing analysis (STA). LibreLane (and OpenROAD) use \myref{https://github.com/the-openroad-project/opensta}{OpenSTA} for static timing analysis. Static timing analysis analyzes timing paths using delay models from the standard cell library and extracted interconnect models.
+
+For static timing analysis, one requests a specific clock frequency as part of the input configuration. E.g., 50~MHz in the configuration .yaml file:
+\begin{verbatim}
+CLOCK_PERIOD: 20
+\end{verbatim}
+
+Then STA can check if there are no setup time or hold time violations. Setup time violations can be avoided by clocking a circuit slower. However, hold time violations are harder to fix. LibreLane can insert buffers to fix hold time violations.
+The LibreLane documentation contains an article on how to achieve the so-called \myref{https://librelane.readthedocs.io/en/stable/usage/timing_closure/index.html}{Timing Closure}.
+
+SKY130 includes three different process characterizations for the standard cells: (1) typical (TT) at normal conditions, (2) slow/worts-case (SS) for high temperature, low voltage, and slow silicon, and (3) fast/best-case (FF) for low temperature, high voltage, and fast silicon.
+The TT corner is used for baseline evaluations; the SS corner for checking setup timing violations, and the FF corner to check hold timing violations. STA is performed for all corners, at different voltages, and at different temperatures.
+
+LiberLane performs timing analysis at several places in the flow. The first run is before PnR using the synthesized netlist. The second runs are performed at different points in the flow, using different versions of the floorplan. The final run uses the final netlist with the parasitics extracted from the final floorplan. This gives the most accurate timing analysis of the final design.
+
+The post-place-and-route report nn-openroad-stastpnr contains a \code{summary.rpt} for an overview of all slacks for the different process characterizations.
+
+\section{Exercises}
+
+In the introduction exercise, we synthesized the pipelined adder with a requested clock period of 20 ns. This requests a frequency of 50~MHz, which is very conservative for this adder. Explore what the maximum clock frequency that can be achieved.
+
+One option would be a binary search with different periods and new complete LibreLane runs. For this tiny design, this is an option. However, a better starting point is to explore the timing report to explore the slack is for a better starting point. Furthermore, you can rerun the timing analysis with different configurations without resynthesizing the full design.
+
+An estimation of the maximum frequency can be found at the end of the \code{clock.rpt} report, under \code{report_clock_min_period}. First decide for which corner you should use this estimation.
+
+Then rerun the timing analysis with that number; if it passes, check with a slightly higher frequency. Does it fail now?
+
+What can be done to push the design to a higher frequency? Will this also change the design size? Does Yosys support timing-driven synthesis? If not, what changes might result in higher frequencies?
+
 
 \chapter{Driving LibreLane from Python}
 
@@ -1833,11 +1861,6 @@ With the help of Google, \myref{https://gf.com/}{GlobalFoundries} (GF) open-sour
 
 \myref{https://wafer.space/}{wafer.space} is a new MPW service started in 2025 by Tim Ansell and Leo Moser.
 The chips are manufactured at \myref{https://gf.com/manufacturing/singapore/}{GF Singapore}.
-The PDK for these tapeouts is GlobalFoundries' 180~nm MCU bulk process technology (GF180MCU).
-The MCU version of the PDK is the low-cost (slow) process intended for 8-bit microcontrollers (see also \myref{https://wafer.space/gf180}{GF 180~nm Technologies}). The open-source standard cells use 5V transistors, which are slow. Running them at 3.3 V will even lower the maximum frequency. However, a \myref{https://www.crowdsupply.com/wafer-space/gf180mcu-run-3/updates/a-need-for-speed-tholins-own-standard-cell-library}{new standard cell library} targeting 3.3~V is in development.
-
-
-
 wafer.space uses GlobalFoundries' 180 nm PDK (gf180mcu PDK) and offers 1000 dies with a user space of 20\;mm$^2$.
 The \myref{https://github.com/wafer-space/gf180mcu-project-template}{project template} is just the pad ring, two SRAM macros, and a counter as an example design.
 
@@ -2297,10 +2320,9 @@ Using Open-Source Tools} by  Martin Schoeberl. The source on GitHub for this boo
 
 Hardware designers and computer engineers like to use acronyms.
 However, it takes time to get used to them. Here is a list of common terms
-related to digital design and computer architecture.
+related to digital design, chip design, and computer architecture.
 
 \todo{Add the very many acronyms we use in chip design...}
-
 
 \begin{description}
 \item [ADC] analog-to-digital converter
@@ -2319,6 +2341,7 @@ related to digital design and computer architecture.
 \item [EDA] electronic design automation
 \item [EMC] electromagnetic compatibility
 \item [ESD] electrostatic discharge
+\item [FAB] fabrication facility
 \item [FF] flip-flop
 \item [FIFO] first-in, first-out
 \item [FPGA] field-programmable gate array
@@ -2348,6 +2371,7 @@ related to digital design and computer architecture.
 \item [SCL] standard cell library
 \item [SDRAM] synchronous DRAM
 \item [SRAM] static random access memory
+\item [STA] static timing analysis
 \item [UART] universal asynchronous receiver/transmitter
 \item [VHDL] VHSIC hardware description language
 \item [VHSIC] very high speed integrated circuit
