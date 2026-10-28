@@ -1104,11 +1104,11 @@ The post-place-and-route report nn-openroad-stastpnr contains a \code{summary.rp
 
 \section{Exercises}
 
-In the introduction exercise, we synthesized the pipelined adder with a requested clock period of 20 ns. This requests a frequency of 50~MHz, which is very conservative for this adder. Explore what the maximum clock frequency that can be achieved.
+In the introduction exercise, we synthesized the pipelined adder with a requested clock period of 20 ns. This requests a frequency of 50~MHz, which is very conservative for this adder. Explore what maximum clock frequency can be achieved.
 
 One option would be a binary search with different periods and new complete LibreLane runs. For this tiny design, this is an option. However, a better starting point is to explore the timing report to explore the slack is for a better starting point. Furthermore, you can rerun the timing analysis with different configurations without resynthesizing the full design.
 
-An estimation of the maximum frequency can be found at the end of the \code{clock.rpt} report, under \code{report_clock_min_period}. First decide for which corner you should use this estimation.
+An estimation of the maximum frequency can be found at the end of the \code{clock.rpt} report, under \code{report_clock_min_period}. First, decide for which corner you should use this estimation.
 
 Then rerun the timing analysis with that number; if it passes, check with a slightly higher frequency. Does it fail now?
 
