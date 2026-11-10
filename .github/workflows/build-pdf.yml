@@ -8,6 +8,10 @@ on:
 permissions:
   contents: write
 
+concurrency:
+  group: book-pdf-release
+  cancel-in-progress: false
+
 jobs:
   build-pdf:
     runs-on: ubuntu-latest
@@ -32,12 +36,22 @@ jobs:
         shell: bash
         run: |
           test -s chip-design-book.pdf
-          tag="pdf-${GITHUB_RUN_NUMBER}-${GITHUB_RUN_ATTEMPT}"
           printf 'Book built from commit %s on branch %s.\n\nBuild: %s/%s/actions/runs/%s\n' \
             "$GITHUB_SHA" "$GITHUB_REF_NAME" "$GITHUB_SERVER_URL" \
             "$GITHUB_REPOSITORY" "$GITHUB_RUN_ID" > release-notes.md
-          gh release create "$tag" chip-design-book.pdf \
-            --target "$GITHUB_SHA" \
-            --title "Book PDF — ${GITHUB_SHA:0:7}" \
-            --notes-file release-notes.md \
-            --latest=false
+          if gh release view latest > /dev/null 2>&1; then
+            gh release upload latest chip-design-book.pdf --clobber
+            gh api --method PATCH "repos/${GH_REPO}/git/refs/tags/latest" \
+              -f sha="$GITHUB_SHA" -F force=true
+            gh release edit latest --title "Latest PDF" \
+              --notes-file release-notes.md --latest
+          else
+            gh release create latest chip-design-book.pdf \
+              --target "$GITHUB_SHA" --title "Latest PDF" \
+              --notes-file release-notes.md --latest
+          fi
+
+          # Remove the initial numbered release after publishing its replacement.
+          if gh release view pdf-1-1 > /dev/null 2>&1; then
+            gh release delete pdf-1-1 --cleanup-tag --yes
+          fi
