@@ -5,12 +5,13 @@ This eBook is an introduction to chip design for a Bachelor level class.
 The practical labs focus on using open-source tools only.
 This enables the students to explore and tinker in chip design on their own laptops.
 
-[Download the latest PDF](https://github.com/os-chip-design/chip-design-book/releases/download/latest/chip-design-book.pdf).
+[Read the latest PDF](https://os-chip-design.github.io/chip-design-book/chip-design-book.pdf)
+or [download it](https://github.com/os-chip-design/chip-design-book/releases/download/latest/chip-design-book.pdf).
 
 [![Book Cover](chip-cover-small.jpg)](https://www.imm.dtu.dk/~masca/chip-design-book.html)
 
 GitHub Actions builds the PDF on each push and updates the single `latest`
-release. Build locally with `make`.
+release. Pushes to `main` also publish it to GitHub Pages. Build locally with `make`.
 
 Cite this book as:
 ```
