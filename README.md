@@ -10,9 +10,6 @@ or [download it](https://github.com/os-chip-design/chip-design-book/releases/dow
 
 [![Book Cover](chip-cover-small.jpg)](https://www.imm.dtu.dk/~masca/chip-design-book.html)
 
-GitHub Actions builds the PDF on each push and updates the single `latest`
-release. Pushes to `main` also publish it to GitHub Pages. Build locally with `make`.
-
 Cite this book as:
 ```
 @Book{chip:design:book,
