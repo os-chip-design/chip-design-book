@@ -1,0 +1,43 @@
+name: Build and release PDF
+
+on:
+  push:
+    branches: ['**']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-pdf:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Check out the source
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Build the book
+        uses: xu-cheng/latex-action@v4
+        with:
+          root_file: chip-design-book.tex
+          # Match the TeX Live version used for the local book build.
+          texlive_version: '2022'
+
+      - name: Publish PDF as a release asset
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        shell: bash
+        run: |
+          test -s chip-design-book.pdf
+          tag="pdf-${GITHUB_RUN_NUMBER}-${GITHUB_RUN_ATTEMPT}"
+          printf 'Book built from commit %s on branch %s.\n\nBuild: %s/%s/actions/runs/%s\n' \
+            "$GITHUB_SHA" "$GITHUB_REF_NAME" "$GITHUB_SERVER_URL" \
+            "$GITHUB_REPOSITORY" "$GITHUB_RUN_ID" > release-notes.md
+          gh release create "$tag" chip-design-book.pdf \
+            --target "$GITHUB_SHA" \
+            --title "Book PDF — ${GITHUB_SHA:0:7}" \
+            --notes-file release-notes.md \
+            --latest=false
